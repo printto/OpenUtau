@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using Avalonia;
 using Avalonia.Media;
+using Avalonia.Platform;
 using OpenUtau.Core;
 using OpenUtau.Core.Util;
 using Serilog;
@@ -13,9 +14,33 @@ public class CustomTheme {
     public static Dictionary<string, string> Themes = [];
     public static ThemeYaml Default;
 
+    private static readonly string[] BundledThemes = { "printmov-theme.yaml" };
+
     static CustomTheme() {
         Default = new ThemeYaml();
+        SeedBundledThemes();
         ListThemes();
+    }
+
+    private static void SeedBundledThemes() {
+        try {
+            Directory.CreateDirectory(PathManager.Inst.ThemesPath);
+            foreach (var fileName in BundledThemes) {
+                string destPath = Path.Combine(PathManager.Inst.ThemesPath, fileName);
+                if (File.Exists(destPath)) {
+                    continue;
+                }
+                var uri = new Uri($"avares://OpenUtau/Assets/Themes/{fileName}");
+                if (!AssetLoader.Exists(uri)) {
+                    continue;
+                }
+                using var stream = AssetLoader.Open(uri);
+                using var dest = File.Create(destPath);
+                stream.CopyTo(dest);
+            }
+        } catch (Exception e) {
+            Log.Error(e, "Failed to seed bundled themes.");
+        }
     }
 
     public static void Load(string themeName) {
