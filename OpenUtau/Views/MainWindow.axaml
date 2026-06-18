@@ -72,8 +72,9 @@
             <MenuItem Header="{Binding ClearCacheHeader}" Click="OnMenuClearCache"/>
             <MenuItem Header="{DynamicResource menu.tools.debugwindow}" Click="OnMenuDebugWindow"/>
             <MenuItem Header="{DynamicResource phoneticassistant.caption}" Click="OnMenuPhoneticAssistant"/>
+            <!-- <MenuItem Header="{DynamicResource menu.tools.singer.install}" Click="OnMenuInstallSinger"/> -->
+            <MenuItem Header="{DynamicResource menu.tools.singer.catalog}" Click="OnMenuSingerCatalog"/>
             <MenuItem Header="{DynamicResource menu.tools.singers}" Click="OnMenuSingers"/>
-            <MenuItem Header="{DynamicResource menu.tools.singer.install}" Click="OnMenuInstallSinger"/>
             <MenuItem Header="{DynamicResource menu.tools.wavtoolresampler.install}" Click="OnMenuInstallWavtoolResampler"/>
             <MenuItem Header="{DynamicResource menu.tools.packages}" Click="OnMenuPackageManager"/>
             <MenuItem Header="{DynamicResource menu.tools.prefs}" Click="OnMenuPreferences"/>
