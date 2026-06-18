@@ -134,7 +134,7 @@ namespace OpenUtau.App.ViewModels {
                 var note = selectedNotes.First();
 
                 Lyric = note.lyric;
-                Tone = MusicMath.GetToneName(note.tone);
+                Tone = MusicMath.GetToneName(note.tone, Preferences.Default.UseFlats);
                 Tuning = note.tuning;
                 SetTuningFontWeight();
                 if (note.pitch.data.Count == 2) {
@@ -253,7 +253,7 @@ namespace OpenUtau.App.ViewModels {
                     Lyric = note.lyric;
                     this.RaisePropertyChanged(nameof(Lyric));
                 } else if (cmd is MoveNoteCommand) {
-                    Tone = MusicMath.GetToneName(note.tone);
+                    Tone = MusicMath.GetToneName(note.tone, Preferences.Default.UseFlats);
                     this.RaisePropertyChanged(nameof(Tone));
                 } else if (cmd is ChangeNoteTuningCommand) {
                     Tuning = note.tuning;
@@ -363,7 +363,7 @@ namespace OpenUtau.App.ViewModels {
                         }
                     } catch {
                         var note = selectedNotes.FirstOrDefault();
-                        Tone = note != null ? MusicMath.GetToneName(note.tone) : string.Empty;
+                        Tone = note != null ? MusicMath.GetToneName(note.tone, Preferences.Default.UseFlats) : string.Empty;
                         this.RaisePropertyChanged(nameof(Tone));
                     }
                 } else if (tag == "Tuning") {

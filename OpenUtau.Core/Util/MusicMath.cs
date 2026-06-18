@@ -22,6 +22,11 @@ namespace OpenUtau.Core {
             Tuple.Create("B" , KeyColor.White),
         };
 
+        // Flat spellings for the same 12 pitch classes, used for display only.
+        public static readonly string[] FlatNamesInOctave = {
+            "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B",
+        };
+
         public static readonly Dictionary<string, int> NameInOctave = new Dictionary<string, int> {
             { "C", 0 }, { "C#", 1 }, { "Db", 1 },
             { "D", 2 }, { "D#", 3 }, { "Eb", 3 },
@@ -62,8 +67,24 @@ namespace OpenUtau.Core {
             "7",
         };
 
+        // Sharp spelling. Used as-is when passing tone names to resamplers,
+        // wavtools, DiffSinger and voicebank lookups, which expect sharps.
         public static string GetToneName(int noteNum) {
-            return noteNum < 0 ? string.Empty : KeysInOctave[noteNum % 12].Item1 + (noteNum / 12 - 1).ToString();
+            return GetToneName(noteNum, false);
+        }
+
+        // Display-oriented overload that can spell accidentals as flats.
+        public static string GetToneName(int noteNum, bool useFlat) {
+            if (noteNum < 0) {
+                return string.Empty;
+            }
+            string name = useFlat ? FlatNamesInOctave[noteNum % 12] : KeysInOctave[noteNum % 12].Item1;
+            return name + (noteNum / 12 - 1).ToString();
+        }
+
+        // Pitch class name only (no octave), e.g. for key signature labels.
+        public static string GetKeyName(int key, bool useFlat) {
+            return useFlat ? FlatNamesInOctave[key % 12] : KeysInOctave[key % 12].Item1;
         }
 
         public static int NameToTone(string name) {

@@ -95,6 +95,7 @@ namespace OpenUtau.App.ViewModels {
         // Appearance
         [Reactive] public string ThemeName { get; set; }
         [Reactive] public int DegreeStyle { get; set; }
+        [Reactive] public bool UseFlats { get; set; }
         [Reactive] public bool UseTrackColor { get; set; }
         [Reactive] public bool ShowPortrait { get; set; }
         [Reactive] public bool ShowIcon { get; set; }
@@ -177,6 +178,7 @@ namespace OpenUtau.App.ViewModels {
             ThemeName = Preferences.Default.ThemeName;
             PenPlusDefault = Preferences.Default.PenPlusDefault;
             DegreeStyle = Preferences.Default.DegreeStyle;
+            UseFlats = Preferences.Default.UseFlats;
             UseTrackColor = Preferences.Default.UseTrackColor;
             ShowPortrait = Preferences.Default.ShowPortrait;
             ShowIcon = Preferences.Default.ShowIcon;
@@ -268,6 +270,12 @@ namespace OpenUtau.App.ViewModels {
             this.WhenAnyValue(vm => vm.DegreeStyle)
                 .Subscribe(degreeStyle => {
                     Preferences.Default.DegreeStyle = degreeStyle;
+                    Preferences.Save();
+                    MessageBus.Current.SendMessage(new PianorollRefreshEvent("Part"));
+                });
+            this.WhenAnyValue(vm => vm.UseFlats)
+                .Subscribe(useFlats => {
+                    Preferences.Default.UseFlats = useFlats;
                     Preferences.Save();
                     MessageBus.Current.SendMessage(new PianorollRefreshEvent("Part"));
                 });

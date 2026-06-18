@@ -200,7 +200,7 @@ namespace OpenUtau.App.ViewModels {
                     Keys.Clear();
                     Keys.AddRange(MusicMath.KeysInOctave
                         .Select((key, index) => new MenuItemViewModel {
-                            Header = $"1={key.Item1}",
+                            Header = $"1={MusicMath.GetKeyName(index, Preferences.Default.UseFlats)}",
                             Command = SetKeyCommand,
                             CommandParameter = index,
                         }));
@@ -350,7 +350,7 @@ namespace OpenUtau.App.ViewModels {
 
         private void UpdateKey(){
             Key = userKey;
-            KeyText = "1="+MusicMath.KeysInOctave[userKey].Item1;
+            KeyText = "1="+MusicMath.GetKeyName(userKey, Preferences.Default.UseFlats);
         }
 
         public void OnXZoomed(Point position, double delta) {

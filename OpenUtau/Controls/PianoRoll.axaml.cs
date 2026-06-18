@@ -261,6 +261,12 @@ namespace OpenUtau.App.Controls {
                 ? WindowState.Normal
                 : WindowState.FullScreen;
         }
+        void OnMenuUseFlats(object sender, RoutedEventArgs args) {
+            Preferences.Default.UseFlats = !Preferences.Default.UseFlats;
+            Preferences.Save();
+            ViewModel.RaisePropertyChanged(nameof(ViewModel.UseFlats));
+            MessageBus.Current.SendMessage(new PianorollRefreshEvent("Part"));
+        }
         void OnMenuDegreeStyle(object sender, RoutedEventArgs args) {
             if (sender is MenuItem menu && int.TryParse(menu.Tag?.ToString(), out int tag)) {
                 Preferences.Default.DegreeStyle = tag;

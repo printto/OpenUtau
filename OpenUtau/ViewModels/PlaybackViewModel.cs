@@ -12,7 +12,7 @@ namespace OpenUtau.App.ViewModels {
         public int BeatUnit => Project.timeSignatures[0].beatUnit;
         public double Bpm => Project.tempos[0].bpm;
         public int Key => Project.key;
-        public string KeyName => MusicMath.KeysInOctave[Key].Item1;
+        public string KeyName => MusicMath.GetKeyName(Key, Preferences.Default.UseFlats);
         public int Resolution => Project.resolution;
         public int PlayPosTick => DocManager.Inst.playPosTick;
         public TimeSpan PlayPosTime => TimeSpan.FromMilliseconds((int)Project.timeAxis.TickPosToMsPos(DocManager.Inst.playPosTick));

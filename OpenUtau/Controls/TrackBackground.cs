@@ -115,7 +115,7 @@ namespace OpenUtau.App.Controls {
                         : isAltTrack ? ThemeManager.BlackKeyNameBrush
                             : ThemeManager.WhiteKeyNameBrush;
                     int tone = ViewConstants.MaxTone - 1 - track;
-                    string toneName = MusicMath.GetToneName(tone);
+                    string toneName = MusicMath.GetToneName(tone, Preferences.Default.UseFlats);
                     var toneTextLayout = TextLayoutCache.Get(toneName, brush, 12);
                     var toneTextPosition = new Point(Bounds.Width - 4 - (int)toneTextLayout.Width, (int)(top + (TrackHeight - toneTextLayout.Height) / 2));
                     using (var state = context.PushTransform(Matrix.CreateTranslation(toneTextPosition))) {

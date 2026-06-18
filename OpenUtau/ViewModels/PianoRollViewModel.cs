@@ -58,6 +58,7 @@ namespace OpenUtau.App.ViewModels {
         public bool ShowIcon { get => Preferences.Default.ShowIcon; }
         public bool ShowGhostNotes { get => Preferences.Default.ShowGhostNotes; }
         public bool UseTrackColor { get => Preferences.Default.UseTrackColor; }
+        public bool UseFlats { get => Preferences.Default.UseFlats; }
         public bool DegreeStyle0 { get => Preferences.Default.DegreeStyle == 0 ? true : false; }
         public bool DegreeStyle1 { get => Preferences.Default.DegreeStyle == 1 ? true : false; }
         public bool DegreeStyle2 { get => Preferences.Default.DegreeStyle == 2 ? true : false; }
