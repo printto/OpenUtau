@@ -63,6 +63,7 @@ namespace OpenUtau.App.ViewModels {
 
         [Reactive] public PlaybackViewModel PlaybackViewModel { get; set; }
         [Reactive] public TracksViewModel TracksViewModel { get; set; }
+        public SingerCatalogViewModel SingerCatalog { get; } = new SingerCatalogViewModel();
         [Reactive] public ReactiveCommand<string, Unit>? OpenRecentCommand { get; private set; }
         [Reactive] public ReactiveCommand<string, Unit>? OpenTemplateCommand { get; private set; }
         public ObservableCollectionExtended<MenuItemViewModel> OpenRecentMenuItems => openRecentMenuItems;

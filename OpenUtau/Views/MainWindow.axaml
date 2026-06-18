@@ -88,7 +88,33 @@
         </Menu>
       <Carousel SelectedIndex="{Binding Page}" >
         <!--Welcome page-->
-        <Grid Margin="60,50,60,40" RowDefinitions="Auto,Auto,Auto,*" ColumnDefinitions="*,*">
+        <Grid Margin="60,50,60,40" RowDefinitions="Auto,Auto,Auto,*" ColumnDefinitions="*,300">
+          <Grid.Resources>
+            <DataTemplate x:Key="SingerTile">
+              <Border Width="240" Margin="0,0,8,8" Padding="12" CornerRadius="8"
+                      Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                      BorderBrush="{DynamicResource SystemControlHighlightBaseMediumLowBrush}" BorderThickness="1">
+                <StackPanel Spacing="8">
+                  <Grid ColumnDefinitions="Auto,*">
+                    <Border Width="44" Height="44" CornerRadius="6" Margin="0,0,10,0" ClipToBounds="True"
+                            Background="{DynamicResource SystemControlBackgroundBaseLowBrush}">
+                      <Image Source="{Binding Image}" Stretch="UniformToFill" IsVisible="{Binding HasImage}"/>
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                      <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14" TextTrimming="CharacterEllipsis"/>
+                      <TextBlock Text="{Binding Author}" FontSize="11" Opacity="0.7" TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                  </Grid>
+                  <TextBlock Text="{Binding Description}" FontSize="12" Opacity="0.8" TextWrapping="Wrap" MaxLines="2" Height="34"/>
+                  <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Text="{Binding VersionDisplay}" FontSize="11" Opacity="0.6" VerticalAlignment="Center" IsVisible="{Binding !IsExternal}"/>
+                    <Button Grid.Column="1" Content="{Binding ActionLabel}" IsEnabled="{Binding CanAction}" IsVisible="{Binding !IsExternal}" Click="OnRepoInstallClick"/>
+                    <Button Grid.Column="1" Content="{DynamicResource singercatalog.action.website}" IsVisible="{Binding IsExternal}" Click="OnRepoOpenWebClick"/>
+                  </Grid>
+                </StackPanel>
+              </Border>
+            </DataTemplate>
+          </Grid.Resources>
           <!--Startup warnings-->
           <StackPanel Grid.Row="0" Grid.ColumnSpan="2">
             <Button Click="OnWelcomeRecovery" Height="40" Content="{Binding RecoveryString}"
@@ -168,8 +194,8 @@
           </StackPanel>
 
           <!-- Recent files -->
-          <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,24,0,8" Text="{DynamicResource welcome.recent}" FontSize="20"/>
-          <ListBox ItemsSource="{Binding RecentFiles}" Grid.Row="3" Grid.Column="0" Margin="0,0,15,0" ScrollViewer.VerticalScrollBarVisibility="Auto" VerticalAlignment="Stretch">
+          <TextBlock Grid.Row="2" Grid.Column="1" Margin="15,24,0,8" Text="{DynamicResource welcome.recent}" FontSize="20"/>
+          <ListBox ItemsSource="{Binding RecentFiles}" Grid.Row="3" Grid.Column="1" Margin="15,0,0,0" ScrollViewer.VerticalScrollBarVisibility="Auto" VerticalAlignment="Stretch">
             <ListBox.Styles>
               <Style Selector="ListBoxItem">
                 <Setter Property="Height" Value="NaN" />
@@ -188,25 +214,31 @@
             </ListBox.ItemTemplate>
           </ListBox>
 
-          <!-- Template files -->
-          <TextBlock Grid.Row="2" Grid.Column="1" Margin="15,24,0,8" Text="{DynamicResource welcome.template}" FontSize="20"/>
-          <ListBox ItemsSource="{Binding TemplateFiles}" Grid.Row="3" Grid.Column="1" Margin="15,0,0,0" ScrollViewer.VerticalScrollBarVisibility="Auto" VerticalAlignment="Stretch">
-            <ListBox.Styles>
-              <Style Selector="ListBoxItem">
-                <Setter Property="Height" Value="NaN" />
-                <Setter Property="MinHeight" Value="48" />
-                <Setter Property="Padding" Value="16,0" />
-                <Setter Property="VerticalContentAlignment" Value="Center" />
-              </Style>
-            </ListBox.Styles>
-            <ListBox.ItemTemplate>
-              <DataTemplate x:DataType="vm:RecentFileInfo">
-                <StackPanel Margin="0,4" PointerPressed="OnWelcomeTemplate" Background="Transparent">
-                  <TextBlock FontSize="16" Text="{Binding Name}"/>
-                </StackPanel>
-              </DataTemplate>
-            </ListBox.ItemTemplate>
-          </ListBox>
+          <!-- Singer Repository -->
+          <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,24,0,8" Text="{DynamicResource singercatalog.caption}" FontSize="20"/>
+          <ScrollViewer Grid.Row="3" Grid.Column="0" Margin="0,0,15,0" VerticalScrollBarVisibility="Auto" VerticalAlignment="Stretch">
+            <StackPanel>
+              <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                <TextBlock Text="{DynamicResource singercatalog.category.builtin}" FontWeight="Bold"/>
+                <TextBlock Text="{Binding SingerCatalog.BuiltInSingers.Count, StringFormat=' ({0})'}" Opacity="0.6"/>
+              </StackPanel>
+              <ItemsControl ItemsSource="{Binding SingerCatalog.BuiltInSingers}" ItemTemplate="{StaticResource SingerTile}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+              </ItemsControl>
+              <StackPanel Orientation="Horizontal" Margin="0,14,0,6">
+                <TextBlock Text="{DynamicResource singercatalog.category.public}" FontWeight="Bold"/>
+                <TextBlock Text="{Binding SingerCatalog.PublicSingers.Count, StringFormat=' ({0})'}" Opacity="0.6"/>
+              </StackPanel>
+              <ItemsControl ItemsSource="{Binding SingerCatalog.PublicSingers}" ItemTemplate="{StaticResource SingerTile}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+              </ItemsControl>
+              <TextBlock Text="{Binding SingerCatalog.Status}" FontSize="11" Opacity="0.5" Margin="0,8,0,4"/>
+            </StackPanel>
+          </ScrollViewer>
         </Grid>
       
         <!--Main page-->

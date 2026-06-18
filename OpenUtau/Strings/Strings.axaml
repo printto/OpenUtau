@@ -325,7 +325,7 @@ Do you want to continue by splitting at the nearest position after current playh
   <system:String x:Key="menu.tools.singer.install">Install Singer...</system:String>
   <system:String x:Key="menu.tools.singer.installadv">Install Singer (Advanced)...</system:String>
   <system:String x:Key="menu.tools.singer.catalog">Install Singers from Repository...</system:String>
-  <system:String x:Key="singercatalog.caption">Singer Catalog</system:String>
+  <system:String x:Key="singercatalog.caption">Singer Repository</system:String>
   <system:String x:Key="singercatalog.refresh">Refresh</system:String>
   <system:String x:Key="singercatalog.category.builtin">Built-in Singers</system:String>
   <system:String x:Key="singercatalog.category.public">Public Singers</system:String>

@@ -619,11 +619,23 @@ namespace OpenUtau.App.Views {
 
         void OnMenuSingerCatalog(object sender, RoutedEventArgs args) {
             try {
-                var dialog = new SingerCatalogDialog() { DataContext = new SingerCatalogViewModel() };
+                var dialog = new SingerCatalogDialog() { DataContext = viewModel.SingerCatalog };
                 dialog.Show();
                 if (dialog.Position.Y < 0) dialog.Position = dialog.Position.WithY(0);
             } catch (Exception e) {
                 DocManager.Inst.ExecuteCmd(new ErrorMessageNotification(e));
+            }
+        }
+
+        async void OnRepoInstallClick(object sender, RoutedEventArgs e) {
+            if (sender is Control control && control.DataContext is SingerCardViewModel card) {
+                await SingerRepositoryActions.InstallAsync(this, viewModel.SingerCatalog, card);
+            }
+        }
+
+        void OnRepoOpenWebClick(object sender, RoutedEventArgs e) {
+            if (sender is Control control && control.DataContext is SingerCardViewModel card) {
+                SingerRepositoryActions.OpenWebsite(card);
             }
         }
 
