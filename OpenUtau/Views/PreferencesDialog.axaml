@@ -13,6 +13,7 @@
         Width="700" Height="460">
   <Window.Resources>
     <vm:CultureNameConverter x:Key="cultureNameConverter"/>
+    <vm:LanguageSelectorConverter x:Key="languageSelectorConverter"/>
   </Window.Resources>
   <Window.Styles>
     <Style Selector="StackPanel">
@@ -70,7 +71,7 @@
           <ComboBox ItemsSource="{Binding Languages}" SelectedItem="{Binding Language}">
             <ComboBox.ItemTemplate>
               <DataTemplate>
-                <TextBlock Text="{Binding Converter={StaticResource cultureNameConverter}}"/>
+                <TextBlock Text="{Binding Converter={StaticResource languageSelectorConverter}}"/>
               </DataTemplate>
             </ComboBox.ItemTemplate>
           </ComboBox>
