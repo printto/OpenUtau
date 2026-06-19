@@ -3,9 +3,9 @@
 ManifestDPIAware true
 
 ; HM NIS Edit Wizard helper defines
-!define PRODUCT_NAME "OpenUtau"
-!define PRODUCT_PUBLISHER "stakira"
-!define PRODUCT_WEB_SITE "https://www.openutau.com"
+!define PRODUCT_NAME "OpenUtau - PRINTmov Edition"
+!define PRODUCT_PUBLISHER "PRINTmov"
+!define PRODUCT_WEB_SITE "https://www.printmov.com"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 
@@ -29,7 +29,7 @@ ManifestDPIAware true
 ; Instfiles page
 !insertmacro MUI_PAGE_INSTFILES
 ; Finish page
-!define MUI_FINISHPAGE_RUN "$INSTDIR\OpenUtau.exe"
+!define MUI_FINISHPAGE_RUN "$INSTDIR\OpenUtau-PRINTmov.exe"
 !insertmacro MUI_PAGE_FINISH
 
 ; Uninstaller pages
@@ -47,8 +47,8 @@ ManifestDPIAware true
 ; MUI end ------
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "OpenUtau-win-${ARCH}.exe"
-InstallDir "$PROGRAMFILES64\OpenUtau"
+OutFile "OpenUtau-PRINTmov-win-${ARCH}.exe"
+InstallDir "$PROGRAMFILES64\OpenUtau-PRINTmov"
 ShowInstDetails show
 ShowUnInstDetails show
 
@@ -63,8 +63,8 @@ Section "MainSection" SEC01
 SectionEnd
 
 Section -AdditionalIcons
-  CreateShortCut "$SMPROGRAMS\OpenUtau.lnk" "$INSTDIR\OpenUtau.exe"
-  CreateShortCut "$DESKTOP\OpenUtau.lnk" "$INSTDIR\OpenUtau.exe"
+  CreateShortCut "$SMPROGRAMS\OpenUtau - PRINTmov Edition.lnk" "$INSTDIR\OpenUtau-PRINTmov.exe"
+  CreateShortCut "$DESKTOP\OpenUtau - PRINTmov Edition.lnk" "$INSTDIR\OpenUtau-PRINTmov.exe"
 SectionEnd
 
 Section -Post
@@ -76,15 +76,15 @@ Section -Post
   WriteUninstaller "$INSTDIR\uninst.exe"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninst.exe"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\OpenUtau.exe"
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\OpenUtau-PRINTmov.exe"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
 
-  WriteRegStr HKCR ".ustx" "" "OpenUtauFile"
-  WriteRegStr HKCR "OpenUtauFile" "" "OpenUtau Sequence File"
-  WriteRegStr HKCR "OpenUtauFile\DefaultIcon" "" "$INSTDIR\OpenUtau.exe"
-  WriteRegStr HKCR "OpenUtauFile\shell\open\command" "" '"$INSTDIR\OpenUtau.exe" "%1"'
+  WriteRegStr HKCR ".ustx" "" "OpenUtauPRINTmovFile"
+  WriteRegStr HKCR "OpenUtauPRINTmovFile" "" "OpenUtau PRINTmov Sequence File"
+  WriteRegStr HKCR "OpenUtauPRINTmovFile\DefaultIcon" "" "$INSTDIR\OpenUtau-PRINTmov.exe"
+  WriteRegStr HKCR "OpenUtauPRINTmovFile\shell\open\command" "" '"$INSTDIR\OpenUtau-PRINTmov.exe" "%1"'
 SectionEnd
 
 Section "VC Redist"
@@ -110,11 +110,10 @@ Section Uninstall
   Delete "$INSTDIR\*"
   RMDir "$INSTDIR"
 
-  Delete "$SMPROGRAMS\OpenUtau.lnk"
-  Delete "$DESKTOP\OpenUtau.lnk"
+  Delete "$SMPROGRAMS\OpenUtau - PRINTmov Edition.lnk"
+  Delete "$DESKTOP\OpenUtau - PRINTmov Edition.lnk"
 
-  DeleteRegKey HKCR ".ustx"
-  DeleteRegKey HKCR "OpenUtauFile"
+  DeleteRegKey HKCR "OpenUtauPRINTmovFile"
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   SetAutoClose true

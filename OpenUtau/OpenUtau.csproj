@@ -7,6 +7,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
+    <AssemblyName>OpenUtau-PRINTmov</AssemblyName>
+    <RootNamespace>OpenUtau</RootNamespace>
     <SatelliteResourceLanguages>none</SatelliteResourceLanguages>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -17,14 +19,14 @@
     <StartupObject />
   </PropertyGroup>
   <PropertyGroup>
-    <CFBundleName>OpenUtau</CFBundleName>
-    <CFBundleDisplayName>OpenUtau</CFBundleDisplayName>
-    <CFBundleIdentifier>com.stakira.openutau</CFBundleIdentifier>
+    <CFBundleName>OpenUtau - PRINTmov Edition</CFBundleName>
+    <CFBundleDisplayName>OpenUtau - PRINTmov Edition</CFBundleDisplayName>
+    <CFBundleIdentifier>com.printmov.openutau-printmov</CFBundleIdentifier>
     <CFBundleVersion>0.0.0</CFBundleVersion>
     <CFBundleShortVersionString>0.0.0</CFBundleShortVersionString>
     <CFBundlePackageType>APPL</CFBundlePackageType>
     <CFBundleSignature>????</CFBundleSignature>
-    <CFBundleExecutable>OpenUtau</CFBundleExecutable>
+    <CFBundleExecutable>OpenUtau-PRINTmov</CFBundleExecutable>
     <CFBundleIconFile>OpenUtau.icns</CFBundleIconFile>
     <NSPrincipalClass>NSApplication</NSPrincipalClass>
     <NSHighResolutionCapable>true</NSHighResolutionCapable>

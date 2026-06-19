@@ -30,7 +30,8 @@ public class CustomTheme {
                 if (File.Exists(destPath)) {
                     continue;
                 }
-                var uri = new Uri($"avares://OpenUtau/Assets/Themes/{fileName}");
+                var asmName = typeof(CustomTheme).Assembly.GetName().Name;
+                var uri = new Uri($"avares://{asmName}/Assets/Themes/{fileName}");
                 if (!AssetLoader.Exists(uri)) {
                     continue;
                 }
