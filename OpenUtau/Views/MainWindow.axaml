@@ -107,9 +107,10 @@
                   </Grid>
                   <TextBlock Text="{Binding Description}" FontSize="12" Opacity="0.8" TextWrapping="Wrap" MaxLines="2" Height="34"/>
                   <Grid ColumnDefinitions="*,Auto">
-                    <TextBlock Text="{Binding VersionDisplay}" FontSize="11" Opacity="0.6" VerticalAlignment="Center" IsVisible="{Binding !IsExternal}"/>
-                    <Button Grid.Column="1" Content="{Binding ActionLabel}" IsEnabled="{Binding CanAction}" IsVisible="{Binding !IsExternal}" Click="OnRepoInstallClick"/>
-                    <Button Grid.Column="1" Content="{DynamicResource singercatalog.action.website}" IsVisible="{Binding IsExternal}" Click="OnRepoOpenWebClick"/>
+                    <TextBlock Text="{Binding VersionDisplay}" FontSize="11" Opacity="0.6" VerticalAlignment="Center" IsVisible="{Binding ShowVersion}"/>
+                    <ProgressBar Grid.ColumnSpan="2" Minimum="0" Maximum="100" Value="{Binding Progress}" IsVisible="{Binding ShowProgress}" VerticalAlignment="Center"/>
+                    <Button Grid.Column="1" Content="{Binding ActionLabel}" IsEnabled="{Binding CanAction}" IsVisible="{Binding ShowInstallButton}" Click="OnRepoInstallClick"/>
+                    <Button Grid.Column="1" Content="{DynamicResource singercatalog.action.website}" IsVisible="{Binding ShowWebButton}" Click="OnRepoOpenWebClick"/>
                   </Grid>
                 </StackPanel>
               </Border>
@@ -236,7 +237,7 @@
                   <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
               </ItemsControl>
-              <TextBlock Text="{Binding SingerCatalog.Status}" FontSize="11" Opacity="0.5" Margin="0,8,0,4"/>
+              <TextBlock Text="{Binding SingerCatalog.Status}" FontSize="11" Opacity="0.5" Margin="0,8,0,4" IsVisible="{Binding SingerCatalog.HasStatus}"/>
             </StackPanel>
           </ScrollViewer>
         </Grid>

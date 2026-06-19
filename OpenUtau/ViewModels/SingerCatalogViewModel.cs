@@ -29,6 +29,7 @@ namespace OpenUtau.App.ViewModels {
         [Reactive] public string InstalledVersion { get; set; } = string.Empty;
         [Reactive] public bool Resolved { get; set; }
         [Reactive] public bool Busy { get; set; }
+        [Reactive] public double Progress { get; set; }
 
         public bool HasUpdate => IsInstalled && Resolved
             && !string.IsNullOrEmpty(LatestVersion)
@@ -41,6 +42,10 @@ namespace OpenUtau.App.ViewModels {
             ? ThemeManager.GetString("singercatalog.action.install")
             : (HasUpdate ? ThemeManager.GetString("singercatalog.action.update")
                          : ThemeManager.GetString("singercatalog.action.installed"));
+        public bool ShowProgress => Busy;
+        public bool ShowVersion => !IsExternal && !Busy;
+        public bool ShowInstallButton => !IsExternal && !Busy;
+        public bool ShowWebButton => IsExternal && !Busy;
 
         public SingerCardViewModel(CatalogSinger singer) {
             Singer = singer;
@@ -50,6 +55,10 @@ namespace OpenUtau.App.ViewModels {
                     this.RaisePropertyChanged(nameof(CanAction));
                     this.RaisePropertyChanged(nameof(VersionDisplay));
                     this.RaisePropertyChanged(nameof(ActionLabel));
+                    this.RaisePropertyChanged(nameof(ShowProgress));
+                    this.RaisePropertyChanged(nameof(ShowVersion));
+                    this.RaisePropertyChanged(nameof(ShowInstallButton));
+                    this.RaisePropertyChanged(nameof(ShowWebButton));
                 });
             if (HasImage) {
                 _ = LoadImageAsync(Singer.image_url);
@@ -74,11 +83,13 @@ namespace OpenUtau.App.ViewModels {
         public ObservableCollection<SingerCardViewModel> BuiltInSingers { get; } = new ObservableCollection<SingerCardViewModel>();
         public ObservableCollection<SingerCardViewModel> PublicSingers { get; } = new ObservableCollection<SingerCardViewModel>();
         [Reactive] public string Status { get; set; } = string.Empty;
+        public bool HasStatus => !string.IsNullOrEmpty(Status);
         [Reactive] public bool IsLoading { get; set; }
         public ReactiveCommand<Unit, Unit> RefreshCommand { get; }
 
         public SingerCatalogViewModel() {
             RefreshCommand = ReactiveCommand.CreateFromTask(RefreshAsync);
+            this.WhenAnyValue(x => x.Status).Subscribe(_ => this.RaisePropertyChanged(nameof(HasStatus)));
             _ = RefreshAsync();
         }
 
@@ -111,7 +122,7 @@ namespace OpenUtau.App.ViewModels {
 
                 Status = (BuiltInSingers.Count + PublicSingers.Count) == 0
                     ? ThemeManager.GetString("singercatalog.status.empty")
-                    : ThemeManager.GetString("singercatalog.status.ready");
+                    : string.Empty;
             } catch (Exception e) {
                 Status = ThemeManager.GetString("singercatalog.status.error");
                 DocManager.Inst.ExecuteCmd(new ErrorMessageNotification(e));
@@ -121,8 +132,7 @@ namespace OpenUtau.App.ViewModels {
         }
 
         public async Task<string?> DownloadAsync(SingerCardViewModel card) {
-            var template = ThemeManager.GetString("singercatalog.status.downloading");
-            var progress = new Progress<int>(p => Status = string.Format(template, card.Name, p));
+            var progress = new Progress<int>(p => card.Progress = p);
             return await SingerCatalog.Inst.DownloadToTempAsync(card.DownloadUrl, progress, card.Singer.sha256);
         }
 
@@ -131,11 +141,9 @@ namespace OpenUtau.App.ViewModels {
         }
 
         public async Task InstallSilentAsync(SingerCardViewModel card, string tempPath) {
-            Status = string.Format(ThemeManager.GetString("singercatalog.status.installing"), card.Name);
             await SingerCatalog.Inst.InstallDownloadedAsync(tempPath, card.Singer.type, card.Singer.encoding);
             MarkInstalled(card);
             TryDelete(tempPath);
-            Status = ThemeManager.GetString("singercatalog.status.installed");
         }
 
         public void MarkInstalled(SingerCardViewModel card) {

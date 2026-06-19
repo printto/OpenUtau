@@ -11,7 +11,6 @@ namespace OpenUtau.App.Views {
                 return;
             }
             try {
-                card.Busy = true;
                 var confirmTemplate = card.HasUpdate
                     ? ThemeManager.GetString("singercatalog.confirm.update")
                     : ThemeManager.GetString("singercatalog.confirm.install");
@@ -22,6 +21,8 @@ namespace OpenUtau.App.Views {
                 if (result != MessageBox.MessageBoxResult.Yes) {
                     return;
                 }
+                card.Progress = 0;
+                card.Busy = true;
                 var tempPath = await vm.DownloadAsync(card);
                 if (string.IsNullOrEmpty(tempPath)) {
                     return;

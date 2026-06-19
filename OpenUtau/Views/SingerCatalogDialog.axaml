@@ -6,54 +6,60 @@
         mc:Ignorable="d"
         x:Class="OpenUtau.App.Views.SingerCatalogDialog"
         Icon="/Assets/open-utau.ico"
-        Title="{DynamicResource singercatalog.caption}" Width="540" Height="600"
+        Title="{DynamicResource singercatalog.caption}" Width="540" Height="620"
         WindowStartupLocation="CenterScreen">
   <Design.DataContext>
     <vm:SingerCatalogViewModel/>
   </Design.DataContext>
+  <Window.Styles>
+    <Style Selector="Border.singerRow:pointerover">
+      <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundBaseLowBrush}"/>
+    </Style>
+  </Window.Styles>
   <Window.Resources>
     <DataTemplate x:Key="SingerRow">
-      <Border Padding="8,6" BorderThickness="0,0,0,1"
-              BorderBrush="{DynamicResource SystemControlHighlightBaseMediumLowBrush}">
+      <Border Classes="singerRow" Padding="10,9" CornerRadius="6" Background="Transparent">
         <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
-          <Border Grid.Column="0" Width="30" Height="30" Margin="0,0,10,0" CornerRadius="4"
+          <Border Grid.Column="0" Width="40" Height="40" Margin="0,0,12,0" CornerRadius="6"
                   ClipToBounds="True" Background="{DynamicResource SystemControlBackgroundBaseLowBrush}">
             <Image Source="{Binding Image}" Stretch="UniformToFill" IsVisible="{Binding HasImage}"/>
           </Border>
-          <StackPanel Grid.Column="1" VerticalAlignment="Center">
-            <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
-            <TextBlock Text="{Binding Author}" FontSize="11" Opacity="0.7" TextTrimming="CharacterEllipsis"/>
+          <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+            <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="Medium" TextTrimming="CharacterEllipsis"/>
+            <TextBlock Text="{Binding Author}" FontSize="12" Opacity="0.8" TextTrimming="CharacterEllipsis"/>
           </StackPanel>
-          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-            <TextBlock Text="{Binding VersionDisplay}" FontSize="11" Opacity="0.6"
-                       VerticalAlignment="Center" IsVisible="{Binding !IsExternal}"/>
+          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+            <TextBlock Text="{Binding VersionDisplay}" FontSize="12" Opacity="0.65"
+                       VerticalAlignment="Center" IsVisible="{Binding ShowVersion}"/>
+            <ProgressBar Width="100" Minimum="0" Maximum="100" Value="{Binding Progress}"
+                         IsVisible="{Binding ShowProgress}" VerticalAlignment="Center"/>
             <Button Content="{Binding ActionLabel}" IsEnabled="{Binding CanAction}"
-                    IsVisible="{Binding !IsExternal}" Click="OnInstallClick" MinWidth="80"/>
+                    IsVisible="{Binding ShowInstallButton}" Click="OnInstallClick" MinWidth="84"/>
             <Button Content="{DynamicResource singercatalog.action.website}"
-                    IsVisible="{Binding IsExternal}" Click="OnOpenWebClick" MinWidth="80"/>
+                    IsVisible="{Binding ShowWebButton}" Click="OnOpenWebClick" MinWidth="84"/>
           </StackPanel>
         </Grid>
       </Border>
     </DataTemplate>
   </Window.Resources>
-  <Grid Margin="10" RowDefinitions="*,Auto">
+  <Grid Margin="12" RowDefinitions="*,Auto">
     <ScrollViewer Grid.Row="0">
       <StackPanel>
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
-          <TextBlock Text="{DynamicResource singercatalog.category.builtin}" FontSize="14" FontWeight="Bold"/>
-          <TextBlock Text="{Binding BuiltInSingers.Count, StringFormat=' ({0})'}" FontSize="14" Opacity="0.6"/>
+        <StackPanel Orientation="Horizontal" Margin="10,0,0,4">
+          <TextBlock Text="{DynamicResource singercatalog.category.builtin}" FontSize="14" FontWeight="Medium"/>
+          <TextBlock Text="{Binding BuiltInSingers.Count, StringFormat=' ({0})'}" FontSize="14" Opacity="0.55"/>
         </StackPanel>
         <ItemsControl ItemsSource="{Binding BuiltInSingers}" ItemTemplate="{StaticResource SingerRow}"/>
-        <StackPanel Orientation="Horizontal" Margin="0,16,0,2">
-          <TextBlock Text="{DynamicResource singercatalog.category.public}" FontSize="14" FontWeight="Bold"/>
-          <TextBlock Text="{Binding PublicSingers.Count, StringFormat=' ({0})'}" FontSize="14" Opacity="0.6"/>
+        <StackPanel Orientation="Horizontal" Margin="10,18,0,4">
+          <TextBlock Text="{DynamicResource singercatalog.category.public}" FontSize="14" FontWeight="Medium"/>
+          <TextBlock Text="{Binding PublicSingers.Count, StringFormat=' ({0})'}" FontSize="14" Opacity="0.55"/>
         </StackPanel>
         <ItemsControl ItemsSource="{Binding PublicSingers}" ItemTemplate="{StaticResource SingerRow}"/>
       </StackPanel>
     </ScrollViewer>
 
-    <Grid Grid.Row="1" Margin="0,8,0,0" ColumnDefinitions="*,Auto">
-      <TextBlock Grid.Column="0" Text="{Binding Status}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+    <Grid Grid.Row="1" Margin="2,10,2,0" ColumnDefinitions="*,Auto">
+      <TextBlock Grid.Column="0" Text="{Binding Status}" VerticalAlignment="Center" Opacity="0.7" TextWrapping="Wrap" IsVisible="{Binding HasStatus}"/>
       <Button Grid.Column="1" Content="{DynamicResource singercatalog.refresh}" Command="{Binding RefreshCommand}"/>
     </Grid>
   </Grid>
