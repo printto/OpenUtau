@@ -378,6 +378,38 @@ namespace OpenUtau.App.ViewModels {
             return key;
         }
 
+        static bool IsDiffSingerPhonemizer(PhonemizerFactory factory) {
+            return factory.type.Namespace?.Contains("DiffSinger") ?? false;
+        }
+
+        static bool IsDefaultDiffSingerPhonemizer(PhonemizerFactory factory) {
+            return factory.name == "DiffSinger Phonemizer";
+        }
+
+        static int DiffSingerSortRank(PhonemizerFactory factory) {
+            if (IsDefaultDiffSingerPhonemizer(factory)) return 2;
+            if (!string.IsNullOrEmpty(factory.author)) return 1;
+            return 0;
+        }
+
+        static string DiffSingerPhonemizerHeader(PhonemizerFactory factory) {
+            var name = factory.name.Replace("DiffSinger", "").Replace("Phonemizer", "").Trim();
+            if (string.IsNullOrEmpty(name)) {
+                name = "Default";
+            } else if (!string.IsNullOrEmpty(factory.language)) {
+                if (!ThemeManager.TryGetString($"languages.{factory.language.ToLowerInvariant()}", out var langName)
+                    || string.IsNullOrEmpty(langName)) {
+                    langName = factory.language;
+                }
+                if (name.IndexOf(langName, StringComparison.OrdinalIgnoreCase) < 0) {
+                    name = $"{langName} {name}";
+                }
+            }
+            return string.IsNullOrEmpty(factory.author)
+                ? name
+                : $"{name} (Contributed by {factory.author})";
+        }
+
         PhonemizerFactory? FindPhonemizerByName(string name) {
             return PhonemizerFactory.Get(name);
         }
@@ -406,18 +438,38 @@ namespace OpenUtau.App.ViewModels {
                     CommandParameter = factory,
                 }));
             //more phonemizers grouped by singing language
-            items.Add(new MenuItemViewModel() {
-                Header = $"{ThemeManager.GetString("tracks.more")} ...",
-                Items = PhonemizerFactory.GetAll().GroupBy(factory => factory.language)
-                .OrderBy(group => group.Key)
-                .Select(group => new MenuItemViewModel() {
-                    Header = GetPhonemizerGroupHeader(group.Key),
-                    Items = group.Select(factory => new MenuItemViewModel() {
-                        Header = factory.ToString(),
+            var allFactories = PhonemizerFactory.GetAll();
+            var moreItems = new List<MenuItemViewModel>();
+            moreItems.Add(new MenuItemViewModel() {
+                Header = "DiffSinger",
+                Items = allFactories
+                    .Where(IsDiffSingerPhonemizer)
+                    .OrderBy(DiffSingerSortRank)
+                    .ThenBy(factory => factory.name)
+                    .Select(factory => new MenuItemViewModel() {
+                        Header = DiffSingerPhonemizerHeader(factory),
                         Command = SelectPhonemizerCommand,
                         CommandParameter = factory,
                     }).ToArray(),
-                }).ToArray()
+            });
+            moreItems.Add(new MenuItemViewModel() {
+                Header = "Legacy",
+                Items = allFactories
+                    .Where(factory => !IsDiffSingerPhonemizer(factory))
+                    .GroupBy(factory => factory.language)
+                    .OrderBy(group => group.Key)
+                    .Select(group => new MenuItemViewModel() {
+                        Header = GetPhonemizerGroupHeader(group.Key),
+                        Items = group.Select(factory => new MenuItemViewModel() {
+                            Header = factory.ToString(),
+                            Command = SelectPhonemizerCommand,
+                            CommandParameter = factory,
+                        }).ToArray(),
+                    }).ToArray(),
+            });
+            items.Add(new MenuItemViewModel() {
+                Header = $"{ThemeManager.GetString("tracks.more")} ...",
+                Items = moreItems.ToArray(),
             });
             PhonemizerMenuItems = items.ToArray();
             this.RaisePropertyChanged(nameof(PhonemizerMenuItems));

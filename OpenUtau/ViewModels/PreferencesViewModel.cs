@@ -146,15 +146,21 @@ namespace OpenUtau.App.ViewModels {
             LoadDeepFolders = Preferences.Default.LoadDeepFolderSinger;
             ToolsManager.Inst.Initialize();
             var pattern = new Regex(@"Strings\.([\w-]+)\.axaml");
-            Languages = App.GetLanguages().Keys
+            var allCultures = App.GetLanguages().Keys
                 .Select(lang => CultureInfo.GetCultureInfo(lang))
                 .ToList();
+            Languages = new List<CultureInfo> {
+                CultureInfo.InvariantCulture,
+                CultureInfo.GetCultureInfo("en-US"),
+                CultureInfo.GetCultureInfo("th-TH"),
+            };
             Language = string.IsNullOrEmpty(Preferences.Default.Language)
-                ? null
+                ? CultureInfo.InvariantCulture
                 : CultureInfo.GetCultureInfo(Preferences.Default.Language);
-            SortingOrders = Languages.ToList();
+            SortingOrders = allCultures;
             SortingOrders.Insert(0, CultureInfo.InvariantCulture);
-            SortingOrder = Preferences.Default.SortingOrder == null ? Language
+            SortingOrder = Preferences.Default.SortingOrder == null
+                ? (Equals(Language, CultureInfo.InvariantCulture) ? null : Language)
                 : string.IsNullOrEmpty(Preferences.Default.SortingOrder) ? CultureInfo.InvariantCulture
                 : CultureInfo.GetCultureInfo(Preferences.Default.SortingOrder);
             PreRender = Preferences.Default.PreRender;

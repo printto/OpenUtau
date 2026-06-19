@@ -14,6 +14,23 @@ namespace OpenUtau.App.ViewModels {
         public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
     }
 
+    public class LanguageSelectorConverter : IValueConverter {
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) {
+            if (value is CultureInfo cultureInfo) {
+                if (cultureInfo.Equals(CultureInfo.InvariantCulture)) {
+                    return "Default";
+                }
+                if (ThemeManager.TryGetString($"languages.{cultureInfo.TwoLetterISOLanguageName}", out var name)
+                    && !string.IsNullOrEmpty(name)) {
+                    return name;
+                }
+                return cultureInfo.NativeName;
+            }
+            return string.Empty;
+        }
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
+    }
+
     public class EncodingNameConverter : IValueConverter {
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => (value as Encoding)?.EncodingName ?? string.Empty;
         public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
