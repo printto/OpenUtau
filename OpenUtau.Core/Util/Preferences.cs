@@ -145,7 +145,7 @@ namespace OpenUtau.Core.Util {
             public string ThemeName = "PRINTmov";
             public bool PenPlusDefault = false;
             public int DegreeStyle;
-            public bool UseFlats = false;
+            public bool UseFlats = true;
             public bool UseTrackColor = false;
             public bool ClearCacheOnQuit = false;
             public bool PreRender = true;

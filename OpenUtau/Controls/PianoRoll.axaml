@@ -284,11 +284,11 @@
                     <CheckBox IsChecked="{Binding DegreeStyle2}" />
                   </MenuItem.Icon>
                 </MenuItem>
-              </MenuItem>
-              <MenuItem Header="{DynamicResource prefs.appearance.useflats}" Click="OnMenuUseFlats">
-                <MenuItem.Icon>
-                  <CheckBox IsChecked="{Binding UseFlats}" />
-                </MenuItem.Icon>
+                <MenuItem Header="{DynamicResource prefs.appearance.useflats}" Click="OnMenuUseFlats">
+                  <MenuItem.Icon>
+                    <CheckBox IsChecked="{Binding UseFlats}" />
+                  </MenuItem.Icon>
+                </MenuItem>
               </MenuItem>
               <MenuItem Header="{DynamicResource prefs.playback.lockstarttime}">
                 <MenuItem Header="{DynamicResource prefs.playback.lockstarttime.off}" Click="OnMenuLockStartTime" Tag="0">
