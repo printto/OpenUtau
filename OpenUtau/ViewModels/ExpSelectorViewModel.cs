@@ -94,13 +94,11 @@ namespace OpenUtau.App.ViewModels {
         }
 
         private void OnListChange() {
-            var selectedIndex = SelectedIndex;
             Descriptors.Clear();
             DocManager.Inst.Project.expressions.Values.ToList().ForEach(Descriptors.Add);
-            if (selectedIndex >= descriptors.Count) {
-                selectedIndex = Index;
-            }
-            SelectedIndex = selectedIndex;
+            var abbr = DocManager.Inst.Project.expSelectors[Index];
+            var selectedIndex = descriptors.ToList().FindIndex(d => d.abbr == abbr);
+            SelectedIndex = selectedIndex >= 0 ? selectedIndex : Index;
         }
 
         private void OnSelectExp(SelectExpressionNotification cmd) {
