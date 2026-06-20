@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="380" d:DesignHeight="320"
         x:Class="OpenUtau.App.Views.TranscribeDialog"
-        Icon="/Assets/open-utau.ico"
+        Icon="/Assets/pmou.png"
         Title="{DynamicResource dialogs.transcribe.caption}"
         WindowStartupLocation="CenterOwner"
         SizeToContent="Height" Width="380" CanResize="False">

@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OpenUtau.App.Views.MessageBox" SizeToContent="WidthAndHeight" CanResize="False"
-        Icon="/Assets/open-utau.ico"
+        Icon="/Assets/pmou.png"
         Title="MessageBox" MinWidth="300" MinHeight="150"
         WindowStartupLocation="CenterScreen">
   <ScrollViewer MaxHeight="700" VerticalScrollBarVisibility="Auto">

@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="136"
         x:Class="OpenUtau.App.Views.PhoneticAssistant"
-        Icon="/Assets/open-utau.ico"
+        Icon="/Assets/pmou.png"
         Title="{DynamicResource phoneticassistant.caption}"
         WindowStartupLocation="CenterScreen"
         Width="400" Height="136" CanResize="False">

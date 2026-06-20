@@ -6,7 +6,7 @@
         xmlns:c="using:OpenUtau.Controls"
         mc:Ignorable="d"
         x:Class="OpenUtau.App.Views.ExpressionsDialog"
-        Icon="/Assets/open-utau.ico"
+        Icon="/Assets/pmou.png"
         Title="{Binding WindowTitle}"
         WindowStartupLocation="CenterScreen"
         MinWidth="600" MinHeight="440" Width="600" Height="440">

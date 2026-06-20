@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" MinWidth="400" MinHeight="200" Width="600" Height="300"
         x:Class="OpenUtau.App.Views.LyricsDialog" WindowStartupLocation="CenterOwner"
-        Icon="/Assets/open-utau.ico"
+        Icon="/Assets/pmou.png"
         Title="{StaticResource lyrics.caption}"
         Opened="OnOpened">
   <Window.Styles>

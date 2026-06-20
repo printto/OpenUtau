@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" MinWidth="325" Width="325" Height="500"
         x:Class="OpenUtau.App.Views.ThemeEditorWindow" WindowStartupLocation="CenterOwner"
-        Icon="/Assets/open-utau.ico"
+        Icon="/Assets/pmou.png"
         Title="{DynamicResource themeeditor.title}"
         Closing="WindowClosing" Topmost="True">
   <Grid RowDefinitions="*,auto" Margin="0,10,0,10">

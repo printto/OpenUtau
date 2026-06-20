@@ -7,7 +7,7 @@
         xmlns:styles="clr-namespace:Material.Styles;assembly=Material.Styles"
         mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="460"
         x:Class="OpenUtau.App.Views.PreferencesDialog"
-        Icon="/Assets/open-utau.ico"
+        Icon="/Assets/pmou.png"
         Title="{DynamicResource prefs.caption}"
         WindowStartupLocation="CenterScreen"
         Width="700" Height="460">

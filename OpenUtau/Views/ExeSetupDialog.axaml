@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" SizeToContent="WidthAndHeight"
         x:Class="OpenUtau.App.Views.ExeSetupDialog"
-        Icon="/Assets/open-utau.ico"
+        Icon="/Assets/pmou.png"
         Title="{DynamicResource exesetup.title}">
   <Grid Margin="10">
     <Grid.RowDefinitions>

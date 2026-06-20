@@ -6,7 +6,7 @@
         xmlns:c="using:OpenUtau.Controls"
         mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="560"
         x:Class="OpenUtau.App.Views.NoteDefaultsDialog"
-        Icon="/Assets/open-utau.ico"
+        Icon="/Assets/pmou.png"
         Title="{DynamicResource pianoroll.menu.notedefaults}"
         WindowStartupLocation="CenterScreen"
         MinWidth="600" MinHeight="560" Width="600" Height="560">

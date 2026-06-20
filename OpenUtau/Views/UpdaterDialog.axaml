@@ -5,12 +5,12 @@
         mc:Ignorable="d"
         x:Class="OpenUtau.App.Views.UpdaterDialog"
         Width="400" Height="300" CanResize="False" WindowStartupLocation="CenterScreen"
-        Icon="/Assets/open-utau.ico"
+        Icon="/Assets/pmou.png"
         Title="{DynamicResource updater.caption}" Closing="OnClosing">
   <Grid RowDefinitions="*, 20, 20, *, *">
     <Image Grid.Row="0" Margin="20" Width="96" Height="96"
            VerticalAlignment="Top" HorizontalAlignment="Center"
-           Source="/Assets/open-utau.ico"/>
+           Source="/Assets/pmou.png"/>
     <Image Grid.Row="0" Height="16" Margin="0,136,0,10"
            VerticalAlignment="Top" HorizontalAlignment="Center"
            Source="/Assets/logotype.png" IsVisible="{Binding !IsDarkMode}"/>

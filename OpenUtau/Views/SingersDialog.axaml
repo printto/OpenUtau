@@ -7,7 +7,7 @@
         xmlns:c="clr-namespace:OpenUtau.App.Controls"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="640"
         x:Class="OpenUtau.App.Views.SingersDialog"
-        Icon="/Assets/open-utau.ico"
+        Icon="/Assets/pmou.png"
         Title="{DynamicResource singers.caption}" Width="1050" MinWidth="1050" MinHeight="640"
         WindowStartupLocation="CenterScreen" KeyDown="OnKeyDown">
   <Design.DataContext>

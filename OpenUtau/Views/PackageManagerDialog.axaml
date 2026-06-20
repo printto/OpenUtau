@@ -5,7 +5,7 @@
         xmlns:vm="using:OpenUtau.App.ViewModels"
         mc:Ignorable="d"
         x:Class="OpenUtau.App.Views.PackageManagerDialog"
-        Icon="/Assets/open-utau.ico"
+        Icon="/Assets/pmou.png"
         Title="{DynamicResource packages.caption}" Width="900" Height="600" WindowStartupLocation="CenterScreen">
   <Design.DataContext>
     <vm:PackageManagerViewModel/>

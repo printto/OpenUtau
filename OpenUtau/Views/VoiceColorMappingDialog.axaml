@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" MinWidth="200" MinHeight="200" Width="350" Height="350"
         x:Class="OpenUtau.App.Views.VoiceColorMappingDialog"
-        Icon="/Assets/open-utau.ico"
+        Icon="/Assets/pmou.png"
         Title="{DynamicResource dialogs.voicecolorremapping}"
         WindowStartupLocation="CenterOwner">
   <Grid RowDefinitions="40,1*,30" Margin="10">
