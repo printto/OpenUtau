@@ -30,6 +30,7 @@ namespace OpenUtau.Core.DiffSinger
 
         string defaultPause = "SP";
         protected virtual string GetDictionaryName()=>"dsdict.yaml";
+        public string DictionaryName => GetDictionaryName();
         public virtual string GetLangCode()=>String.Empty;//The language code of the language the phonemizer is made for
 
         private bool _singerLoaded;
@@ -292,6 +293,9 @@ namespace OpenUtau.Core.DiffSinger
         }
         
         protected override void ProcessPart(Note[][] phrase) {
+            if (dsConfig == null) {
+                throw new Exception($"Voicebank is not loaded for {singer?.Name ?? "(null singer)"}. Make sure the singer is installed and its dsconfig.yaml is valid.");
+            }
             float padding = 500f;//Padding time for consonants at the beginning of a sentence, ms
             float frameMs = dsConfig.frameMs();
             var startMs = timeAxis.TickPosToMsPos(phrase[0][0].position) - padding;

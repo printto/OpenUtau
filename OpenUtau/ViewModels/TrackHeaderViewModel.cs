@@ -414,6 +414,58 @@ namespace OpenUtau.App.ViewModels {
             return PhonemizerFactory.Get(name);
         }
 
+        static readonly Dictionary<Type, string?> phonemizerDictionaryNames = new Dictionary<Type, string?>();
+
+        //The dictionary file name a DiffSinger phonemizer looks for, e.g. dsdict-th.yaml. Cached per type.
+        static string? GetPhonemizerDictionaryName(PhonemizerFactory factory) {
+            if (phonemizerDictionaryNames.TryGetValue(factory.type, out var cached)) {
+                return cached;
+            }
+            string? dictName = null;
+            try {
+                if (factory.Create() is OpenUtau.Core.DiffSinger.DiffSingerBasePhonemizer phonemizer) {
+                    dictName = phonemizer.DictionaryName;
+                }
+            } catch (Exception e) {
+                Log.Error(e, $"Failed to read dictionary name for {factory.name}");
+            }
+            phonemizerDictionaryNames[factory.type] = dictName;
+            return dictName;
+        }
+
+        //The dsdict*.yaml files a singer ships, indicating the languages it supports.
+        static HashSet<string> GetSingerDictionaryFiles(USinger singer) {
+            var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            if (singer.Location == null) {
+                return result;
+            }
+            var rootPath = File.Exists(Path.Join(singer.Location, "dsdur", "dsconfig.yaml"))
+                ? Path.Combine(singer.Location, "dsdur")
+                : singer.Location;
+            try {
+                foreach (var file in Directory.EnumerateFiles(rootPath, "dsdict*.yaml")) {
+                    result.Add(Path.GetFileName(file));
+                }
+            } catch (Exception e) {
+                Log.Error(e, $"Failed to scan dictionaries in {rootPath}");
+            }
+            return result;
+        }
+
+        MenuItemViewModel[] BuildLanguageGroups(IEnumerable<PhonemizerFactory> factories) {
+            return factories
+                .GroupBy(factory => factory.language)
+                .OrderBy(group => group.Key)
+                .Select(group => new MenuItemViewModel() {
+                    Header = GetPhonemizerGroupHeader(group.Key),
+                    Items = group.Select(factory => new MenuItemViewModel() {
+                        Header = factory.ToString(),
+                        Command = SelectPhonemizerCommand,
+                        CommandParameter = factory,
+                    }).ToArray(),
+                }).ToArray();
+        }
+
         public void RefreshPhonemizers() {
             var items = new List<MenuItemViewModel>();
             //Singer default
@@ -439,38 +491,52 @@ namespace OpenUtau.App.ViewModels {
                 }));
             //more phonemizers grouped by singing language
             var allFactories = PhonemizerFactory.GetAll();
-            var moreItems = new List<MenuItemViewModel>();
-            moreItems.Add(new MenuItemViewModel() {
-                Header = "DiffSinger",
-                Items = allFactories
+            var singer = track?.Singer;
+            if (singer != null && singer.Found && singer.SingerType == USingerType.DiffSinger) {
+                //DiffSinger singer: "Supported" lists phonemizers whose dictionary the singer ships; "Legacy" lists everything.
+                var dictFiles = GetSingerDictionaryFiles(singer);
+                var supported = allFactories
                     .Where(IsDiffSingerPhonemizer)
+                    .Where(factory => {
+                        var dictName = GetPhonemizerDictionaryName(factory);
+                        return dictName != null && dictFiles.Contains(dictName);
+                    })
                     .OrderBy(DiffSingerSortRank)
                     .ThenBy(factory => factory.name)
-                    .Select(factory => new MenuItemViewModel() {
-                        Header = DiffSingerPhonemizerHeader(factory),
-                        Command = SelectPhonemizerCommand,
-                        CommandParameter = factory,
-                    }).ToArray(),
-            });
-            moreItems.Add(new MenuItemViewModel() {
-                Header = "Legacy",
-                Items = allFactories
-                    .Where(factory => !IsDiffSingerPhonemizer(factory))
-                    .GroupBy(factory => factory.language)
-                    .OrderBy(group => group.Key)
-                    .Select(group => new MenuItemViewModel() {
-                        Header = GetPhonemizerGroupHeader(group.Key),
-                        Items = group.Select(factory => new MenuItemViewModel() {
-                            Header = factory.ToString(),
+                    .ToList();
+                if (supported.Count == 0) {
+                    //No dictionary matched; fall back to every DiffSinger phonemizer so the group is never empty.
+                    supported = allFactories
+                        .Where(IsDiffSingerPhonemizer)
+                        .OrderBy(DiffSingerSortRank)
+                        .ThenBy(factory => factory.name)
+                        .ToList();
+                }
+                var moreItems = new List<MenuItemViewModel>();
+                moreItems.Add(new MenuItemViewModel() {
+                    Header = "Supported",
+                    Items = supported
+                        .Select(factory => new MenuItemViewModel() {
+                            Header = DiffSingerPhonemizerHeader(factory),
                             Command = SelectPhonemizerCommand,
                             CommandParameter = factory,
                         }).ToArray(),
-                    }).ToArray(),
-            });
-            items.Add(new MenuItemViewModel() {
-                Header = $"{ThemeManager.GetString("tracks.more")} ...",
-                Items = moreItems.ToArray(),
-            });
+                });
+                moreItems.Add(new MenuItemViewModel() {
+                    Header = "Legacy",
+                    Items = BuildLanguageGroups(allFactories),
+                });
+                items.Add(new MenuItemViewModel() {
+                    Header = $"{ThemeManager.GetString("tracks.more")} ...",
+                    Items = moreItems.ToArray(),
+                });
+            } else {
+                //Non-DiffSinger singer: classic language grouping, no Supported/Legacy split.
+                items.Add(new MenuItemViewModel() {
+                    Header = $"{ThemeManager.GetString("tracks.more")} ...",
+                    Items = BuildLanguageGroups(allFactories),
+                });
+            }
             PhonemizerMenuItems = items.ToArray();
             this.RaisePropertyChanged(nameof(PhonemizerMenuItems));
         }
