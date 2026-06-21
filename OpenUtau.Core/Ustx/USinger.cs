@@ -13,9 +13,9 @@ namespace OpenUtau.Core.Ustx {
         public string Phonetic { get; private set; }
         public string Set { get; private set; }
         public USubbank[] Subbanks { get; private set; }
-        public string Color { get => string.Join(", ", Subbanks.Select(x => string.IsNullOrWhiteSpace(x.Color) ? "(main)" : x.Color)); }
-        public string Prefix { get => Subbanks.First().Prefix; }
-        public string Suffix { get => Subbanks.First().Suffix; }
+        public string Color { get => Subbanks == null ? string.Empty : string.Join(", ", Subbanks.Select(x => string.IsNullOrWhiteSpace(x.Color) ? "(main)" : x.Color)); }
+        public string Prefix { get => Subbanks != null && Subbanks.Length > 0 ? Subbanks.First().Prefix : string.Empty; }
+        public string Suffix { get => Subbanks != null && Subbanks.Length > 0 ? Subbanks.First().Suffix : string.Empty; }
         public string File { get; private set; }
         public string DisplayFile { get; private set; }
         public double Offset {
@@ -91,10 +91,11 @@ namespace OpenUtau.Core.Ustx {
         public static UOto OfDummy(string alias) => new UOto() {
             Alias = alias,
             Phonetic = alias,
+            Subbanks = Array.Empty<USubbank>(),
         };
 
         public bool IsColorMatch(string color) {
-            if (Subbanks.Any(s => s.Color == color)) return true;
+            if (Subbanks != null && Subbanks.Any(s => s.Color == color)) return true;
             return false;
         }
 
