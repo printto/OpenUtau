@@ -320,6 +320,8 @@ Syntax: prefix,suffix</system:String>-->
   <system:String x:Key="oto.set">ตั้งค่า</system:String>
   <!--<system:String x:Key="oto.suffix">Suffix</system:String>-->
 
+  <system:String x:Key="phonemizer.selectlanguage">⚠️เลือกภาษา</system:String>
+
   <system:String x:Key="phoneticassistant.caption">ผู้ช่วยการออกเสียง</system:String>
   <system:String x:Key="phoneticassistant.copy">คัดลอก</system:String>
 

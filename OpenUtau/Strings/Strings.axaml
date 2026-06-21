@@ -447,6 +447,8 @@ Warning: this option removes custom presets.</system:String>
   <system:String x:Key="packages.status.installfailed">Install failed</system:String>
   <system:String x:Key="packages.errors.missing">Package {0} not found. Install it using the Package Manager.</system:String>
 
+  <system:String x:Key="phonemizer.selectlanguage">⚠️Select Language</system:String>
+
   <system:String x:Key="phoneticassistant.caption">Phonetic Assistant</system:String>
   <system:String x:Key="phoneticassistant.copy">Copy</system:String>
 

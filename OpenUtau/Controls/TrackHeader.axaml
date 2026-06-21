@@ -101,7 +101,7 @@
                   ContextRequested="SingerButtonContextRequested" ToolTip.Tip="{Binding Singer}" ContextMenu="{StaticResource SingersMenuRes}"/>
           <Button Classes="clear" Margin="1" Padding="2,1,0,0" Height="17" IsVisible="{Binding IsPhonemizerVisible}"
                   HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Focusable="False"
-                  Content="{Binding PhonemizerTag}" Click="PhonemizerButtonClicked" ContextRequested="PhonemizerButtonContextRequested"
+                  Content="{Binding PhonemizerDisplay}" Click="PhonemizerButtonClicked" ContextRequested="PhonemizerButtonContextRequested"
                   ToolTip.Tip="{Binding Phonemizer}" ContextMenu="{StaticResource PhonemizerMenuRes}"/>
           <Button Classes="clear" Margin="1" Padding="2,1,0,0" Height="17" IsVisible="{Binding IsRendererVisible}"
                   HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Focusable="False"
@@ -158,7 +158,7 @@
                         ContextRequested="SingerButtonContextRequested" ToolTip.Tip="{Binding Singer}" ContextMenu="{StaticResource SingersMenuRes}"/>
                 <Button Classes="clear" Margin="1" Height="18" IsVisible="{Binding !IsPhonemizerVisible}"
                         HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Focusable="False"
-                        Content="{Binding PhonemizerTag}" Click="PhonemizerButtonClicked" ContextRequested="PhonemizerButtonContextRequested"
+                        Content="{Binding PhonemizerDisplay}" Click="PhonemizerButtonClicked" ContextRequested="PhonemizerButtonContextRequested"
                         ToolTip.Tip="{Binding Phonemizer}" ContextMenu="{StaticResource PhonemizerMenuRes}"/>
                 <Grid ColumnDefinitions="*,auto" IsVisible="{Binding !IsRendererVisible}">
                   <Button Grid.Column="0" Classes="clear" Margin="1"
