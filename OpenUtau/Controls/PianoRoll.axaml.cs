@@ -59,10 +59,23 @@ namespace OpenUtau.App.Controls {
         }
 
         private void UpdatePortraitPosition() {
-            if (PortraitImage.DesiredSize.Width == 0 || PortraitCanvas.Bounds.Width == 0) return;
-            // Position at top-right of row 3, with 100px margin from right
+            if (PortraitImage.Source == null
+                || PortraitCanvas.Bounds.Width == 0 || PortraitCanvas.Bounds.Height == 0) {
+                return;
+            }
+            var size = PortraitImage.Source.Size;
+            if (size.Width == 0 || size.Height == 0) {
+                return;
+            }
+            // Scale to fill the available height, preserve aspect, pin top-right with 100px margin.
+            double targetHeight = PortraitCanvas.Bounds.Height;
+            double targetWidth = size.Width * targetHeight / size.Height;
+            if (double.IsNaN(PortraitImage.Height) || Math.Abs(PortraitImage.Height - targetHeight) > 0.5) {
+                PortraitImage.Width = targetWidth;
+                PortraitImage.Height = targetHeight;
+            }
             Canvas.SetTop(PortraitImage, 0);
-            Canvas.SetLeft(PortraitImage, PortraitCanvas.Bounds.Width - PortraitImage.DesiredSize.Width - 100);
+            Canvas.SetLeft(PortraitImage, PortraitCanvas.Bounds.Width - targetWidth - 100);
         }
 
         public void InitializePianoRollWindowAsync() {
