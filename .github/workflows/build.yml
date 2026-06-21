@@ -49,9 +49,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - uses: repolevedavaj/install-nsis@v1.0.3
-        with:
-          nsis-version: '3.11'
+      - name: Install NSIS
+        run: choco install nsis -y --no-progress
         if: ${{ matrix.arch.os == 'win' }}
       - uses: justalemon/VersionPatcher@v0.7.1
         with:
@@ -111,10 +110,9 @@ jobs:
         if: ${{ matrix.arch.os == 'win' }}
 
       - name: Create Installer
-        uses: joncloud/makensis-action@v4.1
-        with:
-          script-file: OpenUtau.nsi
-          arguments: "-DPRODUCT_VERSION=${{ inputs.version }} -DARCH=${{ matrix.arch.arch }}"
+        shell: pwsh
+        run: |
+          & "C:\Program Files (x86)\NSIS\makensis.exe" "/DPRODUCT_VERSION=${{ inputs.version }}" "/DARCH=${{ matrix.arch.arch }}" OpenUtau.nsi
         if: ${{ matrix.arch.os == 'win' }}
 
       # Create Dmg
