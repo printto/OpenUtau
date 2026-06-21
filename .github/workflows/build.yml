@@ -89,7 +89,7 @@ jobs:
         if: ${{ matrix.arch.os == 'win' }}
 
       - name: Set executable permission
-        run: chmod +x bin/${{ matrix.arch.name }}/OpenUtau
+        run: chmod +x bin/${{ matrix.arch.name }}/OpenUtau-PRINTmov
         if: ${{ matrix.arch.os == 'linux' }}
 
       - name: Zip
@@ -121,8 +121,9 @@ jobs:
       - name: Create Dmg
         run: |
           npm install -g create-dmg
-          cp OpenUtau/Assets/OpenUtau.icns bin/${{ matrix.arch.name }}/publish/OpenUtau.app/Contents/Resources/
-          create-dmg bin/${{ matrix.arch.name }}/publish/OpenUtau.app || true
+          app=$(ls -d bin/${{ matrix.arch.name }}/publish/*.app | head -n1)
+          cp OpenUtau/Assets/OpenUtau.icns "$app/Contents/Resources/"
+          create-dmg "$app" || true
           mv *.dmg OpenUtau-${{ matrix.arch.name }}.dmg
           codesign -fvs - OpenUtau-${{ matrix.arch.name }}.dmg
         if: ${{ matrix.arch.os == 'osx' }}
@@ -206,9 +207,9 @@ jobs:
             appcast.${{ matrix.arch.name }}*.xml
             OpenUtau-${{ matrix.arch.name }}.*
           body: |
-            See [Getting Started](https://github.com/stakira/OpenUtau/wiki/Getting-Started) for how to use.
+            **OpenUtau - PRINTmov Edition** — a customized build based on [OpenUtau](https://github.com/stakira/OpenUtau).
 
-            If you encountered issues, see [FAQ](https://github.com/stakira/OpenUtau/wiki/FAQ)
+            See [Getting Started](https://github.com/stakira/OpenUtau/wiki/Getting-Started) and the [FAQ](https://github.com/stakira/OpenUtau/wiki/FAQ) for general usage.
 
             ## macOS says "This app is damaged"
             Open a terminal and run `xattr -rc /Applications/OpenUtau.app`. Try opening OpenUtau again.

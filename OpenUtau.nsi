@@ -47,7 +47,7 @@ ManifestDPIAware true
 ; MUI end ------
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "OpenUtau-PRINTmov-win-${ARCH}.exe"
+OutFile "OpenUtau-win-${ARCH}.exe"
 InstallDir "$PROGRAMFILES64\OpenUtau-PRINTmov"
 ShowInstDetails show
 ShowUnInstDetails show
