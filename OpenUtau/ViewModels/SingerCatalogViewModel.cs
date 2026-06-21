@@ -36,7 +36,7 @@ namespace OpenUtau.App.ViewModels {
             && !string.Equals(InstalledVersion, LatestVersion, StringComparison.OrdinalIgnoreCase);
         public bool CanAction => !Busy && Resolved && !string.IsNullOrEmpty(DownloadUrl) && (!IsInstalled || HasUpdate);
         public string VersionDisplay => Resolved && !string.IsNullOrEmpty(LatestVersion)
-            ? (IsInstalled ? $"{InstalledVersion} → {LatestVersion}" : LatestVersion)
+            ? (HasUpdate ? $"{InstalledVersion} → {LatestVersion}" : LatestVersion)
             : (IsInstalled ? InstalledVersion : string.Empty);
         public string ActionLabel => !IsInstalled
             ? ThemeManager.GetString("singercatalog.action.install")
