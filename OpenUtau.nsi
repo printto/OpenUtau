@@ -14,7 +14,7 @@ ManifestDPIAware true
 
 ; MUI Settings
 !define MUI_ABORTWARNING
-!define MUI_ICON "OpenUtau\Assets\open-utau.ico"
+!define MUI_ICON "OpenUtau\Assets\pmou.ico"
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
 
 ; Language Selection Dialog Settings
@@ -47,7 +47,7 @@ ManifestDPIAware true
 ; MUI end ------
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "OpenUtau-win-${ARCH}.exe"
+OutFile "OpenUtau-PRINTmov-win-${ARCH}.exe"
 InstallDir "$PROGRAMFILES64\OpenUtau-PRINTmov"
 ShowInstDetails show
 ShowUnInstDetails show

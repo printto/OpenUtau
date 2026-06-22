@@ -94,13 +94,13 @@ jobs:
       - name: Zip
         run: |
           cd bin/${{ matrix.arch.name }}
-          7z a ../../OpenUtau-${{ matrix.arch.name }}.zip *
+          7z a ../../OpenUtau-PRINTmov-${{ matrix.arch.name }}.zip *
         if: ${{ matrix.arch.os == 'win' }}
 
       - name: Tar.gz
         run: |
           cd bin/${{ matrix.arch.name }}
-          tar -czf ../../OpenUtau-${{ matrix.arch.name }}.tar.gz *
+          tar -czf ../../OpenUtau-PRINTmov-${{ matrix.arch.name }}.tar.gz *
         if: ${{ matrix.arch.os == 'linux' }}
 
       # Create Installer
@@ -122,8 +122,8 @@ jobs:
           app=$(ls -d bin/${{ matrix.arch.name }}/publish/*.app | head -n1)
           cp OpenUtau/Assets/OpenUtau.icns "$app/Contents/Resources/"
           create-dmg "$app" || true
-          mv *.dmg OpenUtau-${{ matrix.arch.name }}.dmg
-          codesign -fvs - OpenUtau-${{ matrix.arch.name }}.dmg
+          mv *.dmg OpenUtau-PRINTmov-${{ matrix.arch.name }}.dmg
+          codesign -fvs - OpenUtau-PRINTmov-${{ matrix.arch.name }}.dmg
         if: ${{ matrix.arch.os == 'osx' }}
 
       # Create Appimage
@@ -142,55 +142,56 @@ jobs:
           cp OpenUtau/Assets/AppRun bin/${{ matrix.arch.name }}
           chmod 755 bin/${{ matrix.arch.name }}/AppRun
           ARCH=${{ matrix.arch.linuxarch }} linuxdeploy --appdir bin/${{ matrix.arch.name }} --output appimage
+          mv OpenUtau-${{ matrix.arch.linuxarch }}.AppImage OpenUtau-PRINTmov-${{ matrix.arch.name }}.AppImage
         if: ${{ matrix.arch.os == 'linux' }}
 
       # Upload Artifacts
       - uses: actions/upload-artifact@v4
         with:
-          name: OpenUtau-${{ matrix.arch.name }}.tar.gz
-          path: OpenUtau-${{ matrix.arch.name }}.tar.gz
+          name: OpenUtau-PRINTmov-${{ matrix.arch.name }}.tar.gz
+          path: OpenUtau-PRINTmov-${{ matrix.arch.name }}.tar.gz
         if: ${{ !inputs.release && matrix.arch.os == 'linux' }}
 
       - uses: actions/upload-artifact@v4
         with:
-          name: OpenUtau-${{ matrix.arch.name }}.zip
-          path: OpenUtau-${{ matrix.arch.name }}.zip
+          name: OpenUtau-PRINTmov-${{ matrix.arch.name }}.zip
+          path: OpenUtau-PRINTmov-${{ matrix.arch.name }}.zip
         if: ${{ !inputs.release && matrix.arch.os == 'win' }}
 
       - uses: actions/upload-artifact@v4
         with:
-          name: OpenUtau-${{ matrix.arch.name }}.exe
-          path: OpenUtau-${{ matrix.arch.name }}.exe
+          name: OpenUtau-PRINTmov-${{ matrix.arch.name }}.exe
+          path: OpenUtau-PRINTmov-${{ matrix.arch.name }}.exe
         if: ${{ !inputs.release && matrix.arch.os == 'win' }}
       
       - uses: actions/upload-artifact@v4
         with:
-          name: OpenUtau-${{ matrix.arch.name }}.AppImage
-          path: OpenUtau-${{ matrix.arch.linuxarch }}.AppImage
+          name: OpenUtau-PRINTmov-${{ matrix.arch.name }}.AppImage
+          path: OpenUtau-PRINTmov-${{ matrix.arch.name }}.AppImage
         if: ${{ !inputs.release && matrix.arch.os == 'linux' }}
 
       - uses: actions/upload-artifact@v4
         with:
-          name: OpenUtau-${{ matrix.arch.name }}.dmg
-          path: OpenUtau-${{ matrix.arch.name }}.dmg
+          name: OpenUtau-PRINTmov-${{ matrix.arch.name }}.dmg
+          path: OpenUtau-PRINTmov-${{ matrix.arch.name }}.dmg
         if: ${{ !inputs.release && matrix.arch.os == 'osx' }}
 
       # Appcast
       - name: Appcast Windows
         shell: cmd
         run: |
-          python appcast.py -v=${{ inputs.version }} -o=windows -r=${{ matrix.arch.name }} -f=OpenUtau-${{ matrix.arch.name }}.zip
-          python appcast.py -v=${{ inputs.version }} -o=windows -r=${{ matrix.arch.name }}-installer -f=OpenUtau-${{ matrix.arch.name }}.exe
+          python appcast.py -v=${{ inputs.version }} -o=windows -r=${{ matrix.arch.name }} -f=OpenUtau-PRINTmov-${{ matrix.arch.name }}.zip
+          python appcast.py -v=${{ inputs.version }} -o=windows -r=${{ matrix.arch.name }}-installer -f=OpenUtau-PRINTmov-${{ matrix.arch.name }}.exe
         if: ${{ inputs.release && matrix.arch.os == 'win' }}
 
       - name: Appcast MacOS
         run: |
-          python appcast.py -v=${{ inputs.version }} -o=macos -r=${{ matrix.arch.name }} -f=OpenUtau-${{ matrix.arch.name }}.dmg
+          python appcast.py -v=${{ inputs.version }} -o=macos -r=${{ matrix.arch.name }} -f=OpenUtau-PRINTmov-${{ matrix.arch.name }}.dmg
         if: ${{ inputs.release && matrix.arch.os == 'osx' }}
 
       - name: Appcast Linux
         run: |
-          python appcast.py -v=${{ inputs.version }} -o=linux -r=${{ matrix.arch.name }} -f=OpenUtau-${{ matrix.arch.name }}.tar.gz
+          python appcast.py -v=${{ inputs.version }} -o=linux -r=${{ matrix.arch.name }} -f=OpenUtau-PRINTmov-${{ matrix.arch.name }}.tar.gz
         if: ${{ inputs.release && matrix.arch.os == 'linux' }}
 
       # Release
@@ -203,12 +204,12 @@ jobs:
           draft: ${{ inputs.draft }}
           files: |
             appcast.${{ matrix.arch.name }}*.xml
-            OpenUtau-${{ matrix.arch.name }}.*
+            OpenUtau-PRINTmov-${{ matrix.arch.name }}.*
           body: |
             **OpenUtau - PRINTmov Edition** — a customized build based on [OpenUtau](https://github.com/stakira/OpenUtau).
 
             See [Getting Started](https://github.com/stakira/OpenUtau/wiki/Getting-Started) and the [FAQ](https://github.com/stakira/OpenUtau/wiki/FAQ) for general usage.
 
             ## macOS says "This app is damaged"
-            Open a terminal and run `xattr -rc /Applications/OpenUtau.app`. Try opening OpenUtau again.
+            Open a terminal and run `xattr -rc "/Applications/OpenUtau - PRINTmov Edition.app"`. Try opening the app again.
         if: ${{ inputs.release }}

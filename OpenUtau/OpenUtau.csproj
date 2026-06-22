@@ -13,7 +13,7 @@
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Version>0.0.1</Version>
-    <ApplicationIcon>Assets\open-utau.ico</ApplicationIcon>
+    <ApplicationIcon>Assets\pmou.ico</ApplicationIcon>
     <PublishReadyToRun>true</PublishReadyToRun>
     <DebugType>embedded</DebugType>
     <StartupObject />
