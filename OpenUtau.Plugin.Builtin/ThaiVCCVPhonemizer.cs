@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
-using Melanchall.DryWetMidi.Interaction;
 using OpenUtau.Api;
-using OpenUtau.Classic;
+using OpenUtau.Core.G2p;
 using OpenUtau.Core.Ustx;
 using Serilog;
 
 namespace OpenUtau.Plugin.Builtin {
-    [Phonemizer("Thai VCCV Phonemizer", "TH VCCV", "PRINTmov", language: "TH")]
+    [Phonemizer("Thai G2P Phonemizer", "TH VCCV & CVVC", "PRINTmov", language: "TH")]
     public class ThaiVCCVPhonemizer : Phonemizer {
 
         readonly string[] vowels = new string[] {
@@ -29,39 +28,34 @@ namespace OpenUtau.Plugin.Builtin {
             "b", "ch", "d", "f", "g", "h", "j", "k", "kh", "l", "m", "n", "p", "ph", "r", "s", "t", "th", "w", "y"
         };
 
-        private readonly Dictionary<string, string> VowelMapping = new Dictionary<string, string> {
-            {"เcือะ", "6"}, {"เcือx", "6"}, {"แcะ", "@"}, {"แcx", "@"}, {"เcอะ", "3"}, {"เcอ", "3"}, {"ไc", "I"}, {"ใc", "I"}, {"เcาะ", "Q"}, {"cอx", "Q"},
-            {"cืx", "1"}, {"cึx", "1"}, {"cือ", "1"}, {"cะ", "a"}, {"cัx", "a"}, {"cาx", "a"}, {"เcา", "8"}, {"เcะ", "e"}, {"เcx", "e"}, {"cิx", "i"}, {"cีx", "i"},
-            {"เcียะ", "ia"}, {"เcียx", "ia"}, {"โcะ", "o"}, {"โcx", "o"}, {"cุx", "u"}, {"cูx", "u"}, {"cัวะ", "ua"}, {"cัว", "ua"}, {"cำ", "am"}, {"เcิx", "3"}, {"เcิ", "3"}
-        };
-
-        private readonly Dictionary<char, string> CMapping = new Dictionary<char, string> {
-            {'ก', "k"}, {'ข', "kh"}, {'ค', "kh"}, {'ฆ', "kh"}, {'ฅ', "kh"}, {'ฃ', "kh"},
-            {'จ', "j"}, {'ฉ', "ch"}, {'ช', "ch"}, {'ฌ', "ch"},
-            {'ฎ', "d"}, {'ด', "d"},
-            {'ต', "t"}, {'ฏ', "t"},
-            {'ถ', "th"}, {'ฐ', "th"}, {'ฑ', "th"}, {'ธ', "th"}, {'ท', "th"},
-            {'บ', "b"}, {'ป', "p"}, {'พ', "ph"}, {'ผ', "ph"}, {'ภ', "ph"}, {'ฟ', "f"}, {'ฝ', "f"},
-            {'ห', "h"}, {'ฮ', "h"},
-            {'ม', "m"}, {'น', "n"}, {'ณ', "n"}, {'ร', "r"}, {'ล', "l"}, {'ฤ', "r"},
-            {'ส', "s"}, {'ศ', "s"}, {'ษ', "s"}, {'ซ', "s"},
-            {'ง', "g"}, {'ย', "y"}, {'ญ', "y"}, {'ว', "w"}, {'ฬ', "r"}
-        };
-
-        private readonly Dictionary<char, string> XMapping = new Dictionary<char, string> {
-            {'บ', "b"}, {'ป', "b"}, {'พ', "b"}, {'ฟ', "b"}, {'ภ', "b"},
-            {'ด', "d"}, {'จ', "d"}, {'ช', "d"}, {'ซ', "d"}, {'ฎ', "d"}, {'ฏ', "d"}, {'ฐ', "d"},
-            {'ฑ', "d"}, {'ฒ', "d"}, {'ต', "d"}, {'ถ', "d"}, {'ท', "d"}, {'ธ', "d"}, {'ศ', "d"}, {'ษ', "d"}, {'ส', "d"},
-            {'ก', "k"}, {'ข', "k"}, {'ค', "k"}, {'ฆ', "k"},
-            {'ว', "w"},
-            {'ย', "y"},
-            {'น', "n"}, {'ญ', "n"}, {'ณ', "n"}, {'ร', "n"}, {'ล', "n"}, {'ฬ', "n"},
-            {'ง', "g"},
-            {'ม', "m"}
+        // Maps ThaiG2p output (DiffSinger notation) to this voicebank's UTAU/VCCV notation.
+        private static readonly Dictionary<string, string> G2pToVCCV = new Dictionary<string, string> {
+            // onset consonants
+            {"b", "b"}, {"ch", "ch"}, {"d", "d"}, {"f", "f"}, {"h", "h"}, {"j", "j"},
+            {"kk", "k"}, {"k", "kh"}, {"l", "l"}, {"m", "m"}, {"n", "n"}, {"ng", "g"},
+            {"pp", "p"}, {"p", "ph"}, {"r", "r"}, {"s", "s"}, {"tt", "t"}, {"t", "th"},
+            {"w", "w"}, {"y", "y"},
+            // vowels
+            {"A", "@"}, {"E", "3"}, {"I", "I"}, {"O", "Q"}, {"U", "1"}, {"Ua", "6"},
+            {"a", "a"}, {"au", "8"}, {"e", "e"}, {"i", "i"}, {"ia", "ia"}, {"o", "o"},
+            {"u", "u"}, {"ua", "ua"},
+            // ending consonants
+            {"B", "b"}, {"D", "d"}, {"K", "k"}, {"W", "w"}, {"Y", "y"},
         };
 
         private USinger singer;
-        public override void SetSinger(USinger singer) => this.singer = singer;
+        private IG2p g2p;
+
+        public override void SetSinger(USinger singer) {
+            this.singer = singer;
+            if (g2p == null) {
+                try {
+                    g2p = new ThaiG2p();
+                } catch (Exception e) {
+                    Log.Error(e, "Failed to load Thai G2p.");
+                }
+            }
+        }
 
         private bool checkOtoUntilHit(string[] input, Note note, out UOto oto) {
             oto = default;
@@ -259,81 +253,22 @@ namespace OpenUtau.Plugin.Builtin {
             return (consonant, diphthong, vowel, endingConsonant);
         }
 
-
+        // Convert a Thai lyric into VCCV phonemes using OpenUtau's Thai G2p,
+        // then remap the G2p (DiffSinger) phonemes to this voicebank's notation.
         public string WordToPhonemes(string input) {
             input = input.Replace(" ", "");
-            input = RemoveInvalidLetters(input);
             if (!Regex.IsMatch(input, "[ก-ฮ]")) {
+                return input; // not Thai text (e.g. an already-phonemized hint)
+            }
+            var result = g2p?.Query(input);
+            if (result == null || result.Length == 0) {
                 return input;
             }
-            foreach (var mapping in VowelMapping) {
-                string pattern = "^" + mapping.Key
-                    .Replace("c", "([ก-ฮ][ลรว]?|อ[ย]?|ห[ก-ฮ]?)")
-                    .Replace("x", "([ก-ฮ]?)") + "$";
-
-                var match = Regex.Match(input, pattern);
-                if (match.Success) {
-                    string c = match.Groups[1].Value;
-                    string x = match.Groups.Count > 2 ? match.Groups[2].Value : string.Empty;
-                    if (c.Length >= 2 && (c.StartsWith("ห") || c.StartsWith("อ"))) {
-                        c = c.Substring(1);
-                    }
-                    string cConverted = ConvertC(c);
-                    string xConverted = ConvertX(x);
-                    if (mapping.Value == "a" && input.Contains("ั") && x == "ว") {
-                        return cConverted + "ua";
-                    }
-                    if (mapping.Value == "e" && x == "ย") {
-                        return cConverted + "3" + xConverted;
-                    }
-                    return cConverted + mapping.Value + xConverted;
-                }
+            var sb = new StringBuilder();
+            foreach (var phoneme in result) {
+                sb.Append(G2pToVCCV.TryGetValue(phoneme, out var mapped) ? mapped : phoneme);
             }
-            if (input.Length == 1) {
-                return ConvertC(input) + "Q";
-            } else if (input.Length == 2) {
-                return ConvertC(input[0].ToString()) + "o" + ConvertX(input[1].ToString());
-            } else if (input.Length == 3) {
-                if (input[1] == 'ว') {
-                    return ConvertC(input[0].ToString()) + "ua" + ConvertX(input[2].ToString());
-                } else {
-                    return ConvertC(input.Substring(0, 2).ToString()) + "o" + ConvertX(input[1].ToString());
-                }
-            } else if (input.Length == 4) {
-                if (input[2] == 'ว') {
-                    return ConvertC(input.Substring(0, 2).ToString()) + "ua" + ConvertX(input[3].ToString());
-                }
-            }
-            return input;
-        }
-
-        private string ConvertC(string input) {
-            if (string.IsNullOrEmpty(input)) return input;
-            char firstChar = input[0];
-            char? secondChar = input.Length > 1 ? input[1] : (char?)null;
-            if (CMapping.ContainsKey(firstChar)) {
-                string firstCharConverted = CMapping[firstChar];
-                if (secondChar != null && CMapping.ContainsKey((char)secondChar)) {
-                    return firstCharConverted + CMapping[(char)secondChar];
-                }
-                return firstCharConverted;
-            }
-            return input;
-        }
-
-        private string ConvertX(string input) {
-            if (string.IsNullOrEmpty(input)) return input;
-            char firstChar = input[0];
-            if (XMapping.ContainsKey(firstChar)) {
-                return XMapping[firstChar];
-            }
-            return input;
-        }
-
-        private string RemoveInvalidLetters(string input) {
-            input = Regex.Replace(input, ".์", "");
-            input = Regex.Replace(input, "[่้๊๋็]", "");
-            return input;
+            return sb.ToString();
         }
 
     }
