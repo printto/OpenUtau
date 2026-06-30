@@ -1897,6 +1897,11 @@ namespace OpenUtau.App.Views {
                         MessageBox.ShowError(this, notif.e, notif.message, true);
                         break;
                 }
+            } else if (cmd is DefaultVocoderUsedNotification) {
+                Avalonia.Threading.Dispatcher.UIThread.Post(async () => {
+                    var dialog = new VocoderCreditDialog();
+                    await dialog.ShowDialog(this);
+                });
             } else if (cmd is VoiceColorRemappingNotification voicecolorNotif) {
                 if (voicecolorNotif.TrackNo < 0 || DocManager.Inst.Project.tracks.Count <= voicecolorNotif.TrackNo) {
                     // Verify whether remapping is required when the voice color lineup changes

@@ -263,4 +263,8 @@ namespace OpenUtau.Core {
         }
         public override string ToString() => "Note preset changed.";
     }
+
+    public class DefaultVocoderUsedNotification : UNotification {
+        public override string ToString() => "Default vocoder used.";
+    }
 }

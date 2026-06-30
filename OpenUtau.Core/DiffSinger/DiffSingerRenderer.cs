@@ -13,10 +13,13 @@ using OpenUtau.Core.Render;
 using OpenUtau.Core.SignalChain;
 using OpenUtau.Core.Ustx;
 using OpenUtau.Core.Util;
+using OpenUtau.Core;
 using Serilog;
 
 namespace OpenUtau.Core.DiffSinger {
     public class DiffSingerRenderer : IRenderer {
+        static bool defaultVocoderNotifiedThisSession = false;
+
         const string VELC = DiffSingerUtils.VELC;
         const string ENE = DiffSingerUtils.ENE;
         const string PEXP = DiffSingerUtils.PEXP;
@@ -148,6 +151,10 @@ namespace OpenUtau.Core.DiffSinger {
             }
 
             var vocoder = singer.getVocoder();
+            if (singer.UsingDefaultVocoder && !Preferences.Default.ShownPotluckVocoderCredit && !defaultVocoderNotifiedThisSession) {
+                defaultVocoderNotifiedThisSession = true;
+                DocManager.Inst.ExecuteCmd(new DefaultVocoderUsedNotification());
+            }
             //mel specification validity checks
             //num_mel_bins must be a sane vocoder value. This is a hard-coded
             //upper bound (see DsVocoderConfig.MaxMelBins): voicebank authors

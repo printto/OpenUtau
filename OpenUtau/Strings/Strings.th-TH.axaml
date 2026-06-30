@@ -65,6 +65,7 @@
   <!--<system:String x:Key="dialogs.voicecolorremapping">Voice color remapping</system:String>-->
   <!--<system:String x:Key="dialogs.voicecolorremapping.caption">Applies to all notes in this track:</system:String>-->
 
+  <system:String x:Key="dialogs.potluckvocoder.dontshow">ไม่ต้องแสดงอีก</system:String>
   <system:String x:Key="errors.caption">เกิดข้อผิดพลาด</system:String>
   <!--<system:String x:Key="errors.details">Error Details</system:String>-->
   <!--<system:String x:Key="errors.diffsinger.downloadvocoder">Error loading vocoder "{0}". Please download vocoder from {1}</system:String>-->

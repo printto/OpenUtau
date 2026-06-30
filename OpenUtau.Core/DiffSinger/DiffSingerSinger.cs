@@ -182,13 +182,26 @@ namespace OpenUtau.Core.DiffSinger {
             return acousticSession;
         }
 
+        public bool UsingDefaultVocoder { get; private set; }
+
         public DsVocoder getVocoder() {
             if(vocoder is null) {
                 if(File.Exists(Path.Join(Location, "dsvocoder", "vocoder.yaml"))) {
                     vocoder = new DsVocoder(Path.Join(Location, "dsvocoder"));
                     return vocoder;
                 }
-                vocoder = new DsVocoder(Path.Combine(PathManager.Inst.DependencyPath, dsConfig.vocoder));
+                var depPath = Path.Combine(PathManager.Inst.DependencyPath, dsConfig.vocoder);
+                if (File.Exists(Path.Combine(depPath, "vocoder.yaml"))) {
+                    vocoder = new DsVocoder(depPath);
+                    return vocoder;
+                }
+                var defaultPath = Path.Combine(PathManager.Inst.RootPath, "DefaultVocoder");
+                if (File.Exists(Path.Combine(defaultPath, "vocoder.yaml"))) {
+                    vocoder = new DsVocoder(defaultPath);
+                    UsingDefaultVocoder = true;
+                    return vocoder;
+                }
+                vocoder = new DsVocoder(depPath);
             }
             return vocoder;
         }

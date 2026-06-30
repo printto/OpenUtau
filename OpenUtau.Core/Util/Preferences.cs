@@ -203,6 +203,7 @@ namespace OpenUtau.Core.Util {
             public Dictionary<string, string> DefaultResamplers = new Dictionary<string, string>();
             public Dictionary<string, string> DefaultWavtools = new Dictionary<string, string>();
             public string LyricHelper = string.Empty;
+            public bool ShownPotluckVocoderCredit = false;
             public bool LyricsHelperBrackets = false;
             public int OtoEditor = 0;
             public string VLabelerPath = string.Empty;
