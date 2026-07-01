@@ -446,14 +446,12 @@ namespace OpenUtau.App.ViewModels {
             var name = factory.name.Replace("DiffSinger", "").Replace("Phonemizer", "").Trim();
             if (string.IsNullOrEmpty(name)) {
                 name = "DiffSinger Default";
-            } else if (!string.IsNullOrEmpty(factory.language)) {
-                if (!ThemeManager.TryGetString($"languages.{factory.language.ToLowerInvariant()}", out var langName)
-                    || string.IsNullOrEmpty(langName)) {
-                    langName = factory.language;
-                }
-                if (name.IndexOf(langName, StringComparison.OrdinalIgnoreCase) < 0) {
-                    name = $"{langName} {name}";
-                }
+            } else if (!string.IsNullOrEmpty(factory.language)
+                && ThemeManager.TryGetString($"languages.{factory.language.ToLowerInvariant()}", out var langName)
+                && !string.IsNullOrEmpty(langName)) {
+                var parts = name.Split(new[] { ' ' }, 2);
+                var variant = parts.Length > 1 ? parts[1] : string.Empty;
+                name = string.IsNullOrEmpty(variant) ? langName : $"{langName} {variant}";
             }
             return includeAuthor && !string.IsNullOrEmpty(factory.author)
                 ? $"{name} (Contributed by {factory.author})"
