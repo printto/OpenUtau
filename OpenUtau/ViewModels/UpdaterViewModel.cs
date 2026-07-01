@@ -92,7 +92,7 @@ namespace OpenUtau.App.ViewModels {
                 return null;
             }
             return releases
-                .Where(r => !r.draft && r.prerelease == Preferences.Default.Beta)
+                .Where(r => !r.draft)
                 .OrderByDescending(r => r.id)
                 .FirstOrDefault();
         }
@@ -189,23 +189,11 @@ namespace OpenUtau.App.ViewModels {
         }
     }
 
-    // Force allow downgrading so that switching between beta and stable works.
+    // Only offer versions newer than the installed one.
     public class DowngradableFilter : IAppCastFilter {
-        static bool Eq(int a, int b) {
-            a = a == -1 ? 0 : a;
-            b = b == -1 ? 0 : b;
-            return a == b;
-        }
-        // Ambiguous version equal where 1.2 == 1.2.0 == 1.2.0.0.
-        static bool Eq(Version a, Version b) {
-            return Eq(a.Major, b.Major)
-                && Eq(a.Minor, b.Minor)
-                && Eq(a.Build, b.Build)
-                && Eq(a.Revision, b.Revision);
-        }
         public FilterResult GetFilteredAppCastItems(Version installed, List<AppCastItem> items) {
-            items = items.Where(item => !Eq(new Version(item.Version), installed)).ToList();
-            return new FilterResult(/*forceInstallOfLatestInFilteredList=*/true, items);
+            items = items.Where(item => new Version(item.Version) > installed).ToList();
+            return new FilterResult(false, items);
         }
     }
 
