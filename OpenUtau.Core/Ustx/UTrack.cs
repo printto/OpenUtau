@@ -102,6 +102,9 @@ namespace OpenUtau.Core.Ustx {
         [YamlIgnore] public UExpressionDescriptor VoiceColorExp { set; get; }
         public string[] VoiceColorNames { get; set; } = new string[] { "" };
 
+        static readonly string[] AutoTrackColors = {
+            "Blue", "Green", "Yellow", "Orange", "Red", "Pink", "Purple",
+        };
         public UTrack() {
         }
         public UTrack(UProject project) {
@@ -113,6 +116,7 @@ namespace OpenUtau.Core.Ustx {
                 }
             }
             TrackName = "Track" + (trackCount + 1);
+            TrackColor = AutoTrackColors[(project.tracks?.Count ?? 0) % AutoTrackColors.Length];
         }
         public UTrack(string trackName) {
             TrackName = trackName;

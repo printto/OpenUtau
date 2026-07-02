@@ -445,7 +445,7 @@ namespace OpenUtau.App.ViewModels {
         static string DiffSingerPhonemizerHeader(PhonemizerFactory factory, bool includeAuthor = true) {
             var name = factory.name.Replace("DiffSinger", "").Replace("Phonemizer", "").Trim();
             if (string.IsNullOrEmpty(name)) {
-                name = "DiffSinger Default";
+                name = ThemeManager.GetString("phonemizer.diffsingerdefault");
             } else if (!string.IsNullOrEmpty(factory.language)
                 && ThemeManager.TryGetString($"languages.{factory.language.ToLowerInvariant()}", out var langName)
                 && !string.IsNullOrEmpty(langName)) {

@@ -27,7 +27,7 @@
     <CFBundlePackageType>APPL</CFBundlePackageType>
     <CFBundleSignature>????</CFBundleSignature>
     <CFBundleExecutable>OpenUtau-PRINTmov</CFBundleExecutable>
-    <CFBundleIconFile>OpenUtau.icns</CFBundleIconFile>
+    <CFBundleIconFile>pmou.icns</CFBundleIconFile>
     <NSPrincipalClass>NSApplication</NSPrincipalClass>
     <NSHighResolutionCapable>true</NSHighResolutionCapable>
     <CFBundleDocumentTypes>
@@ -40,7 +40,7 @@
                     <string>ustx</string>
                 </array>
                 <key>CFBundleTypeIconFile</key>
-                <string>OpenUtau.icns</string>
+                <string>pmou.icns</string>
                 <key>CFBundleTypeRole</key>
                 <string>Editor</string>
                 <key>LSItemContentTypes</key>

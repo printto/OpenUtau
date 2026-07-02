@@ -181,9 +181,17 @@ namespace OpenUtau.App.Controls {
         }
 
         public override void Render(DrawingContext context) {
-            var backgroundBrush = Selected ? ThemeManager.AccentBrush2 : ThemeManager.AccentBrush1;
-            // Background
-            context.DrawRectangle(backgroundBrush, null, new Rect(1, 0, Width - 1, Height - 1), 4, 4);
+            IBrush backgroundBrush;
+            var project = Core.DocManager.Inst.Project;
+            if (part != null && project != null && part.trackNo >= 0 && part.trackNo < project.tracks.Count) {
+                var trackColor = ThemeManager.GetTrackColor(project.tracks[part.trackNo].TrackColor);
+                backgroundBrush = Selected ? trackColor.AccentColorDark : trackColor.AccentColor;
+            } else {
+                backgroundBrush = Selected ? ThemeManager.AccentBrush2 : ThemeManager.AccentBrush1;
+            }
+            using (context.PushOpacity(Selected ? 0.9 : 0.6)) {
+                context.DrawRectangle(backgroundBrush, null, new Rect(1, 0, Width - 1, Height - 1), 4, 4);
+            }
 
             // Text
             var textLayout = TextLayoutCache.Get(Text, Brushes.White, 12);

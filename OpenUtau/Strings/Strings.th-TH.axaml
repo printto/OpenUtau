@@ -319,6 +319,8 @@ Syntax: prefix,suffix</system:String>-->
   <system:String x:Key="oto.set">ตั้งค่า</system:String>
   <!--<system:String x:Key="oto.suffix">Suffix</system:String>-->
 
+  <system:String x:Key="phonemizer.diffsingerdefault">ค่าเริ่มต้น DiffSinger</system:String>
+
   <system:String x:Key="phonemizer.selectlanguage">⚠️เลือกภาษา</system:String>
 
   <system:String x:Key="phoneticassistant.caption">ผู้ช่วยการออกเสียง</system:String>

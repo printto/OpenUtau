@@ -12,7 +12,7 @@ on:
         description: "Release"
       beta:
         type: boolean
-        default: true
+        default: false
         description: "Beta"
       draft:
         type: boolean
@@ -120,7 +120,7 @@ jobs:
         run: |
           npm install -g create-dmg
           app=$(ls -d bin/${{ matrix.arch.name }}/publish/*.app | head -n1)
-          cp OpenUtau/Assets/OpenUtau.icns "$app/Contents/Resources/"
+          cp OpenUtau/Assets/pmou.icns "$app/Contents/Resources/"
           create-dmg "$app" || true
           mv *.dmg OpenUtau-PRINTmov-${{ matrix.arch.name }}.dmg
           codesign -fvs - OpenUtau-PRINTmov-${{ matrix.arch.name }}.dmg

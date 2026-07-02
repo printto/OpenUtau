@@ -72,6 +72,7 @@ namespace OpenUtau.App.Controls {
                 .Subscribe(_ => {
                     foreach (var (part, control) in partControls) {
                         control.SetPosition();
+                        control.InvalidateVisual();
                     }
                 });
             MessageBus.Current.Listen<PartsSelectionEvent>()
