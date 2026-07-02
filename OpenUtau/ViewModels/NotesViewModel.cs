@@ -166,8 +166,7 @@ namespace OpenUtau.App.ViewModels {
                     }
                     if (descriptor != null) {
                         if (descriptor.type == UExpressionType.Options) {
-                            int numOptions = Math.Max(descriptor.options.Length, 1);
-                            ExpTrackHeight = t.Item1.Height / numOptions;
+                            ExpTrackHeight = 0;
                             ExpShadowOpacity = 0;
                         } else {
                             ExpTrackHeight = 0;

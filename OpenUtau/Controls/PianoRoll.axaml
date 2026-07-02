@@ -217,7 +217,7 @@
                    IsHitTestVisible="False" IsVisible="False"
                    ZIndex="999"/>
       </Canvas>
-      <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Margin="2"
+      <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" Margin="2"
             HorizontalAlignment="Stretch" VerticalAlignment="Top">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="Auto"/>
@@ -545,6 +545,20 @@
         </Border>
         <Border Grid.Column="4">
           <StackPanel Orientation="Horizontal">
+            <ToggleButton Classes="toolbar" Margin="0" Padding="1" Height="20" Width="20"
+                          IsChecked="{Binding PianoRollDetached, Mode=OneWay}" Click="OnMenuDetachPianoRoll"
+                          ToolTip.Tip="{DynamicResource pianoroll.menu.view.pianoroll.detach}">
+              <Grid Width="18" Height="18">
+                <Path Classes="filled" Data="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z">
+                  <Path.RenderTransform>
+                    <TransformGroup>
+                      <ScaleTransform ScaleX=".65" ScaleY=".65" />
+                      <TranslateTransform X="-2" Y="-2"/>
+                    </TransformGroup>
+                  </Path.RenderTransform>
+                </Path>
+              </Grid>
+            </ToggleButton>
             <ToggleButton Classes="toolbar" Margin="0" Padding="1" Height="20" Width="20" IsChecked="{Binding NotesViewModel.ShowNoteParams}"
                           ToolTip.Tip="{DynamicResource pianoroll.toggle.noteparams}">
               <Grid Width="18" Height="18">
