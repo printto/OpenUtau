@@ -109,7 +109,10 @@ namespace OpenUtau.App.Controls {
         void SingerButtonClicked(object sender, RoutedEventArgs args) {
             try {
                 ViewModel?.RefreshSingers();
-                SingersMenu.Open((Control)sender);
+                var control = (Control)sender;
+                control.ContextMenu = null;
+                control.ContextMenu = SingersMenu;
+                SingersMenu.Open(control);
             } catch (Exception e) {
                 DocManager.Inst.ExecuteCmd(new ErrorMessageNotification(e));
             }
@@ -122,7 +125,10 @@ namespace OpenUtau.App.Controls {
 
         void PhonemizerButtonClicked(object sender, RoutedEventArgs args) {
             ViewModel?.RefreshPhonemizers();
-            PhonemizersMenu.Open((Control)sender);
+            var control = (Control)sender;
+            control.ContextMenu = null;
+            control.ContextMenu = PhonemizersMenu;
+            PhonemizersMenu.Open(control);
             args.Handled = true;
         }
 
@@ -133,7 +139,10 @@ namespace OpenUtau.App.Controls {
         void RendererButtonClicked(object sender, RoutedEventArgs args) {
             ViewModel?.RefreshRenderers();
             if (ViewModel?.RenderersMenuItems?.Count > 0) {
-                RenderersMenu.Open((Control)sender);
+                var control = (Control)sender;
+                control.ContextMenu = null;
+                control.ContextMenu = RenderersMenu;
+                RenderersMenu.Open(control);
             }
             args.Handled = true;
         }

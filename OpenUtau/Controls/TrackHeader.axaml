@@ -104,7 +104,7 @@
            CornerRadius="2" PointerPressed="HeaderPointerPressed">
     <Grid ColumnDefinitions="auto,*,auto" Background="Transparent">
       <Panel Grid.Column="0" VerticalAlignment="Stretch">
-        <Border BorderThickness="0,0,1,1" MaxHeight="101" VerticalAlignment="Top" CornerRadius="0,0,2,0"
+        <Border x:Name="AvatarImageBorder" BorderThickness="0,0,1,1" MaxHeight="101" VerticalAlignment="Top" HorizontalAlignment="Left" CornerRadius="0,0,2,0"
                 BorderBrush="{DynamicResource NeutralAccentBrushSemi}" ClipToBounds="True">
           <Image Source="{Binding Avatar}" Stretch="Uniform" VerticalAlignment="Top" ToolTip.Tip="{Binding Singer}"
                 RenderOptions.BitmapInterpolationMode="HighQuality"/>
@@ -114,9 +114,18 @@
           <TextBlock TextAlignment="Center" FontWeight="Bold"
                      Text="{Binding TrackNo}" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         </Border>
+        <Border IsVisible="{Binding !IsRendererVisible}" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                Width="{Binding #AvatarImageBorder.Bounds.Width}" ClipToBounds="True"
+                Background="#B0000000" Height="16">
+          <Button Classes="clear" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                  Padding="3,0" Focusable="False"
+                  Click="TrackNameButtonClicked" ToolTip.Tip="{Binding TrackName}">
+            <TextBlock Text="{Binding TrackName}" Foreground="White" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+          </Button>
+        </Border>
       </Panel>
       <Grid ColumnDefinitions="*,auto" RowDefinitions="auto,auto" Grid.Column="1">
-        <StackPanel Grid.Column="0" Grid.Row="0">
+        <StackPanel Grid.Column="0" Grid.Row="0" IsVisible="{Binding IsRendererVisible}">
           <Button Classes="clear" Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" Margin="1" Padding="2,1,0,0" Height="17"
                   HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Focusable="False"
                   Content="{Binding TrackName}" Click="TrackNameButtonClicked"/>
@@ -133,6 +142,20 @@
                   Content="{Binding Renderer}" Click="RendererButtonClicked" ContextRequested="RendererButtonContextRequested"
                   ToolTip.Tip="{DynamicResource tracks.selectrenderer}" ContextMenu="{StaticResource RendererMenuRes}"/>
         </StackPanel>
+        <Grid Grid.Column="0" Grid.Row="0" IsVisible="{Binding !IsRendererVisible}" ColumnDefinitions="*,*" RowDefinitions="auto,auto">
+          <Button Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Classes="clear" Margin="1" Padding="2,1,0,0" Height="17"
+                  HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Focusable="False"
+                  Content="{Binding Singer, TargetNullValue={StaticResource tracks.selectsinger}}" Click="SingerButtonClicked"
+                  ToolTip.Tip="{Binding Singer}"/>
+          <Button Grid.Row="1" Grid.Column="0" Classes="clear" Margin="1" Padding="2,1,0,0" Height="17"
+                  HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Focusable="False"
+                  Content="{Binding PhonemizerDisplay}" Click="PhonemizerButtonClicked"
+                  ToolTip.Tip="{Binding Phonemizer}"/>
+          <Button Grid.Row="1" Grid.Column="1" Classes="clear" Margin="1" Padding="2,1,0,0" Height="17"
+                  HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Focusable="False"
+                  Content="{Binding Renderer}" Click="RendererButtonClicked"
+                  ToolTip.Tip="{DynamicResource tracks.selectrenderer}"/>
+        </Grid>
         <Grid Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" ColumnDefinitions="3,2*,2,28,5,*,2,26">
           <Grid.Styles>
             <Style Selector="Slider, TextBlock, TextBox">
@@ -173,7 +196,7 @@
                   FontFamily="monospace" KeyDown="VolumeOrPanTextBoxKeyDown" LostFocus="VolumeOrPanTextBoxLostFocus"/>
         </Grid>
         <Button Grid.Column="1" Grid.Row="0" Classes="clear" Height="17" Width="17" Margin="1" Padding="0"
-                VerticalAlignment="Top" Content="⋯" IsVisible="{Binding !IsRendererVisible}">
+                VerticalAlignment="Top" Content="⋯" IsVisible="False">
           <Button.Flyout>
             <Flyout>
               <StackPanel Spacing="2">
@@ -256,6 +279,7 @@
           <MenuItem Classes="context" Header="{DynamicResource tracks.duplicate}" Command="{Binding Duplicate}"/>
           <MenuItem Classes="context" Header="{DynamicResource tracks.duplicatesettings}" Command="{Binding DuplicateSettings}"/>
           <MenuItem Classes="context" Header="{DynamicResource dialogs.voicecolorremapping}" Command="{Binding VoiceColorRemapping}"/>
+          <MenuItem Classes="context" Header="{DynamicResource tracks.tracksettings}" Click="TrackSettingsButtonClicked"/>
           <Separator/>
           <MenuItem Classes="context" Header="{DynamicResource tracks.mixfx}" Command="{Binding OpenMixFxDialog}"/>
         </ContextMenu>

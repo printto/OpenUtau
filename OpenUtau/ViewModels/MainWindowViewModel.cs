@@ -136,6 +136,8 @@ namespace OpenUtau.App.ViewModels {
                 .Subscribe(x => {
                     PianoRollMaxHeight = x ? double.PositiveInfinity : 0;
                     PianoRollMinHeight = x ? ViewConstants.PianoRollMinHeight : 0;
+                    // Compact tracks while the piano roll is docked; full height otherwise.
+                    TracksViewModel.TrackHeight = x ? ViewConstants.TrackHeightCompact : ViewConstants.TrackHeightDefault;
                 });
         }
 
