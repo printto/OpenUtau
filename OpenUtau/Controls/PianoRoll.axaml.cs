@@ -256,6 +256,12 @@ namespace OpenUtau.App.Controls {
             Focus(); // Force unfocus menu for key down events.
         }
 
+        void OnCloseNoteParams(object sender, RoutedEventArgs args) {
+            if (ViewModel?.NotesViewModel != null) {
+                ViewModel.NotesViewModel.ShowNoteParams = false;
+            }
+        }
+
         void OnMenuPointerLeave(object sender, PointerEventArgs args) {
             Focus(); // Force unfocus menu for key down events.
         }

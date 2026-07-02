@@ -624,11 +624,21 @@
                  IsHitTestVisible="False" VerticalAlignment="Bottom" Margin="10,5"
                  IsVisible="{Binding NotesViewModel.PrimaryKeyNotSupported}"
                  Text="{DynamicResource tip.exps.notsupported}"/>
-      <Border Grid.Column="3" Grid.Row="0" Grid.RowSpan="6"
+      <Border Grid.Column="3" Grid.Row="2" Grid.RowSpan="4"
               IsEnabled="{Binding NotesViewModel.ShowNoteParams}"
               IsVisible="{Binding NotesViewModel.ShowNoteParams}"
               Background="{DynamicResource SystemRegionBrush}" Padding="0">
-        <c:NotePropertiesControl/>
+        <Grid>
+          <c:NotePropertiesControl/>
+          <Button HorizontalAlignment="Right" VerticalAlignment="Top"
+                  Background="Transparent" BorderThickness="0"
+                  Margin="0,2,6,0" Padding="0" Width="26" Height="26"
+                  Click="OnCloseNoteParams" ToolTip.Tip="Close">
+            <Path Width="14" Height="14" Stretch="Uniform"
+                  Fill="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                  Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+          </Button>
+        </Grid>
       </Border>
 
       <Border Grid.Row="2" Grid.RowSpan="2" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
