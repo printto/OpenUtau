@@ -54,6 +54,7 @@ namespace OpenUtau.App.Controls {
             DataContext = ViewModel = model;
             ValueTip.IsVisible = false;
             SetPenToolIcon();
+            SetPitchToolIcon();
             penTool.AddHandler(PointerPressedEvent, OnToolButtonPointerPressed, RoutingStrategies.Tunnel | RoutingStrategies.Bubble, true);
             this.LayoutUpdated += PianoRollLayoutUpdated;
         }
@@ -414,6 +415,26 @@ namespace OpenUtau.App.Controls {
             penTool.Classes.Remove("penTool");
             penTool.Classes.Remove("penPlusTool");
             penTool.Classes.Add(ViewModel.EditTool.PenToolVariation == 1 ? "penPlusTool" : "penTool");
+        }
+        void PitchToolButton_PointerReleased(object? sender, PointerReleasedEventArgs args) {
+            FlyoutBase.ShowAttachedFlyout(pitchTool);
+        }
+        void PitchToolListBox_PointerReleased(object? sender, PointerReleasedEventArgs args) {
+            FlyoutBase.GetAttachedFlyout(pitchTool)?.Hide();
+            SetPitchToolIcon();
+        }
+        void SetPitchToolIcon() {
+            pitchTool.Classes.Remove("pitchLineTool");
+            pitchTool.Classes.Remove("pitchSCurveTool");
+            pitchTool.Classes.Remove("pitchSineWaveTool");
+            pitchTool.Classes.Remove("pitchSmoothenTool");
+            string pitchClass = ViewModel.EditTool.PitchToolVariation switch {
+                1 => "pitchSCurveTool",
+                2 => "pitchSineWaveTool",
+                3 => "pitchSmoothenTool",
+                _ => "pitchLineTool",
+            };
+            pitchTool.Classes.Add(pitchClass);
         }
 
         void SearchNote() {
@@ -1524,15 +1545,16 @@ namespace OpenUtau.App.Controls {
                     case Key.D2: ViewModel.ToolIndex = 1; return true;
                     case Key.D3: ViewModel.ToolIndex = 2; return true;
                     case Key.D4: ViewModel.ToolIndex = 3; return true;
+                    case Key.D5: ViewModel.ToolIndex = 4; return true;
+                    case Key.D6: ViewModel.ToolIndex = 5; return true;
                 }
             }
             if (isShift) {
                 switch (args.Key) {
-                    case Key.D1: ViewModel.ToolIndex = 4; return true;
-                    case Key.D2: ViewModel.ToolIndex = 5; return true;
-                    case Key.D3: ViewModel.ToolIndex = 6; return true;
-                    case Key.D4: ViewModel.ToolIndex = 7; return true;
-                    case Key.D5: ViewModel.ToolIndex = 8; return true;
+                    case Key.D1: ViewModel.ToolIndex = 5; ViewModel.PitchToolIndex = 0; SetPitchToolIcon(); return true;
+                    case Key.D2: ViewModel.ToolIndex = 5; ViewModel.PitchToolIndex = 1; SetPitchToolIcon(); return true;
+                    case Key.D3: ViewModel.ToolIndex = 5; ViewModel.PitchToolIndex = 2; SetPitchToolIcon(); return true;
+                    case Key.D4: ViewModel.ToolIndex = 5; ViewModel.PitchToolIndex = 3; SetPitchToolIcon(); return true;
                 }
             }
             if (isAlt) {
