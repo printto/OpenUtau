@@ -1536,17 +1536,15 @@ namespace OpenUtau.App.Controls {
                 }
             }
             if (isAlt) {
-                switch (args.Key) {
-                    case Key.D1: expSelector1?.SelectExp(); return true;
-                    case Key.D2: expSelector2?.SelectExp(); return true;
-                    case Key.D3: expSelector3?.SelectExp(); return true;
-                    case Key.D4: expSelector4?.SelectExp(); return true;
-                    case Key.D5: expSelector5?.SelectExp(); return true;
-                    case Key.D6: expSelector6?.SelectExp(); return true;
-                    case Key.D7: expSelector7?.SelectExp(); return true;
-                    case Key.D8: expSelector8?.SelectExp(); return true;
-                    case Key.D9: expSelector9?.SelectExp(); return true;
-                    case Key.D0: expSelector10?.SelectExp(); return true;
+                var exps = ViewModel.NotesViewModel.Expressions;
+                int expIndex = args.Key switch {
+                    Key.D1 => 0, Key.D2 => 1, Key.D3 => 2, Key.D4 => 3, Key.D5 => 4,
+                    Key.D6 => 5, Key.D7 => 6, Key.D8 => 7, Key.D9 => 8, Key.D0 => 9,
+                    _ => -1,
+                };
+                if (expIndex >= 0 && expIndex < exps.Count) {
+                    ViewModel.NotesViewModel.PrimaryExp = exps[expIndex];
+                    return true;
                 }
             }
             #endregion
@@ -2024,12 +2022,7 @@ namespace OpenUtau.App.Controls {
         }
 
         public void AttachExpressions() {
-            if (expSelector1 == null) {
-                return;
-            }
-            var exps = new ExpSelector[] { expSelector1, expSelector2, expSelector3, expSelector4, expSelector5, expSelector6, expSelector7, expSelector8, expSelector9, expSelector10 };
-            exps[DocManager.Inst.Project.expSecondary].SelectExp();
-            exps[DocManager.Inst.Project.expPrimary].SelectExp();
+            ViewModel?.NotesViewModel?.RefreshExpressions();
         }
 
         public void OnNext(UCommand cmd, bool isUndo) {

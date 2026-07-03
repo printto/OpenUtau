@@ -34,6 +34,18 @@ namespace OpenUtau.App.ViewModels {
     }
     public class WaveformRefreshEvent { }
 
+    public class ExpressionOption {
+        public UExpressionDescriptor Descriptor { get; }
+        public string Abbr => Descriptor.abbr ?? string.Empty;
+        public string ShortDisplay => (Descriptor.abbr ?? string.Empty).ToUpperInvariant();
+        public string Display => string.IsNullOrEmpty(Descriptor.name)
+            ? ShortDisplay
+            : System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Descriptor.name);
+        public ExpressionOption(UExpressionDescriptor descriptor) {
+            Descriptor = descriptor;
+        }
+    }
+
     public class NotesViewModel : ViewModelBase, ICmdSubscriber {
         [Reactive] public Rect Bounds { get; set; }
         public int TickCount => Part?.Duration ?? 480 * 4;
@@ -71,6 +83,9 @@ namespace OpenUtau.App.ViewModels {
         [Reactive] public string SecondaryKey { get; set; }
         [Reactive] public double ExpTrackHeight { get; set; }
         [Reactive] public double ExpShadowOpacity { get; set; }
+        [Reactive] public ExpressionOption? PrimaryExp { get; set; }
+        [Reactive] public ExpressionOption? SecondaryExp { get; set; }
+        public ObservableCollectionExtended<ExpressionOption> Expressions { get; } = new ObservableCollectionExtended<ExpressionOption>();
         [Reactive] public double ExpHeightMin { get; set; }
         [Reactive] public double ExpHeightMax { get; set; }
         [Reactive] public UVoicePart? Part { get; set; }
@@ -165,18 +180,42 @@ namespace OpenUtau.App.ViewModels {
                         }
                     }
                     if (descriptor != null) {
-                        if (descriptor.type == UExpressionType.Options) {
-                            ExpTrackHeight = 0;
-                            ExpShadowOpacity = 0;
-                        } else {
-                            ExpTrackHeight = 0;
-                        }
+                        ExpTrackHeight = 0;
                         ShowCurveToolbar = descriptor.type == UExpressionType.Curve;
                     } else {
                         ExpTrackHeight = 0;
-                        ExpShadowOpacity = 0.3;
                         ShowCurveToolbar = false;
                     }
+                });
+            this.WhenAnyValue(x => x.PrimaryExp)
+                .Subscribe(o => {
+                    if (o != null && PrimaryKey != o.Abbr) {
+                        PrimaryKey = o.Abbr;
+                        PrimaryKeyNotSupported = !IsExpSupported(PrimaryKey);
+                    }
+                });
+            this.WhenAnyValue(x => x.SecondaryExp)
+                .Subscribe(o => {
+                    var k = o?.Abbr ?? string.Empty;
+                    if (SecondaryKey != k) {
+                        SecondaryKey = k;
+                    }
+                });
+            this.WhenAnyValue(x => x.PrimaryKey)
+                .Subscribe(k => {
+                    var o = Expressions.FirstOrDefault(e => e.Abbr == k);
+                    if (o != null && !ReferenceEquals(PrimaryExp, o)) {
+                        PrimaryExp = o;
+                    }
+                    UpdateExpShadow();
+                });
+            this.WhenAnyValue(x => x.SecondaryKey)
+                .Subscribe(k => {
+                    var o = Expressions.FirstOrDefault(e => e.Abbr == k);
+                    if (!ReferenceEquals(SecondaryExp, o)) {
+                        SecondaryExp = o;
+                    }
+                    UpdateExpShadow();
                 });
             this.WhenAnyValue(x => x.Project)
                 .Subscribe(project => {
@@ -274,8 +313,8 @@ namespace OpenUtau.App.ViewModels {
                 Preferences.Default.ShowTips = false;
                 Preferences.Save();
             }
-            PrimaryKey = Core.Format.Ustx.VEL;
-            SecondaryKey = Core.Format.Ustx.VOL;
+            PrimaryKey = Core.Format.Ustx.CLR;
+            SecondaryKey = Core.Format.Ustx.CLR;
 
             HitTest = new NotesViewModelHitTest(this);
             DocManager.Inst.AddSubscriber(this);
@@ -1054,6 +1093,22 @@ namespace OpenUtau.App.ViewModels {
             return true;
         }
 
+        void UpdateExpShadow() {
+            ExpShadowOpacity = (!string.IsNullOrEmpty(SecondaryKey) && SecondaryKey != PrimaryKey) ? 0.3 : 0;
+        }
+
+        public void RefreshExpressions() {
+            var options = Project?.expressions.Values.Select(d => new ExpressionOption(d)).ToList()
+                ?? new List<ExpressionOption>();
+            Expressions.Clear();
+            foreach (var o in options) {
+                Expressions.Add(o);
+            }
+            PrimaryExp = Expressions.FirstOrDefault(e => e.Abbr == PrimaryKey);
+            SecondaryExp = Expressions.FirstOrDefault(e => e.Abbr == SecondaryKey);
+            UpdateExpShadow();
+        }
+
         public void OnNext(UCommand cmd, bool isUndo) {
             if (cmd is UNotification notif) {
                 if (cmd is LoadPartNotification loadPart) {
@@ -1066,7 +1121,6 @@ namespace OpenUtau.App.ViewModels {
                     LoadPortrait(null, null);
                     PrimaryKeyNotSupported = !IsExpSupported(PrimaryKey);
                 } else if (cmd is SelectExpressionNotification selectExp) {
-                    SecondaryKey = PrimaryKey;
                     PrimaryKey = selectExp.ExpKey;
                     PrimaryKeyNotSupported = !IsExpSupported(PrimaryKey);
                 } else if (cmd is SetPlayPosTickNotification setPlayPosTick) {
