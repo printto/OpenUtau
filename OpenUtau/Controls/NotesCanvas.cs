@@ -219,10 +219,24 @@ namespace OpenUtau.App.Controls {
             Size size = viewModel.TickToneToSize(note.duration, 1);
             size = size.WithWidth(size.Width - 1).WithHeight(Math.Floor(size.Height - 2));
             Point rightBottom = new Point(leftTop.X + size.Width, leftTop.Y + size.Height);
-            var brush = selectedNotes.Contains(note)
-                ? (note.Error ? ThemeManager.AccentBrush2Semi : ThemeManager.AccentBrush2)
-                : (note.Error ? ThemeManager.AccentBrush1Semi : ThemeManager.AccentBrush1);
-            context.DrawRectangle(brush, null, new Rect(leftTop, rightBottom), 2, 2);
+            var baseBrush = selectedNotes.Contains(note)
+                    ? (note.Error ? ThemeManager.AccentBrush2Semi : ThemeManager.AccentBrush2)
+                    : (note.Error ? ThemeManager.AccentBrush1Semi : ThemeManager.AccentBrush1);
+            // Darker base brush for the inside of the note
+            Avalonia.Media.IBrush fillBrush = baseBrush;
+            if (ThemeManager.IsDarkMode) {
+                if (baseBrush is Avalonia.Media.ISolidColorBrush solidBrush) {
+                    var c = solidBrush.Color;
+                    var darkerColor = Avalonia.Media.Color.FromArgb(c.A,
+                        (byte)(c.R * 0.6),
+                        (byte)(c.G * 0.6),
+                        (byte)(c.B * 0.6));
+                    fillBrush = new Avalonia.Media.SolidColorBrush(darkerColor);
+                }
+            }
+            // Outline
+            var outlinePen = new Avalonia.Media.Pen(baseBrush, 1.5); // Change 1.5 to adjust border thickness
+            context.DrawRectangle(fillBrush, outlinePen, new Rect(leftTop, rightBottom), 5, 5);
             if (TrackHeight < 10 || note.lyric.Length == 0) {
                 return;
             }
@@ -321,9 +335,9 @@ namespace OpenUtau.App.Controls {
 
         private void RenderGhostNote(UNote note, NotesViewModel viewModel, DrawingContext context, int partOffset, IBrush brush) {
             // REVIEW should ghost note be smaller?
-            double relativeSize = 0.5d;
+            double relativeSize = 0.4d;
             double height = TrackHeight * relativeSize;
-            double yOffset = Math.Floor(height * 0.5f);
+            double yOffset = Math.Floor(height * 0.8f);
             Point leftTop = viewModel.TickToneToPoint(partOffset + note.position, note.AdjustedTone);
             leftTop = leftTop.WithX(leftTop.X + 1).WithY(Math.Round(leftTop.Y + 1 + yOffset));
 
@@ -349,7 +363,7 @@ namespace OpenUtau.App.Controls {
             points.Add(p0);
 
             var brush = note.pitch.snapFirst ? ThemeManager.AccentBrush3 : null;
-            var pen = ThemeManager.AccentPen3;
+            var pen = ThemeManager.AccentPen2;
             using (var state = context.PushTransform(Matrix.CreateTranslation(p0.X, p0.Y))) {
                 context.DrawGeometry(brush, pen, pointGeometry);
             }
