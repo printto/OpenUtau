@@ -314,7 +314,7 @@ namespace OpenUtau.App.ViewModels {
                 Preferences.Save();
             }
             PrimaryKey = Core.Format.Ustx.CLR;
-            SecondaryKey = Core.Format.Ustx.CLR;
+            SecondaryKey = Core.Format.Ustx.PITD;
 
             HitTest = new NotesViewModelHitTest(this);
             DocManager.Inst.AddSubscriber(this);

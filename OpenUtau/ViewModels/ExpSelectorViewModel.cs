@@ -68,6 +68,7 @@ namespace OpenUtau.App.ViewModels {
                 DocManager.Inst.ExecuteCmd(new SelectExpressionNotification(Descriptor.abbr, Index, true));
             }
             if(store) {
+                DocManager.Inst.ExpSelectorsUserChanged = true;
                 var project = DocManager.Inst.Project;
                 project.expSecondary = project.expPrimary;
                 project.expPrimary = Index;

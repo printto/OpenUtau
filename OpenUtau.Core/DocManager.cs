@@ -46,6 +46,8 @@ namespace OpenUtau.Core {
         internal PhonemizerRunner PhonemizerRunner { get; private set; }
         public List<Type> ExternalBatchEditTypes { get; private set; } = new List<Type>();
 
+        public bool ExpSelectorsUserChanged { get; set; } = false; //This is used per session
+
         public void Initialize(Thread mainThread, TaskScheduler mainScheduler) {
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler((sender, args) => {
                 CrashSave();
@@ -220,6 +222,23 @@ namespace OpenUtau.Core {
                     playPosTick = 0;
                     rangeStartTick = 0;
                     rangeEndTick = 0;
+
+                    // force primary CLR and secondary PITD regardless of saved USTx.
+                    if (!ExpSelectorsUserChanged) {
+                        try {
+                            var selectors = Project.expSelectors;
+                            int clrIndex = Array.FindIndex(selectors, s => s == Format.Ustx.CLR);
+                            int pitdIndex = Array.FindIndex(selectors, s => s == Format.Ustx.PITD);
+                            if (clrIndex >= 0) {
+                                Project.expPrimary = clrIndex;
+                            }
+                            if (pitdIndex >= 0) {
+                                Project.expSecondary = pitdIndex;
+                            }
+                        } catch (Exception e) {
+                            Log.Warning(e, "Failed to enforce CLR/PITD defaults for expression selectors.");
+                        }
+                    }
                 } else if (cmd is SetPlayPosTickNotification setPlayPosTickNotif) {
                     playPosTick = setPlayPosTickNotif.playPosTick;
                 } else if (cmd is SetRangeSelectionNotification setRange) {
