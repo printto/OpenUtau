@@ -240,6 +240,12 @@ namespace OpenUtau.Core.Ustx {
                 }
             }
             TrackNo = project.tracks.IndexOf(this);
+
+            // Auto-assign a track color when loading if the track color isn't provided.
+            if (TrackColor == "Blue" && AutoTrackColors[(TrackNo >= 0 ? TrackNo : 0) % AutoTrackColors.Length] != "Blue") {
+                TrackColor = AutoTrackColors[(TrackNo >= 0 ? TrackNo : 0) % AutoTrackColors.Length];
+            }
+
             if (!Solo && Mute) {
                 Muted = true;
             }
