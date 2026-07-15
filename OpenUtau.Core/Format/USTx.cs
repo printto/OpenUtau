@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using NWaves.Windows;
 using OpenUtau.Classic;
 using OpenUtau.Core.Ustx;
 using OpenUtau.Core.Util;
@@ -133,7 +136,15 @@ namespace OpenUtau.Core.Format {
             project.AfterLoad();
             project.ValidateFull();
             if (project.ustxVersion > kUstxVersion) {
-                throw new MessageCustomizableException($"Project file is newer than software: {filePath}", $"<translate:errors.failed.opennewerproject>:\n{filePath}", new FileFormatException("Project file is newer than software."));
+                //throw new MessageCustomizableException($"Project file is newer than software: {filePath}", $"<translate:errors.failed.opennewerproject>:\n{filePath}", new FileFormatException("Project file is newer than software."));
+                string errorString = $"Project file is newer than this version of the software:\n{filePath}\n\nProject version: {project.ustxVersion}\nSupported version: {kUstxVersion}\n\nThe project may have been created with a newer or different fork of the software.\n\nThe project will still load, but some features may not work in this version.";
+                Log.Warning(errorString);
+                var mce = new MessageCustomizableException(
+                    errorString,
+                    errorString,
+                    new FileFormatException("Project file is newer than software."),
+                    false);
+                DocManager.Inst.ExecuteCmd(new ErrorMessageNotification(mce));
             }
             if (project.ustxVersion < kUstxVersion) {
                 Log.Information($"Upgrading project from {project.ustxVersion} to {kUstxVersion}");
