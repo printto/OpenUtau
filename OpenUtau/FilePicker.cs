@@ -9,7 +9,10 @@ using OpenUtau.Core.Util;
 namespace OpenUtau.App {
     internal class FilePicker {
         public static FilePickerFileType ProjectFiles { get; } = new("Project Files") {
-            Patterns = new[] { "*.ustx", "*.vsqx", "*.ust", "*.mid", "*.midi", "*.ufdata", "*.musicxml" },
+            Patterns = new[] { "*.ustx", "*.vsqx", "*.ust", "*.mid", "*.midi", "*.ufdata", "*.musicxml", "*.pmws" },
+        };
+        public static FilePickerFileType PMWS { get; } = new("PRINTmov Web Synth") {
+            Patterns = new[] { "*.pmws" },
         };
         public static FilePickerFileType USTX { get; } = new("USTX") {
             Patterns = new[] { "*.ustx" },

@@ -108,6 +108,11 @@ OpenUtau aims to be an open source editing environment for UTAU community, with 
   <system:String x:Key="dialogs.export.savefirst">Save project file first</system:String>
   <system:String x:Key="dialogs.importtracks.caption">Import tracks</system:String>
   <system:String x:Key="dialogs.importtracks.importtempo">The imported project contains the following tempo markers. Do you want to use them?</system:String>
+  <system:String x:Key="dialogs.printmovorigin.caption">Loading PRINTmov Vocal USTx</system:String>
+  <system:String x:Key="dialogs.printmovorigin.message">This project was exported from PRINTmov Vocal (Web Synth Project).&#x0a;&#x0a;PRINTmov Vocal and OpenUtau PRINTmov Edition share the USTx format but not every feature, so some things may be missing or behave differently.&#x0a;&#x0a;The project will load normally.</system:String>
+  <system:String x:Key="dialogs.pmws.exported">Exported to PRINTmov Web Synth</system:String>
+  <system:String x:Key="dialogs.pmws.notracks">This project has no voice tracks with notes to export.</system:String>
+  <system:String x:Key="menu.file.exportpmws">Export PRINTmov Web Synth (.pmws)</system:String>
   <system:String x:Key="dialogs.installdependency.caption">Installing dependency</system:String>
   <system:String x:Key="dialogs.installdependency.message">Installing </system:String>
   <system:String x:Key="dialogs.installdll.caption">Installing phonemizer</system:String>

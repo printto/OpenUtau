@@ -493,6 +493,26 @@ namespace OpenUtau.App.Views {
             }
         }
 
+        async void OnMenuExportPmws(object sender, RoutedEventArgs e) {
+            var project = DocManager.Inst.Project;
+            var file = await FilePicker.SaveFileAboutProject(
+                this, "menu.file.exportpmws", FilePicker.PMWS);
+            if (string.IsNullOrEmpty(file)) {
+                return;
+            }
+            try {
+                // A pmws holds one voice part, so a multi-part project writes one file each.
+                var written = Pmws.Save(file, project);
+                DocManager.Inst.ExecuteCmd(new ProgressBarNotification(0,
+                    $"{ThemeManager.GetString("dialogs.pmws.exported")}: {string.Join(", ", written)}"));
+            } catch (Exception ex) {
+                DocManager.Inst.ExecuteCmd(new ErrorMessageNotification(
+                    new MessageCustomizableException(
+                        $"Failed to export pmws: {file}",
+                        "<translate:dialogs.pmws.notracks>", ex, false)));
+            }
+        }
+
         private async Task<bool> WarnToSave(UProject project) {
             if (string.IsNullOrEmpty(project.FilePath)) {
                 await MessageBox.Show(
@@ -900,7 +920,7 @@ namespace OpenUtau.App.Views {
         }
 
         async void OnDrop(object? sender, DragEventArgs args) {
-            string[] ProjectExts = { ".ustx", ".ust", ".vsqx", ".ufdata", ".musicxml", ".mid", ".midi" };
+            string[] ProjectExts = { ".ustx", ".ust", ".vsqx", ".ufdata", ".musicxml", ".mid", ".midi", ".pmws" };
             string[] ArchiveExts = { ".zip", ".rar", ".uar" };
             string[] AudioExts = { ".mp3", ".wav", ".ogg", ".flac" };
             string[] SupportedExts = ProjectExts
@@ -1897,6 +1917,15 @@ namespace OpenUtau.App.Views {
                         MessageBox.ShowError(this, notif.e, notif.message, true);
                         break;
                 }
+            } else if (cmd is PrintmovOriginNotification) {
+                // Informational, not an error — plain message box, not ShowError.
+                Avalonia.Threading.Dispatcher.UIThread.Post(async () => {
+                    await MessageBox.Show(
+                        this,
+                        ThemeManager.GetString("dialogs.printmovorigin.message"),
+                        ThemeManager.GetString("dialogs.printmovorigin.caption"),
+                        MessageBox.MessageBoxButtons.Ok);
+                });
             } else if (cmd is DefaultVocoderUsedNotification) {
                 Avalonia.Threading.Dispatcher.UIThread.Post(async () => {
                     var dialog = new VocoderCreditDialog();

@@ -32,9 +32,23 @@ namespace OpenUtau.Core.Ustx {
         public override string ToString() => $"{beatPerBar}/{beatUnit}@bar{barPosition}";
     }
 
+    /// <summary>
+    /// Origin marker written by PRINTmov Vocal (web synth) when it exports ustx.
+    /// Upstream OpenUtau ignores it (the yaml reader ignores unmatched properties).
+    /// </summary>
+    public class UPrintmovOrigin {
+        public string app = string.Empty;
+        public int format;
+        public string? exported;
+
+        [YamlIgnore] public bool IsWebSynth => app == "printmov-web-synth";
+    }
+
     public class UProject {
         public string name = "New Project";
         public string comment = string.Empty;
+        /// <summary>Set when the project came from PRINTmov Vocal. Null otherwise.</summary>
+        public UPrintmovOrigin? printmov;
         public string outputDir = "Vocal";
         public string cacheDir = "UCache";
         [YamlMember(SerializeAs = typeof(string))]

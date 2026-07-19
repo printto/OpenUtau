@@ -267,4 +267,14 @@ namespace OpenUtau.Core {
     public class DefaultVocoderUsedNotification : UNotification {
         public override string ToString() => "Default vocoder used.";
     }
+    /// <summary>
+    /// A project exported from PRINTmov Vocal was opened.
+    /// </summary>
+    public class PrintmovOriginNotification : UNotification {
+        public int Format { get; }
+        public PrintmovOriginNotification(int format) {
+            Format = format;
+        }
+        public override string ToString() => "Project from PRINTmov Vocal.";
+    }
 }

@@ -127,6 +127,17 @@ namespace OpenUtau.Core.Format {
             }
         }
 
+        /// <summary>
+        /// Tell the user a ustx came from PRINTmov Vocal.
+        /// </summary>
+        private static void NotifyPrintmovOrigin(UProject project, string filePath) {
+            if (project.printmov == null || !project.printmov.IsWebSynth) {
+                return;
+            }
+            Log.Information($"Project exported from PRINTmov Vocal (format {project.printmov.format}): {filePath}");
+            DocManager.Inst.ExecuteCmd(new PrintmovOriginNotification(project.printmov.format));
+        }
+
         public static UProject Load(string filePath) {
             string text = File.ReadAllText(filePath, Encoding.UTF8);
             UProject project = Yaml.DefaultDeserializer.Deserialize<UProject>(text);
@@ -149,6 +160,7 @@ namespace OpenUtau.Core.Format {
             if (project.ustxVersion < kUstxVersion) {
                 Log.Information($"Upgrading project from {project.ustxVersion} to {kUstxVersion}");
             }
+            NotifyPrintmovOrigin(project, filePath);
             if (project.ustxVersion < new Version(0, 4)) {
                 if (project.expressions.TryGetValue("acc", out var exp) && exp.name == "accent") {
                     project.expressions.Remove("acc");
