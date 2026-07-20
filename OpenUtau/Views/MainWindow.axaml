@@ -27,10 +27,12 @@
             <MenuItem Header="-" Height="1"/>
             <MenuItem Header="{DynamicResource menu.file.open}" InputGesture="Ctrl+O" Click="OnMenuOpen"/>
             <MenuItem Header="{DynamicResource menu.file.openrecent}" ItemsSource="{Binding OpenRecentMenuItems}" Classes="MenuItemWithSubMenu"/>
-            <MenuItem Header="{DynamicResource menu.file.openprojectlocation}" Click="OnMenuOpenProjectLocation"/>
+            <MenuItem Header="{DynamicResource menu.file.opensharecode}" Click="OnMenuOpenShareCode"/>
+            <!-- <MenuItem Header="{DynamicResource menu.file.openprojectlocation}" Click="OnMenuOpenProjectLocation"/> -->
             <MenuItem Header="-" Height="1"/>
             <MenuItem Header="{DynamicResource menu.file.save}" InputGesture="Ctrl+S" Click="OnMenuSave"/>
             <MenuItem Header="{DynamicResource menu.file.saveas}"  InputGesture="Ctrl+Shift+S" Click="OnMenuSaveAs"/>
+            <MenuItem Header="{DynamicResource menu.file.sharetodevice}" Click="OnMenuShareToDevice"/>
             <MenuItem Header="-" Height="1"/>
             <MenuItem Header="{DynamicResource menu.file.importtracks}" Click="OnMenuImportTracks"/>
             <MenuItem Header="{DynamicResource menu.file.importaudio}" Click="OnMenuImportAudio"/>
@@ -48,6 +50,8 @@
               <MenuItem Header="{DynamicResource menu.file.exportpmws}" Click="OnMenuExportPmws"/>
             </MenuItem>
             <MenuItem Header="{DynamicResource menu.file.openexportlocation}" Click="OnMenuOpenProjectLocation"/>
+            <MenuItem Header="-" Height="1"/>
+            <MenuItem Header="{DynamicResource menu.file.sendtowebsynth}" Click="OnMenuSendToWebSynth"/>
           </MenuItem>
           <MenuItem Header="{DynamicResource menu.edit}" IsEnabled="{Binding Page}">
             <MenuItem Header="{Binding UndoText}" InputGesture="Ctrl+Z" Command="{Binding Undo}" IsEnabled="{Binding CanUndo}"/>
@@ -184,6 +188,39 @@
 
                     <TextBlock HorizontalAlignment="Stretch"
                       Text="{DynamicResource welcome.open.description}"
+                      FontSize="12"
+                      FontWeight="Normal"
+                      TextWrapping="Wrap" />
+                  </StackPanel>
+                </Grid>
+              </Button>
+
+              <Button Margin="4" Click="OnMenuOpenShareCode" Height="60" Padding="12">
+                <Grid ColumnDefinitions="Auto,*">
+                  <Viewbox
+                    Grid.RowSpan="2"
+                    Width="24"
+                    Height="24"
+                    Margin="8,4,12,4">
+                    <!--download-into-tray: pulling a shared project down from a code-->
+                    <Path Classes="clear" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center"
+                      Data="M7 1h2v5h3l-4 4.5L4 6h3V1z M2.5 12h11v1.5h-11z"
+                      Fill="{StaticResource NeutralAccentBrush}"/>
+                  </Viewbox>
+
+                  <StackPanel Grid.Column="1"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    Margin="0,0,8,0">
+
+                    <TextBlock HorizontalAlignment="Stretch"
+                      Text="{DynamicResource welcome.opensharecode}"
+                      FontSize="14"
+                      FontWeight="Normal"
+                      TextWrapping="Wrap" />
+
+                    <TextBlock HorizontalAlignment="Stretch"
+                      Text="{DynamicResource welcome.opensharecode.description}"
                       FontSize="12"
                       FontWeight="Normal"
                       TextWrapping="Wrap" />

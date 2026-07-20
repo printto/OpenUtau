@@ -501,7 +501,7 @@ namespace OpenUtau.App.Views {
                 return;
             }
             try {
-                // A pmws holds one voice part, so a multi-part project writes one file each.
+                // A pmws holds one voice part, so a multi-part project writes several files.
                 var written = Pmws.Save(file, project);
                 DocManager.Inst.ExecuteCmd(new ProgressBarNotification(0,
                     $"{ThemeManager.GetString("dialogs.pmws.exported")}: {string.Join(", ", written)}"));
@@ -511,6 +511,57 @@ namespace OpenUtau.App.Views {
                         $"Failed to export pmws: {file}",
                         "<translate:dialogs.pmws.notracks>", ex, false)));
             }
+        }
+
+        async Task ShowShareDialog(ShareCodeDialog.StartMode mode) {
+            var dialog = new ShareCodeDialog();
+            dialog.Init(DocManager.Inst.Project, mode);
+            await dialog.ShowDialog(this);
+            if (dialog.OpenedProject == null) {
+                return;
+            }
+            if (!DocManager.Inst.ChangesSaved && !await AskIfSaveAndContinue()) {
+                return;
+            }
+            DocManager.Inst.ExecuteCmd(new LoadProjectNotification(dialog.OpenedProject));
+            viewModel.Page = 1;
+        }
+
+        async void OnMenuSendToWebSynth(object sender, RoutedEventArgs e)
+            => await ShowShareDialog(ShareCodeDialog.StartMode.Share);
+
+        async void OnMenuShareToDevice(object sender, RoutedEventArgs e)
+            => await ShowShareDialog(ShareCodeDialog.StartMode.Choose);
+
+        async void OnMenuOpenShareCode(object sender, RoutedEventArgs e) {
+            var dialog = new TypeInDialog();
+            dialog.Title = ThemeManager.GetString("dialogs.opensharecode.caption");
+            dialog.SetPrompt(ThemeManager.GetString("dialogs.opensharecode.message"));
+            dialog.SetOkText(ThemeManager.GetString("dialogs.opensharecode.open"));
+            dialog.SetText(string.Empty);
+            dialog.onFinish = async code => {
+                if (string.IsNullOrWhiteSpace(code)) {
+                    return;
+                }
+                try {
+                    DocManager.Inst.ExecuteCmd(new ProgressBarNotification(0,
+                        ThemeManager.GetString("dialogs.opensharecode.fetching")));
+                    var project = await PmwsLink.OpenShareAsync(code);
+                    DocManager.Inst.ExecuteCmd(new ProgressBarNotification(0, string.Empty));
+                    if (!DocManager.Inst.ChangesSaved && !await AskIfSaveAndContinue()) {
+                        return;
+                    }
+                    DocManager.Inst.ExecuteCmd(new LoadProjectNotification(project));
+                    viewModel.Page = 1;   // leave the welcome screen
+                } catch (Exception ex) {
+                    DocManager.Inst.ExecuteCmd(new ProgressBarNotification(0, string.Empty));
+                    DocManager.Inst.ExecuteCmd(new ErrorMessageNotification(
+                        new MessageCustomizableException(
+                            $"Could not open share code: {ex.Message}",
+                            "<translate:dialogs.opensharecode.failed>", ex, false)));
+                }
+            };
+            await dialog.ShowDialog(this);
         }
 
         private async Task<bool> WarnToSave(UProject project) {

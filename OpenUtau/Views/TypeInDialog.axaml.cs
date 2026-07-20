@@ -22,6 +22,10 @@ namespace OpenUtau.App.Views {
             TextBox.Text = text;
         }
 
+        public void SetOkText(string text) {
+            OkButton.Content = text;
+        }
+
         private void OkButtonClick(object? sender, RoutedEventArgs e) {
             Finish();
         }

@@ -1,0 +1,98 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="440" d:DesignHeight="420"
+        x:Class="OpenUtau.App.Views.ShareCodeDialog"
+        Icon="/Assets/open-utau.ico"
+        Title="{DynamicResource dialogs.sharecode.caption}"
+        WindowStartupLocation="CenterOwner"
+        SizeToContent="Height" Width="440" CanResize="False">
+  <Window.Resources>
+    <SolidColorBrush x:Key="SharePanelBrush" Color="{DynamicResource BackgroundColorPointerOver}"/>
+    <SolidColorBrush x:Key="ShareCardBrush" Color="{DynamicResource BackgroundColor}"/>
+  </Window.Resources>
+  <Window.Styles>
+    <Style Selector="TextBlock">
+      <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="TextBlock.muted">
+      <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="TextWrapping" Value="Wrap"/>
+    </Style>
+    <Style Selector="TextBlock.fieldlabel">
+      <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+      <Setter Property="FontSize" Value="11"/>
+      <Setter Property="LetterSpacing" Value="0.8"/>
+    </Style>
+    <Style Selector="Button.action">
+      <Setter Property="Height" Value="NaN"/>
+      <Setter Property="MinHeight" Value="28"/>
+      <Setter Property="Margin" Value="0"/>
+      <Setter Property="HorizontalAlignment" Value="Stretch"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    </Style>
+  </Window.Styles>
+
+  <Border Margin="{Binding $parent.WindowDecorationMargin}"
+          Background="{DynamicResource SharePanelBrush}">
+    <StackPanel Margin="16" Spacing="12">
+
+      <StackPanel Name="ResultPanel" Spacing="12" IsVisible="False">
+        <TextBlock Text="{DynamicResource dialogs.sharecode.scan}" TextWrapping="Wrap"/>
+        <Grid ColumnDefinitions="Auto,16,*">
+          <Border Grid.Column="0" Background="White" Padding="8" CornerRadius="6"
+                  VerticalAlignment="Top">
+            <Image Name="QrImage" Width="160" Height="160"/>
+          </Border>
+          <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="6">
+            <TextBlock Classes="fieldlabel" Text="{DynamicResource dialogs.sharecode.code}"/>
+            <SelectableTextBlock Name="CodeText"
+                                 FontSize="28" FontWeight="Bold" LetterSpacing="3"
+                                 FontFamily="Consolas,Menlo,monospace"
+                                 Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                                 TextWrapping="NoWrap"/>
+            <TextBlock Name="ExpiryText" Classes="muted"/>
+            <TextBlock Classes="muted" Text="{DynamicResource dialogs.sharecode.alsoworks}"/>
+          </StackPanel>
+        </Grid>
+      </StackPanel>
+
+      <StackPanel Name="SharePrompt" Spacing="8">
+        <TextBlock Classes="muted" Text="{DynamicResource dialogs.sharecode.sharedesc}"/>
+        <Button Name="ShareButton" Classes="action" Click="OnShareClicked"
+                Content="{DynamicResource dialogs.sharecode.sharethis}"/>
+      </StackPanel>
+
+      <Grid Name="ResultActions" ColumnDefinitions="*,8,*" IsVisible="False">
+        <Button Grid.Column="0" Classes="action" Click="OnOpenWebClicked"
+                Content="{DynamicResource dialogs.sharecode.open}"/>
+        <Button Grid.Column="2" Classes="action" Click="OnCopyClicked"
+                Content="{DynamicResource dialogs.sharecode.copycode}"/>
+      </Grid>
+
+      <Grid Name="DividerRow" ColumnDefinitions="*,Auto,*" Margin="0,2">
+        <Border Grid.Column="0" Height="1" VerticalAlignment="Center"
+                Background="{DynamicResource SystemControlHighlightBaseMediumLowBrush}"/>
+        <TextBlock Grid.Column="1" Classes="fieldlabel" Margin="10,0"
+                   Text="{DynamicResource dialogs.sharecode.divider}"/>
+        <Border Grid.Column="2" Height="1" VerticalAlignment="Center"
+                Background="{DynamicResource SystemControlHighlightBaseMediumLowBrush}"/>
+      </Grid>
+
+      <TextBox Name="CodeInput" MaxLength="6" IsVisible="False"
+               Watermark="ABC123" FontSize="22" LetterSpacing="4"
+               FontFamily="Consolas,Menlo,monospace"
+               Height="NaN" MinHeight="44" Padding="8,6" Margin="0"
+               VerticalContentAlignment="Center"
+               HorizontalContentAlignment="Center"/>
+
+      <Button Name="OpenCodeButton" Classes="action" Click="OnOpenCodeClicked"
+              Content="{DynamicResource dialogs.sharecode.openfromcode}"/>
+
+      <TextBlock Name="StatusText" Classes="muted" IsVisible="False"/>
+    </StackPanel>
+  </Border>
+</Window>
