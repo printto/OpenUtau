@@ -44,6 +44,19 @@ namespace OpenUtau.Classic {
         public string Portrait;
         public float PortraitOpacity = 0.67f;
         public int PortraitHeight = 0;
+
+        public string PortraitA;
+        public string PortraitI;
+        public string PortraitU;
+        public string PortraitE;
+        public string PortraitO;
+        public string PortraitN;
+        public string ImageA;
+        public string ImageI;
+        public string ImageU;
+        public string ImageE;
+        public string ImageO;
+        public string ImageN;
         public string Author;
         public string Voice;
         public string Web;

@@ -403,10 +403,12 @@ namespace OpenUtau.Core {
         }
 
         private void Publish(UCommand cmd, bool isUndo = false) {
+            ICmdSubscriber[] snapshot;
             lock (lockObj) {
-                foreach (var sub in subscribers) {
-                    sub.OnNext(cmd, isUndo);
-                }
+                snapshot = subscribers.ToArray();
+            }
+            foreach (var sub in snapshot) {
+                sub.OnNext(cmd, isUndo);
             }
         }
 

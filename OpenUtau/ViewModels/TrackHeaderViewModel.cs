@@ -19,7 +19,7 @@ using ReactiveUI.Fody.Helpers;
 using Serilog;
 
 namespace OpenUtau.App.ViewModels {
-    public class TrackHeaderViewModel : ViewModelBase, IActivatableViewModel {
+    public class TrackHeaderViewModel : ViewModelBase, IActivatableViewModel, ICmdSubscriber, IDisposable {
         public int TrackNo => track.TrackNo + 1;
         public USinger Singer => track.Singer;
         public Phonemizer Phonemizer => track.Phonemizer;
@@ -66,6 +66,10 @@ namespace OpenUtau.App.ViewModels {
         public ViewModelActivator Activator { get; }
 
         private readonly UTrack track;
+        private Bitmap? baseAvatar;
+        private readonly Dictionary<string, Bitmap> lipSyncAvatars = new Dictionary<string, Bitmap>();
+        private string? currentAvatarVowel;
+        private bool subscribed;
 
         // Parameterless constructor for Avalonia preview only.
         public TrackHeaderViewModel() {
@@ -178,6 +182,8 @@ namespace OpenUtau.App.ViewModels {
 
             RefreshAvatar();
             RefreshSelectionStyle();
+            DocManager.Inst.AddSubscriber(this);
+            subscribed = true;
         }
 
         public void RefreshSelectionStyle() {
@@ -594,6 +600,9 @@ namespace OpenUtau.App.ViewModels {
         }
 
         public void RefreshAvatar() {
+            lipSyncAvatars.Clear();
+            baseAvatar = null;
+            currentAvatarVowel = null;
             var singer = track?.Singer;
             if (singer == null || singer.AvatarData == null) {
                 Avatar = new RenderTargetBitmap(new PixelSize(1, 1));
@@ -601,10 +610,86 @@ namespace OpenUtau.App.ViewModels {
             }
             try {
                 using var stream = new MemoryStream(singer.AvatarData);
-                Avatar = new Bitmap(stream).CreateScaledBitmap(new PixelSize(100, 100));
+                baseAvatar = new Bitmap(stream).CreateScaledBitmap(new PixelSize(100, 100));
+                LoadLipSyncAvatars(singer);
+                Avatar = baseAvatar;
             } catch (Exception e) {
                 Avatar = null;
                 Log.Error(e, "Failed to decode avatar.");
+            }
+        }
+
+        private void LoadLipSyncAvatars(USinger singer) {
+            var map = singer.LipSyncAvatars;
+            if (map == null || map.Count == 0) {
+                return;
+            }
+            foreach (var key in LipSync.Visemes) {
+                try {
+                    var data = singer.LoadLipSyncAvatar(key);
+                    if (data != null) {
+                        using var stream = new MemoryStream(data);
+                        lipSyncAvatars[key] = new Bitmap(stream).CreateScaledBitmap(new PixelSize(100, 100));
+                    }
+                } catch (Exception e) {
+                    Log.Error(e, $"Failed to load lipsync avatar '{key}' for {singer.Name}");
+                }
+            }
+        }
+
+        private void UpdateAvatarLipSync(int tick) {
+            if (lipSyncAvatars.Count == 0 || baseAvatar == null) {
+                return;
+            }
+            string? viseme = ComputeAvatarViseme(tick);
+            if (viseme == currentAvatarVowel) {
+                return;
+            }
+            currentAvatarVowel = viseme;
+            Bitmap? next = null;
+            if (viseme != null) {
+                lipSyncAvatars.TryGetValue(viseme, out next);
+            }
+            Avatar = next ?? baseAvatar;
+        }
+
+        private string? ComputeAvatarViseme(int tick) {
+            if (!PlaybackManager.Inst.PlayingMaster) {
+                return null; // base avatar
+            }
+            var project = DocManager.Inst.Project;
+            if (project == null) {
+                return "n";
+            }
+            try {
+                foreach (var part in project.parts) {
+                    if (part.trackNo != track.TrackNo || part is not UVoicePart voicePart) {
+                        continue;
+                    }
+                    if (tick < part.position || tick >= part.End) {
+                        continue;
+                    }
+                    var v = LipSync.VisemeAt(voicePart.phonemes, tick - part.position);
+                    if (v != null) {
+                        return v;
+                    }
+                }
+                return "n"; // between phrases: closed
+            } catch {
+                return currentAvatarVowel;
+            }
+        }
+
+        public void OnNext(UCommand cmd, bool isUndo) {
+            if (cmd is SetPlayPosTickNotification setPlayPos) {
+                UpdateAvatarLipSync(setPlayPos.playPosTick);
+            }
+        }
+
+        public void Dispose() {
+            if (subscribed) {
+                DocManager.Inst.RemoveSubscriber(this);
+                subscribed = false;
             }
         }
 

@@ -233,6 +233,8 @@ namespace OpenUtau.Core.Ustx {
         public virtual string Portrait { get; }
         public virtual float PortraitOpacity { get; }
         public virtual int PortraitHeight { get; }
+        public virtual IReadOnlyDictionary<string, string> LipSyncPortraits => null;
+        public virtual IReadOnlyDictionary<string, string> LipSyncAvatars => null;
         public virtual string Sample { get; }
         public virtual string DefaultPhonemizer { get; }
         public virtual Encoding TextFileEncoding => Encoding.UTF8;
@@ -306,6 +308,8 @@ namespace OpenUtau.Core.Ustx {
 
         public virtual IEnumerable<UOto> GetSuggestions(string text) { return emptyOtos; }
         public virtual byte[] LoadPortrait() => null;
+        public virtual byte[] LoadLipSyncPortrait(string vowel) => null;
+        public virtual byte[] LoadLipSyncAvatar(string vowel) => null;
         public virtual byte[] LoadSample() => null;
         public override string ToString() => LocalizedName;
         public bool Equals(USinger other) {

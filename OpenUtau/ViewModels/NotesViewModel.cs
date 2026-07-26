@@ -121,6 +121,11 @@ namespace OpenUtau.App.ViewModels {
         private int _lastNoteLength = 480;
         private string? portraitSource;
         private readonly object portraitLock = new object();
+        private Bitmap? basePortrait;
+        private readonly Dictionary<string, Bitmap> lipSyncBitmaps = new Dictionary<string, Bitmap>();
+        private Bitmap? baseAvatar;
+        private readonly Dictionary<string, Bitmap> lipSyncAvatarBitmaps = new Dictionary<string, Bitmap>();
+        private string? currentVowel;
         private int userSnapDiv = -2;
         private int userKey => Project.key;
 
@@ -512,39 +517,39 @@ namespace OpenUtau.App.ViewModels {
         private void LoadPortrait(UPart? part, UProject? project) {
             if (part == null || project == null) {
                 lock (portraitLock) {
-                    Avatar = null;
-                    Portrait = null;
+                    DisposeAvatars();
+                    DisposePortraits();
                     portraitSource = null;
                 }
                 return;
             }
             var singer = project.tracks[part.trackNo].Singer;
             lock (portraitLock) {
-                Avatar?.Dispose();
-                Avatar = null;
+                DisposeAvatars();
                 if (singer != null && singer.AvatarData != null && Preferences.Default.ShowIcon) {
                     try {
                         using (var stream = new MemoryStream(singer.AvatarData)) {
-                            Avatar = new Bitmap(stream);
+                            baseAvatar = new Bitmap(stream);
                         }
+                        LoadLipSyncAvatars(singer);
+                        currentVowel = null;
+                        Avatar = baseAvatar;
                     } catch (Exception e) {
-                        Avatar?.Dispose();
-                        Avatar = null;
+                        DisposeAvatars();
                         Log.Error(e, $"Failed to load Avatar {singer.Avatar}");
                     }
                 }
             }
             if (singer == null || string.IsNullOrEmpty(singer.Portrait) || !Preferences.Default.ShowPortrait) {
                 lock (portraitLock) {
-                    Portrait = null;
+                    DisposePortraits();
                     portraitSource = null;
                 }
                 return;
             }
             if (portraitSource != singer.Portrait) {
                 lock (portraitLock) {
-                    Portrait?.Dispose();
-                    Portrait = null;
+                    DisposePortraits();
                     portraitSource = null;
                 }
                 PortraitMask = new SolidColorBrush(Avalonia.Media.Colors.White, singer.PortraitOpacity);
@@ -553,22 +558,130 @@ namespace OpenUtau.App.ViewModels {
                         try {
                             var data = singer.LoadPortrait();
                             if (data == null) {
-                                Portrait = null;
+                                DisposePortraits();
                                 portraitSource = null;
                             } else {
                                 using (var stream = new MemoryStream(data)) {
-                                    Portrait = ResizePortrait(new Bitmap(stream), singer.PortraitHeight);
-                                    portraitSource = singer.Portrait;
+                                    basePortrait = ResizePortrait(new Bitmap(stream), singer.PortraitHeight);
                                 }
+                                LoadLipSyncPortraits(singer);
+                                currentVowel = null;
+                                Portrait = basePortrait;
+                                portraitSource = singer.Portrait;
                             }
                         } catch (Exception e) {
-                            Portrait?.Dispose();
-                            Portrait = null;
+                            DisposePortraits();
                             portraitSource = null;
                             Log.Error(e, $"Failed to load Portrait {singer.Portrait}");
                         }
                     }
                 });
+            }
+        }
+
+        private void LoadLipSyncPortraits(USinger singer) {
+            var map = singer.LipSyncPortraits;
+            Log.Information($"LipSync portrait: singer={singer.Name} mapCount={map?.Count ?? -1}");
+            if (map == null || map.Count == 0) {
+                return;
+            }
+            foreach (var key in LipSync.Visemes) {
+                try {
+                    var data = singer.LoadLipSyncPortrait(key);
+                    if (data != null) {
+                        using var stream = new MemoryStream(data);
+                        lipSyncBitmaps[key] = ResizePortrait(new Bitmap(stream), singer.PortraitHeight);
+                    }
+                } catch (Exception e) {
+                    Log.Error(e, $"Failed to load lipsync portrait '{key}' for {singer.Name}");
+                }
+            }
+            Log.Information($"LipSync portrait: loaded {lipSyncBitmaps.Count} bitmaps");
+        }
+
+        private void LoadLipSyncAvatars(USinger singer) {
+            var map = singer.LipSyncAvatars;
+            if (map == null || map.Count == 0) {
+                return;
+            }
+            foreach (var key in LipSync.Visemes) {
+                try {
+                    var data = singer.LoadLipSyncAvatar(key);
+                    if (data != null) {
+                        using var stream = new MemoryStream(data);
+                        lipSyncAvatarBitmaps[key] = new Bitmap(stream);
+                    }
+                } catch (Exception e) {
+                    Log.Error(e, $"Failed to load lipsync avatar '{key}' for {singer.Name}");
+                }
+            }
+        }
+
+        private void DisposePortraits() {
+            Portrait = null;
+            basePortrait?.Dispose();
+            basePortrait = null;
+            foreach (var bmp in lipSyncBitmaps.Values) {
+                bmp?.Dispose();
+            }
+            lipSyncBitmaps.Clear();
+            currentVowel = null;
+        }
+
+        private void DisposeAvatars() {
+            Avatar = null;
+            baseAvatar?.Dispose();
+            baseAvatar = null;
+            foreach (var bmp in lipSyncAvatarBitmaps.Values) {
+                bmp?.Dispose();
+            }
+            lipSyncAvatarBitmaps.Clear();
+        }
+
+        private void UpdateLipSync(int relTick) {
+            if (lipSyncBitmaps.Count == 0 && lipSyncAvatarBitmaps.Count == 0) {
+                return;
+            }
+            if (!System.Threading.Monitor.TryEnter(portraitLock)) {
+                return;
+            }
+            try {
+                string? viseme = ComputeViseme(relTick);
+                if (viseme == currentVowel) {
+                    return;
+                }
+                currentVowel = viseme;
+                if (basePortrait != null && lipSyncBitmaps.Count > 0) {
+                    Bitmap? next = null;
+                    if (viseme != null) {
+                        lipSyncBitmaps.TryGetValue(viseme, out next);
+                    }
+                    Portrait = next ?? basePortrait;
+                }
+                if (baseAvatar != null && lipSyncAvatarBitmaps.Count > 0) {
+                    Bitmap? next = null;
+                    if (viseme != null) {
+                        lipSyncAvatarBitmaps.TryGetValue(viseme, out next);
+                    }
+                    Avatar = next ?? baseAvatar;
+                }
+            } finally {
+                System.Threading.Monitor.Exit(portraitLock);
+            }
+        }
+
+        private string? ComputeViseme(int relTick) {
+            if (!PlaybackManager.Inst.PlayingMaster) {
+                return null; // base portrait
+            }
+            var part = Part;
+            if (part == null) {
+                return "n";
+            }
+            try {
+                return LipSync.VisemeAt(part.phonemes, relTick) ?? "n"; // no phoneme: closed
+            } catch {
+                return currentVowel;
             }
         }
         private void LoadWindowTitle(UPart? part, UProject? project) {
@@ -1023,6 +1136,7 @@ namespace OpenUtau.App.ViewModels {
             tick -= Part?.position ?? 0;
             PlayPosX = TickToneToPoint(tick, 0).X;
             UpdateHighlight();
+            UpdateLipSync(tick);
         }
 
         private void UpdateHighlight() {
