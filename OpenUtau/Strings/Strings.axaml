@@ -116,7 +116,7 @@ OpenUtau aims to be an open source editing environment for UTAU community, with 
   <system:String x:Key="menu.file.sendtowebsynth">Send to PRINTmov Vocal</system:String>
   <system:String x:Key="menu.file.opensharecode">Open from Share Code…</system:String>
   <system:String x:Key="dialogs.sharecode.caption">Share</system:String>
-  <system:String x:Key="menu.file.sharetodevice">Share to other device…</system:String>
+  <system:String x:Key="menu.file.sharetodevice">Share to other devices…</system:String>
   <system:String x:Key="dialogs.sharecode.sharethis">Share this project</system:String>
   <system:String x:Key="dialogs.sharecode.sharedesc">Send to other devices or PRINTmov Vocal (Web Synth).</system:String>
   <system:String x:Key="dialogs.sharecode.divider">or open a shared project</system:String>
