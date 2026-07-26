@@ -367,6 +367,7 @@ Do you want to continue by splitting at the nearest position after current playh
   <system:String x:Key="singercatalog.refresh">Refresh</system:String>
   <system:String x:Key="singercatalog.category.builtin">Built-in Singers</system:String>
   <system:String x:Key="singercatalog.category.public">Public Singers</system:String>
+  <system:String x:Key="singercatalog.category.other">Other</system:String>
   <system:String x:Key="singercatalog.action.website">Download</system:String>
   <system:String x:Key="singercatalog.action.install">Install</system:String>
   <system:String x:Key="singercatalog.action.update">Update</system:String>
@@ -376,6 +377,8 @@ Do you want to continue by splitting at the nearest position after current playh
   <system:String x:Key="singercatalog.status.fetching">Fetching catalog...</system:String>
   <system:String x:Key="singercatalog.status.ready">Ready</system:String>
   <system:String x:Key="singercatalog.status.empty">No singers found in catalog.</system:String>
+  <system:String x:Key="singercatalog.status.noresults">No singers match your search.</system:String>
+  <system:String x:Key="singercatalog.search">Search singers...</system:String>
   <system:String x:Key="singercatalog.status.error">Failed to load catalog.</system:String>
   <system:String x:Key="singercatalog.status.downloading">Downloading {0}... ({1}%)</system:String>
   <system:String x:Key="singercatalog.status.installing">Installing {0}...</system:String>

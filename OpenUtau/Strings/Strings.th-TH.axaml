@@ -236,6 +236,7 @@
   <system:String x:Key="singercatalog.refresh">Refresh</system:String>
   <system:String x:Key="singercatalog.category.builtin">Built-in Singers</system:String>
   <system:String x:Key="singercatalog.category.public">Public Singers</system:String>
+  <system:String x:Key="singercatalog.category.other">อื่นๆ</system:String>
   <system:String x:Key="singercatalog.action.website">ดาวน์โหลด</system:String>
   <system:String x:Key="singercatalog.action.install">ติดตั้ง</system:String>
   <system:String x:Key="singercatalog.action.update">อัพเดท</system:String>
@@ -245,6 +246,8 @@
   <system:String x:Key="singercatalog.status.fetching">กำลังโหลด...</system:String>
   <system:String x:Key="singercatalog.status.ready">Ready</system:String>
   <system:String x:Key="singercatalog.status.empty">No singers found in catalog.</system:String>
+  <system:String x:Key="singercatalog.status.noresults">ไม่พบนักร้องที่ตรงกับการค้นหา</system:String>
+  <system:String x:Key="singercatalog.search">ค้นหานักร้อง...</system:String>
   <system:String x:Key="singercatalog.status.error">เกิดข้อผิดพลาด</system:String>
   <system:String x:Key="singercatalog.status.downloading">กำลังดาวน์โหลด {0}... ({1}%)</system:String>
   <system:String x:Key="singercatalog.status.installing">กำลังติดตั้ง {0}...</system:String>

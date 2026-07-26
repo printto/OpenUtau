@@ -882,6 +882,10 @@ namespace OpenUtau.App.Views {
                 args.Handled = false;
                 return;
             }
+            if (FocusManager?.GetFocusedElement() is TextBox) {
+                args.Handled = false;
+                return;
+            }
 
             var tracksVm = viewModel.TracksViewModel;
 

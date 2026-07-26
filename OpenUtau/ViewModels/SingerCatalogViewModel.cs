@@ -79,17 +79,30 @@ namespace OpenUtau.App.ViewModels {
         }
     }
 
+    public class SingerCategoryViewModel : ViewModelBase {
+        public string Title { get; }
+        public ObservableCollection<SingerCardViewModel> Singers { get; } = new ObservableCollection<SingerCardViewModel>();
+        public int Count => Singers.Count;
+
+        public SingerCategoryViewModel(string title) {
+            Title = title;
+        }
+    }
+
     public class SingerCatalogViewModel : ViewModelBase {
-        public ObservableCollection<SingerCardViewModel> BuiltInSingers { get; } = new ObservableCollection<SingerCardViewModel>();
-        public ObservableCollection<SingerCardViewModel> PublicSingers { get; } = new ObservableCollection<SingerCardViewModel>();
+        public ObservableCollection<SingerCategoryViewModel> Categories { get; } = new ObservableCollection<SingerCategoryViewModel>();
         [Reactive] public string Status { get; set; } = string.Empty;
         public bool HasStatus => !string.IsNullOrEmpty(Status);
         [Reactive] public bool IsLoading { get; set; }
+        [Reactive] public string SearchText { get; set; } = string.Empty;
         public ReactiveCommand<Unit, Unit> RefreshCommand { get; }
+
+        readonly List<SingerCardViewModel> allCards = new List<SingerCardViewModel>();
 
         public SingerCatalogViewModel() {
             RefreshCommand = ReactiveCommand.CreateFromTask(RefreshAsync);
             this.WhenAnyValue(x => x.Status).Subscribe(_ => this.RaisePropertyChanged(nameof(HasStatus)));
+            this.WhenAnyValue(x => x.SearchText).Subscribe(_ => BuildCategories());
             _ = RefreshAsync();
         }
 
@@ -100,35 +113,66 @@ namespace OpenUtau.App.ViewModels {
                 var catalog = await SingerCatalog.Inst.FetchCatalogAsync();
                 var installed = SingerCatalog.Inst.GetInstalledRecords();
 
-                BuiltInSingers.Clear();
-                PublicSingers.Clear();
+                allCards.Clear();
                 foreach (var s in catalog) {
                     var card = new SingerCardViewModel(s);
-                    bool isPublic = card.IsExternal
-                        || string.Equals(s.category, "Public Singers", StringComparison.OrdinalIgnoreCase);
-                    if (isPublic) {
-                        PublicSingers.Add(card);
-                    } else {
-                        if (installed.TryGetValue(card.Id, out var rec)) {
-                            card.IsInstalled = true;
-                            card.InstalledVersion = rec.version;
-                        }
-                        card.DownloadUrl = s.download_url;
-                        card.LatestVersion = s.version;
-                        card.Resolved = true;
-                        BuiltInSingers.Add(card);
+                    if (installed.TryGetValue(card.Id, out var rec)) {
+                        card.IsInstalled = true;
+                        card.InstalledVersion = rec.version;
                     }
+                    card.DownloadUrl = s.download_url;
+                    card.LatestVersion = s.version;
+                    card.Resolved = true;
+                    allCards.Add(card);
                 }
 
-                Status = (BuiltInSingers.Count + PublicSingers.Count) == 0
-                    ? ThemeManager.GetString("singercatalog.status.empty")
-                    : string.Empty;
+                BuildCategories();
             } catch (Exception e) {
                 Status = ThemeManager.GetString("singercatalog.status.error");
                 DocManager.Inst.ExecuteCmd(new ErrorMessageNotification(e));
             } finally {
                 IsLoading = false;
             }
+        }
+
+        void BuildCategories() {
+            Categories.Clear();
+            var query = SearchText?.Trim() ?? string.Empty;
+            var groups = new Dictionary<string, SingerCategoryViewModel>();
+            int total = 0;
+            foreach (var card in allCards) {
+                if (query.Length > 0 && !MatchesSearch(card, query)) {
+                    continue;
+                }
+                string title = string.IsNullOrWhiteSpace(card.Singer.category)
+                    ? ThemeManager.GetString("singercatalog.category.other")
+                    : card.Singer.category;
+                if (!groups.TryGetValue(title, out var group)) {
+                    group = new SingerCategoryViewModel(title);
+                    groups[title] = group;
+                    Categories.Add(group);
+                }
+                group.Singers.Add(card);
+                total++;
+            }
+
+            Status = total == 0
+                ? ThemeManager.GetString(allCards.Count == 0
+                    ? "singercatalog.status.empty"
+                    : "singercatalog.status.noresults")
+                : string.Empty;
+        }
+
+        static bool MatchesSearch(SingerCardViewModel card, string query) {
+            var s = card.Singer;
+            return Contains(s.name, query) || Contains(s.id, query)
+                || Contains(s.author, query) || Contains(s.category, query)
+                || Contains(s.description, query);
+        }
+
+        static bool Contains(string? value, string query) {
+            return !string.IsNullOrEmpty(value)
+                && value.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         public async Task<string?> DownloadAsync(SingerCardViewModel card) {

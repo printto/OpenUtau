@@ -15,6 +15,29 @@
     <Style Selector="Border.singerRow:pointerover">
       <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundBaseLowBrush}"/>
     </Style>
+    <Style Selector="Border.search">
+      <Setter Property="CornerRadius" Value="16"/>
+      <Setter Property="Padding" Value="10,0,8,0"/>
+      <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundBaseLowBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="BorderBrush" Value="Transparent"/>
+    </Style>
+    <Style Selector="Border.search:focus-within">
+      <Setter Property="BorderBrush" Value="{DynamicResource SystemControlHighlightAccentBrush}"/>
+    </Style>
+    <Style Selector="Border.search TextBox">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding" Value="6,0"/>
+      <Setter Property="MinHeight" Value="0"/>
+      <Setter Property="Height" Value="28"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Border.search TextBox /template/ Border#PART_BorderElement, Border.search TextBox:pointerover /template/ Border#PART_BorderElement, Border.search TextBox:focus /template/ Border#PART_BorderElement">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+    </Style>
   </Window.Styles>
   <Window.Resources>
     <DataTemplate x:Key="SingerRow">
@@ -42,23 +65,33 @@
       </Border>
     </DataTemplate>
   </Window.Resources>
-  <Grid Margin="12" RowDefinitions="*,Auto">
-    <ScrollViewer Grid.Row="0">
-      <StackPanel>
-        <StackPanel Orientation="Horizontal" Margin="10,0,0,4">
-          <TextBlock Text="{DynamicResource singercatalog.category.builtin}" FontSize="14" FontWeight="Medium"/>
-          <TextBlock Text="{Binding BuiltInSingers.Count, StringFormat=' ({0})'}" FontSize="14" Opacity="0.55"/>
-        </StackPanel>
-        <ItemsControl ItemsSource="{Binding BuiltInSingers}" ItemTemplate="{StaticResource SingerRow}"/>
-        <StackPanel Orientation="Horizontal" Margin="10,18,0,4">
-          <TextBlock Text="{DynamicResource singercatalog.category.public}" FontSize="14" FontWeight="Medium"/>
-          <TextBlock Text="{Binding PublicSingers.Count, StringFormat=' ({0})'}" FontSize="14" Opacity="0.55"/>
-        </StackPanel>
-        <ItemsControl ItemsSource="{Binding PublicSingers}" ItemTemplate="{StaticResource SingerRow}"/>
-      </StackPanel>
+  <Grid Margin="12" RowDefinitions="Auto,*,Auto" Focusable="True" PointerPressed="OnBackgroundPointerPressed">
+    <Border Grid.Row="0" Classes="search" Margin="0,0,0,10">
+      <Grid ColumnDefinitions="Auto,*">
+        <PathIcon Grid.Column="0" Width="15" Height="15" Opacity="0.55"
+                  VerticalAlignment="Center"
+                  Data="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+        <TextBox Grid.Column="1" Text="{Binding SearchText}"
+                 Watermark="{DynamicResource singercatalog.search}"/>
+      </Grid>
+    </Border>
+    <ScrollViewer Grid.Row="1">
+      <ItemsControl ItemsSource="{Binding Categories}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <StackPanel Margin="0,0,0,14">
+              <StackPanel Orientation="Horizontal" Margin="10,4,0,4">
+                <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="Medium"/>
+                <TextBlock Text="{Binding Count, StringFormat=' ({0})'}" FontSize="14" Opacity="0.55"/>
+              </StackPanel>
+              <ItemsControl ItemsSource="{Binding Singers}" ItemTemplate="{StaticResource SingerRow}"/>
+            </StackPanel>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
     </ScrollViewer>
 
-    <Grid Grid.Row="1" Margin="2,10,2,0" ColumnDefinitions="*,Auto">
+    <Grid Grid.Row="2" Margin="2,10,2,0" ColumnDefinitions="*,Auto">
       <TextBlock Grid.Column="0" Text="{Binding Status}" VerticalAlignment="Center" Opacity="0.7" TextWrapping="Wrap" IsVisible="{Binding HasStatus}"/>
       <Button Grid.Column="1" Content="{DynamicResource singercatalog.refresh}" Command="{Binding RefreshCommand}"/>
     </Grid>

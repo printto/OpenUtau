@@ -37,7 +37,7 @@ namespace OpenUtau.Core {
     }
 
     public class SingerCatalog : SingletonBase<SingerCatalog> {
-        public const string CatalogUrl = "https://www.printmov.com/json/singers.json";
+        public const string CatalogUrl = "https://www.printmov.com/json/merge-singers.php";
 
         string StateFilePath => Path.Combine(PathManager.Inst.DataPath, "installed-singers.json");
 
