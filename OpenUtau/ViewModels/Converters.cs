@@ -35,4 +35,28 @@ namespace OpenUtau.App.ViewModels {
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => (value as Encoding)?.EncodingName ?? string.Empty;
         public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
     }
+
+    public class WidthToColumnsConverter : IValueConverter {
+        public static int ColumnsFor(double width, double tileWidth) => Math.Max(1, (int)(width / tileWidth));
+
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) {
+            double width = value is double d ? d : 0;
+            double tileWidth = 240;
+            if (parameter is string s && double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out var p)) {
+                tileWidth = p;
+            }
+            return ColumnsFor(width, tileWidth);
+        }
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
+    }
+
+    public class SingerLayoutVisibilityConverter : IValueConverter {
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) {
+            double width = value is double d ? d : 0;
+            int columns = WidthToColumnsConverter.ColumnsFor(width, 248);
+            bool wantRow = parameter is string s && s == "row";
+            return wantRow ? columns <= 1 : columns > 1;
+        }
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
+    }
 }
