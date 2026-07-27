@@ -46,8 +46,9 @@ namespace OpenUtau.App.ViewModels {
 
     public class MainWindowViewModel : ViewModelBase, ICmdSubscriber {
         public string Title => !ProjectSaved
-            ? $"{AppVersion}"
-            : $"{(DocManager.Inst.ChangesSaved ? "" : "*")}{AppVersion} [{DocManager.Inst.Project.FilePath}]";
+            ? $"{AppVersion.Replace("v", "")}"
+            //: $"{(DocManager.Inst.ChangesSaved ? "" : "*")}{AppVersion} [{DocManager.Inst.Project.FilePath}]";
+            : $"{(DocManager.Inst.ChangesSaved ? "" : "*")}{Path.GetFileName(DocManager.Inst.Project.FilePath)} - {AppVersion.Replace("v", "")}";
         public double Width => Preferences.Default.MainWindowSize.Width;
         public double Height => Preferences.Default.MainWindowSize.Height;
 
@@ -73,7 +74,7 @@ namespace OpenUtau.App.ViewModels {
 
         [Reactive] public string ClearCacheHeader { get; set; }
         public bool ProjectSaved => !string.IsNullOrEmpty(DocManager.Inst.Project.FilePath) && DocManager.Inst.Project.Saved;
-        public string AppVersion => $"OpenUtau - PRINTmov Edition v{System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version}";
+        public string AppVersion => $"PMOU v{System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version}";
         [Reactive] public double Progress { get; set; }
         [Reactive] public string ProgressText { get; set; }
         [Reactive] public bool ShowPianoRoll { get; set; }
