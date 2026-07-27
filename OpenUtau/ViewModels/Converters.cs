@@ -36,6 +36,11 @@ namespace OpenUtau.App.ViewModels {
         public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
     }
 
+    public class StringNotEmptyConverter : IValueConverter {
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => !string.IsNullOrEmpty(value as string);
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
+    }
+
     public class WidthToColumnsConverter : IValueConverter {
         public static int ColumnsFor(double width, double tileWidth) => Math.Max(1, (int)(width / tileWidth));
 

@@ -511,6 +511,7 @@ Syntax: prefix,suffix</system:String>-->
   <!--<system:String x:Key="progress.loadingsingers">Loading Singers...</system:String>-->
   <system:String x:Key="progress.saved">บันทึกโปรเจกต์ {0} แล้ว</system:String>
   <system:String x:Key="progress.waitingrendering">โปรดรอ กำลังประมวลผล</system:String>
+  <system:String x:Key="progress.rendering">กำลังประมวลผล…</system:String>
 
   <system:String x:Key="singers.caption">นักร้อง</system:String>
   <!--<system:String x:Key="singers.editoto.editinsetparam">Edit In setParam</system:String>-->

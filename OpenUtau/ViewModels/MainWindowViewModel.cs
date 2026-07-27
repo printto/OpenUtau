@@ -77,6 +77,9 @@ namespace OpenUtau.App.ViewModels {
         [Reactive] public double Progress { get; set; }
         [Reactive] public string ProgressText { get; set; }
         [Reactive] public bool ShowPianoRoll { get; set; }
+        public bool ShowFloatingProgress => !ShowPianoRoll && !string.IsNullOrEmpty(ProgressText);
+        public bool HasProgressBar => Progress > 0;
+        public string StatusLabel => Progress > 0 ? ThemeManager.GetString("progress.rendering") : ProgressText;
         [Reactive] public double PianoRollMaxHeight { get; set; }
         [Reactive] public double PianoRollMinHeight { get; set; }
         public ReactiveCommand<UPart, Unit> PartDeleteCommand { get; set; }
@@ -131,6 +134,13 @@ namespace OpenUtau.App.ViewModels {
                 TracksViewModel.DeleteSelectedParts();
             });
             DocManager.Inst.AddSubscriber(this);
+
+            this.WhenAnyValue(vm => vm.ShowPianoRoll, vm => vm.ProgressText, vm => vm.Progress)
+                .Subscribe(_ => {
+                    this.RaisePropertyChanged(nameof(ShowFloatingProgress));
+                    this.RaisePropertyChanged(nameof(HasProgressBar));
+                    this.RaisePropertyChanged(nameof(StatusLabel));
+                });
 
             this.WhenAnyValue(vm => vm.ShowPianoRoll)
                 .Subscribe(x => {

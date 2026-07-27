@@ -100,6 +100,9 @@ namespace OpenUtau.App.ViewModels {
             = new Dictionary<Key, MenuItemViewModel>();
 
         [Reactive] public double Progress { get; set; }
+        [Reactive] public string ProgressText { get; set; } = string.Empty;
+        public bool HasProgressBar => Progress > 0;
+        public string StatusLabel => Progress > 0 ? ThemeManager.GetString("progress.rendering") : ProgressText;
         [Reactive] public bool CanUndo { get; set; } = false;
         [Reactive] public bool CanRedo { get; set; } = false;
         [Reactive] public string UndoText { get; set; } = ThemeManager.GetString("menu.edit.undo");
@@ -131,6 +134,11 @@ namespace OpenUtau.App.ViewModels {
                 .Subscribe(index => EditTool.PitchToolVariation = index);
             this.WhenAnyValue(vm => vm.PitchOverwrite)
                 .Subscribe(val => { EditTool.OverwritePitch = val; Preferences.Default.EditTool.OverwritePitch = val; Preferences.Save(); });
+            this.WhenAnyValue(vm => vm.Progress, vm => vm.ProgressText)
+                .Subscribe(_ => {
+                    this.RaisePropertyChanged(nameof(HasProgressBar));
+                    this.RaisePropertyChanged(nameof(StatusLabel));
+                });
 
             NoteDeleteCommand = ReactiveCommand.Create<NoteHitInfo>(info => {
                 NotesViewModel.DeleteSelectedNotes();
@@ -312,11 +320,10 @@ namespace OpenUtau.App.ViewModels {
 
         public void OnNext(UCommand cmd, bool isUndo) {
             if (cmd is ProgressBarNotification progressBarNotification) {
-                if (PianoRollDetached) {
-                    Dispatcher.UIThread.InvokeAsync(() => {
-                        Progress = progressBarNotification.Progress;
-                    }, DispatcherPriority.Background);
-                }
+                Dispatcher.UIThread.InvokeAsync(() => {
+                    Progress = progressBarNotification.Progress;
+                    ProgressText = progressBarNotification.Info;
+                }, DispatcherPriority.Background);
             }
             SetUndoState();
         }

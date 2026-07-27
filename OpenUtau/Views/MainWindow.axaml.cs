@@ -1361,17 +1361,21 @@ namespace OpenUtau.App.Views {
             if (Preferences.Default.DetachPianoRoll) {
                 pianoRollWindow?.ForceClose();
                 pianoRollWindow = null;
-                PianoRollContainer.Content = pianoRoll;
                 viewModel.ShowPianoRoll = true;
                 Preferences.Default.DetachPianoRoll = false;
+                Dispatcher.UIThread.Post(() => {
+                    PianoRollContainer.Content = pianoRoll;
+                }, DispatcherPriority.Background);
             } else {
                 PianoRollContainer.Content = null;
                 viewModel.ShowPianoRoll = false;
-                if (pianoRollWindow == null) {
-                    pianoRollWindow = new(pianoRoll);
-                    pianoRollWindow.Show();
-                }
                 Preferences.Default.DetachPianoRoll = true;
+                Dispatcher.UIThread.Post(() => {
+                    if (pianoRollWindow == null) {
+                        pianoRollWindow = new(pianoRoll);
+                        pianoRollWindow.Show();
+                    }
+                }, DispatcherPriority.Background);
             }
             Preferences.Save();
         }

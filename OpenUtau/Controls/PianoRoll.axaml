@@ -11,6 +11,9 @@
   <UserControl.Styles>
     <StyleInclude Source="/Styles/PianoRollStyles.axaml"/>
   </UserControl.Styles>
+  <UserControl.Resources>
+    <vm:StringNotEmptyConverter x:Key="StringNotEmpty"/>
+  </UserControl.Resources>
   <Border>
     <Grid Margin="{Binding $parent[1].WindowDecorationMargin}" PointerMoved="BackgroundPointerMoved">
       <Grid.RowDefinitions>
@@ -19,10 +22,9 @@
         <RowDefinition Height="24"/>
         <RowDefinition Height="*"/>
         <RowDefinition Height="Auto"/>
-        <RowDefinition Height="150" 
+        <RowDefinition Height="150"
                        MinHeight="{Binding NotesViewModel.ExpHeightMin}"
                        MaxHeight="{Binding NotesViewModel.ExpHeightMax}"/>
-        <RowDefinition Height="4"/>
       </Grid.RowDefinitions>
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="60"/>
@@ -597,6 +599,20 @@
             </Button>
           </StackPanel>
         </Border>
+        <Border Grid.Column="3" Margin="8,0" HorizontalAlignment="Right" VerticalAlignment="Center"
+                CornerRadius="5" Padding="8,4" Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                IsVisible="{Binding ProgressText, Converter={StaticResource StringNotEmpty}}"
+                ToolTip.Tip="{Binding ProgressText}">
+          <StackPanel Orientation="Horizontal" Spacing="7" VerticalAlignment="Center">
+            <TextBlock Text="{Binding StatusLabel}" VerticalAlignment="Center"
+                       FontSize="11" Foreground="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                       TextTrimming="CharacterEllipsis" MaxWidth="260"/>
+            <ProgressBar Width="100" MinWidth="0" Height="3" CornerRadius="2" VerticalAlignment="Center"
+                         IsVisible="{Binding HasProgressBar}"
+                         Minimum="0" Maximum="100" Value="{Binding Progress}"
+                         Background="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"/>
+          </StackPanel>
+        </Border>
         <Border Grid.Column="4">
           <StackPanel Orientation="Horizontal">
             <ToggleButton Classes="toolbar" Margin="0" Padding="1" Height="20" Width="20"
@@ -758,7 +774,6 @@
           <TextBlock Name="ValueTipText" Margin="2"/>
         </Border>
       </Canvas>
-      <ProgressBar Grid.Row="6" Grid.ColumnSpan="4" Value="{Binding Progress}" IsVisible="{Binding PianoRollDetached}"/>
     </Grid>
   </Border>
 </UserControl>

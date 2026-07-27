@@ -17,6 +17,9 @@
   </Window.Styles>
   <Grid>
     <Grid Name="MainGrid" Margin="{Binding $parent[1].WindowDecorationMargin}">
+      <Grid.Resources>
+        <vm:StringNotEmptyConverter x:Key="StringNotEmpty"/>
+      </Grid.Resources>
       <Menu Grid.Row="0" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24"
                 Opened="OnMainMenuOpened" Closed="OnMainMenuClosed" PointerExited="OnMainMenuPointerLeave"
                 ZIndex="1">
@@ -323,8 +326,6 @@
             <RowDefinition Height="3*"
                            MinHeight="{Binding PianoRollMinHeight}"
                            MaxHeight="{Binding PianoRollMaxHeight}"/>
-            <RowDefinition Height="20"/>
-            <RowDefinition Height="4"/>
           </Grid.RowDefinitions>
           <Panel Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="24">
             <Border Classes="playback" Width="72" HorizontalAlignment="Left" Margin="4,0">
@@ -520,8 +521,22 @@
           <Canvas Grid.Row="4" Grid.ColumnSpan="3" IsVisible="{Binding ShowPianoRoll}">
             <ContentControl Name="PianoRollContainer" Width="{Binding $parent[Canvas].Bounds.Width}" Height="{Binding $parent[Canvas].Bounds.Height}"/>
           </Canvas>
-          <TextBlock Grid.Row="5" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" Height="20" Margin="4,4,4,0" Text="{Binding ProgressText}"/>
-          <ProgressBar Grid.Row="6" Grid.ColumnSpan="3" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Value="{Binding Progress}"/>
+          <!-- Floating auto-hide render status: short label (full detail on hover) + slim gradient bar -->
+          <Border Grid.Row="2" Grid.RowSpan="3" Grid.Column="0" ZIndex="100"
+                  VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="12,0,12,12"
+                  CornerRadius="6" Padding="10,6" Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                  IsVisible="{Binding ShowFloatingProgress}"
+                  ToolTip.Tip="{Binding ProgressText}">
+            <StackPanel Orientation="Horizontal" Spacing="9" VerticalAlignment="Center">
+              <TextBlock Text="{Binding StatusLabel}" VerticalAlignment="Center"
+                         FontSize="12" Foreground="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                         TextTrimming="CharacterEllipsis" MaxWidth="320"/>
+              <ProgressBar Width="150" MinWidth="0" Height="4" CornerRadius="2" VerticalAlignment="Center"
+                           IsVisible="{Binding HasProgressBar}"
+                           Minimum="0" Maximum="100" Value="{Binding Progress}"
+                           Background="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"/>
+            </StackPanel>
+          </Border>
         </Grid>
       </Carousel>
     </Grid>
