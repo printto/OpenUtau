@@ -29,12 +29,16 @@ namespace OpenUtau.App.ViewModels {
             public bool draft;
             public bool prerelease;
             public string name = string.Empty;
+            public string body = string.Empty;
             public GithubReleaseAsset[] assets = new GithubReleaseAsset[0];
 #pragma warning restore 0649
         }
+        static string latestReleaseNotes = string.Empty;
         public string AppVersion => $"v{System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version}";
         public bool IsDarkMode => ThemeManager.IsDarkMode;
         [Reactive] public string UpdaterStatus { get; set; }
+        [Reactive] public string ReleaseNotes { get; set; }
+        [Reactive] public bool HasReleaseNotes { get; set; }
         [Reactive] public bool UpdateAvailable { get; set; }
         [Reactive] public FontWeight UpdateButtonFontWeight { get; set; }
         public Action? CloseApplication { get; set; }
@@ -45,6 +49,8 @@ namespace OpenUtau.App.ViewModels {
 
         public UpdaterViewModel() {
             UpdaterStatus = string.Empty;
+            ReleaseNotes = string.Empty;
+            HasReleaseNotes = false;
             UpdateAvailable = false;
             UpdateButtonFontWeight = FontWeight.Normal;
             Init();
@@ -91,10 +97,12 @@ namespace OpenUtau.App.ViewModels {
             if (releases == null) {
                 return null;
             }
-            return releases
+            var selected = releases
                 .Where(r => !r.draft)
                 .OrderByDescending(r => r.id)
                 .FirstOrDefault();
+            latestReleaseNotes = selected?.body?.Trim() ?? string.Empty;
+            return selected;
         }
 
         static GithubReleaseAsset? SelectAppcast(GithubRelease release) {
@@ -122,6 +130,10 @@ namespace OpenUtau.App.ViewModels {
                     UpdaterStatus = string.Format(ThemeManager.GetString("updater.status.available"), updateInfo.Updates[0].Version);
                     UpdateAvailable = true;
                     UpdateButtonFontWeight = FontWeight.Bold;
+                    if (!string.IsNullOrEmpty(latestReleaseNotes)) {
+                        ReleaseNotes = latestReleaseNotes;
+                        HasReleaseNotes = true;
+                    }
                     break;
                 case UpdateStatus.UpdateNotAvailable:
                     UpdaterStatus = ThemeManager.GetString("updater.status.notavailable");
@@ -134,7 +146,7 @@ namespace OpenUtau.App.ViewModels {
 
         public void OnGithub() {
             try {
-                OS.OpenWeb("https://github.com/stakira/OpenUtau/wiki");
+                OS.OpenWeb("https://github.com/printto/OpenUtau/releases");
             } catch (Exception e) {
                 DocManager.Inst.ExecuteCmd(new ErrorMessageNotification(e));
             }

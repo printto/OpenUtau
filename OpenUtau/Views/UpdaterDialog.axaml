@@ -2,28 +2,38 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:c="clr-namespace:OpenUtau.App.Controls"
         mc:Ignorable="d"
         x:Class="OpenUtau.App.Views.UpdaterDialog"
-        Width="400" Height="300" CanResize="False" WindowStartupLocation="CenterScreen"
+        Width="400" Height="460" CanResize="False" WindowStartupLocation="CenterScreen"
         Icon="/Assets/pmou.png"
         Title="{DynamicResource updater.caption}" Closing="OnClosing">
-  <Grid RowDefinitions="*, 20, 20, *, *">
-    <Image Grid.Row="0" Margin="20" Width="96" Height="96"
-           VerticalAlignment="Top" HorizontalAlignment="Center"
-           Source="/Assets/pmou.png"/>
-    <Image Grid.Row="0" Height="16" Margin="0,136,0,10"
-           VerticalAlignment="Top" HorizontalAlignment="Center"
-           Source="/Assets/logotype.png" IsVisible="{Binding !IsDarkMode}"/>
-    <Image Grid.Row="0" Height="16" Margin="0,136,0,10"
-           VerticalAlignment="Top" HorizontalAlignment="Center"
-           Source="/Assets/logotype-w.png" IsVisible="{Binding IsDarkMode}"/>
+  <Grid RowDefinitions="Auto, 20, 20, *, Auto, Auto">
+    <Grid Grid.Row="0" Height="180">
+      <Image Margin="20" Width="96" Height="96"
+             VerticalAlignment="Top" HorizontalAlignment="Center"
+             Source="/Assets/pmou.png"/>
+      <Image Height="16" Margin="0,136,0,10"
+             VerticalAlignment="Top" HorizontalAlignment="Center"
+             Source="/Assets/logotype.png" IsVisible="{Binding !IsDarkMode}"/>
+      <Image Height="16" Margin="0,136,0,10"
+             VerticalAlignment="Top" HorizontalAlignment="Center"
+             Source="/Assets/logotype-w.png" IsVisible="{Binding IsDarkMode}"/>
+    </Grid>
     <TextBlock Grid.Row="1" Margin="40,0" TextAlignment="Center"
                Text="{Binding AppVersion}"/>
     <TextBlock Grid.Row="2" Margin="40,0" TextAlignment="Center"
                Text="{DynamicResource updater.description}"/>
-    <TextBlock Grid.Row="3" Margin="40,0" TextAlignment="Center" VerticalAlignment="Bottom"
+    <Border Grid.Row="3" Margin="20,10" CornerRadius="4" BorderThickness="1"
+            BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+            IsVisible="{Binding HasReleaseNotes}">
+      <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <c:MarkdownPresenter Margin="10" Markdown="{Binding ReleaseNotes}"/>
+      </ScrollViewer>
+    </Border>
+    <TextBlock Grid.Row="4" Margin="40,0" TextAlignment="Center"
                Text="{Binding UpdaterStatus}" FontWeight="Bold"/>
-    <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="0,20,0,20"
+    <StackPanel Grid.Row="5" Orientation="Horizontal" Margin="0,20,0,20"
                 HorizontalAlignment="Center" Spacing="20">
       <Button Width="120" Content="{DynamicResource updater.github}" Command="{Binding OnGithub}"/>
       <Button Width="120" Content="{DynamicResource updater.update}" Command="{Binding OnUpdate}"
