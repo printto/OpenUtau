@@ -1345,7 +1345,7 @@ namespace OpenUtau.App.ViewModels {
         }
 
         private double GetStationaryCursorScrollValueDelta(double positionX) {
-            double rightMargin = Preferences.Default.PlayPosMarkerMargin * Bounds.Width;
+            double rightMargin = (1 - Preferences.Default.PlayPosMarkerMargin) * Bounds.Width;
             if (positionX > rightMargin) {
                 return (positionX - rightMargin) * playPosXToTickOffset;
             } else if (positionX < 0) {
