@@ -40,12 +40,18 @@ namespace OpenUtau.App.Views {
             return item;
         }
 
-        public static NativeMenuItem Toggle(string header, bool isChecked, Action action) {
+        public static NativeMenuItem Toggle(
+            string header, bool isChecked, Action action, bool enabled = true) {
             var item = new NativeMenuItem(header) {
                 ToggleType = NativeMenuItemToggleType.CheckBox,
                 IsChecked = isChecked,
+                IsEnabled = enabled,
             };
-            item.Click += (sender, args) => Invoke(action);
+            if (enabled) {
+                item.Click += (sender, args) => Invoke(action);
+            } else {
+                item.Command = NeverCommand.Instance;
+            }
             return item;
         }
 

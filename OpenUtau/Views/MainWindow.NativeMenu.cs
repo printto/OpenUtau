@@ -4,6 +4,8 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
+using OpenUtau.App.ViewModels;
 
 namespace OpenUtau.App.Views {
     public partial class MainWindow {
@@ -26,6 +28,11 @@ namespace OpenUtau.App.Views {
             nativeMenu.Opening += (sender, args) => RebuildNativeMenu();
             MacMenu.MenuActionCompleted = () => RebuildNativeMenu(false);
             Activated += (sender, args) => RebuildNativeMenu(true);
+            viewModel.PropertyChanged += (sender, args) => {
+                if (args.PropertyName != null && MenuRelevantProperties.Contains(args.PropertyName)) {
+                    InvalidateNativeMenu();
+                }
+            };
             RebuildNativeMenu();
             NativeMenu.SetMenu(this, nativeMenu);
         }
@@ -35,11 +42,32 @@ namespace OpenUtau.App.Views {
                 return;
             }
             NativeMenu.SetMenu(window, nativeMenu);
-            window.Activated += (sender, args) => RebuildNativeMenu(false);
-            window.Deactivated += (sender, args) => RebuildNativeMenu(false);
+            window.Activated += (sender, args) => InvalidateNativeMenu();
+            window.Deactivated += (sender, args) => InvalidateNativeMenu();
         }
 
+        private static readonly HashSet<string> MenuRelevantProperties = new() {
+            nameof(MainWindowViewModel.Page),
+            nameof(MainWindowViewModel.CanUndo),
+            nameof(MainWindowViewModel.CanRedo),
+            nameof(MainWindowViewModel.UndoText),
+            nameof(MainWindowViewModel.RedoText),
+        };
+
         private DateTime lastMenuDataRefresh = DateTime.MinValue;
+        private bool nativeMenuDirty;
+
+        /// Coalesces bursts of state changes into one rebuild on the next dispatcher pass.
+        internal void InvalidateNativeMenu() {
+            if (nativeMenu == null || nativeMenuDirty) {
+                return;
+            }
+            nativeMenuDirty = true;
+            Dispatcher.UIThread.Post(() => {
+                nativeMenuDirty = false;
+                RebuildNativeMenu(false);
+            }, DispatcherPriority.Background);
+        }
 
         private void RebuildNativeMenu() => RebuildNativeMenu(true);
 
@@ -151,11 +179,7 @@ namespace OpenUtau.App.Views {
 
         private List<NativeMenuItem> BuildPianoRollMenus() {
             if (pianoRoll == null) {
-                var view = MacMenu.SubMenu(MacMenu.Str("menu.view"));
-                view.IsEnabled = false;
-                var batch = MacMenu.SubMenu(MacMenu.Str("pianoroll.menu.batch"));
-                batch.IsEnabled = false;
-                return new List<NativeMenuItem> { view, batch };
+                return new List<NativeMenuItem>();
             }
             var menus = pianoRoll.BuildViewAndBatchMenus();
             foreach (var menu in menus) {

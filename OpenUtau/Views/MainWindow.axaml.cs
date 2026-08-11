@@ -1380,6 +1380,7 @@ namespace OpenUtau.App.Views {
                 Preferences.Default.DetachPianoRoll = false;
                 Dispatcher.UIThread.Post(() => {
                     PianoRollContainer.Content = pianoRoll;
+                    InvalidateNativeMenu();
                 }, DispatcherPriority.Background);
             } else {
                 PianoRollContainer.Content = null;
