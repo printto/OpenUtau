@@ -23,44 +23,44 @@
       <Menu Name="MainMenu" Grid.Row="0" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24"
                 Opened="OnMainMenuOpened" Closed="OnMainMenuClosed" PointerExited="OnMainMenuPointerLeave"
                 ZIndex="1">
-          <MenuItem Header="{DynamicResource menu.file}" IsEnabled="{Binding Page}">
+          <MenuItem Header="{DynamicResource menu.file}">
             <MenuItem Header="{DynamicResource menu.file.new}" InputGesture="Ctrl+N" Click="OnMenuNew"/>
             <MenuItem Header="{DynamicResource menu.file.newfromtemplate}" ItemsSource="{Binding OpenTemplatesMenuItems}" Classes="MenuItemWithSubMenu"/>
-            <MenuItem Header="{DynamicResource menu.file.savetemplate}" Click="OnMenuSaveTemplate"/>
+            <MenuItem Header="{DynamicResource menu.file.savetemplate}" Click="OnMenuSaveTemplate" IsEnabled="{Binding ProjectOpen}"/>
             <MenuItem Header="-" Height="1"/>
             <MenuItem Header="{DynamicResource menu.file.open}" InputGesture="Ctrl+O" Click="OnMenuOpen"/>
             <MenuItem Header="{DynamicResource menu.file.openrecent}" ItemsSource="{Binding OpenRecentMenuItems}" Classes="MenuItemWithSubMenu"/>
             <MenuItem Header="{DynamicResource menu.file.opensharecode}" Click="OnMenuOpenShareCode"/>
             <!-- <MenuItem Header="{DynamicResource menu.file.openprojectlocation}" Click="OnMenuOpenProjectLocation"/> -->
             <MenuItem Header="-" Height="1"/>
-            <MenuItem Header="{DynamicResource menu.file.save}" InputGesture="Ctrl+S" Click="OnMenuSave"/>
-            <MenuItem Header="{DynamicResource menu.file.saveas}"  InputGesture="Ctrl+Shift+S" Click="OnMenuSaveAs"/>
-            <MenuItem Header="{DynamicResource menu.file.sharetodevice}" Click="OnMenuShareToDevice"/>
+            <MenuItem Header="{DynamicResource menu.file.save}" InputGesture="Ctrl+S" Click="OnMenuSave" IsEnabled="{Binding ProjectOpen}"/>
+            <MenuItem Header="{DynamicResource menu.file.saveas}"  InputGesture="Ctrl+Shift+S" Click="OnMenuSaveAs" IsEnabled="{Binding ProjectOpen}"/>
+            <MenuItem Header="{DynamicResource menu.file.sharetodevice}" Click="OnMenuShareToDevice" IsEnabled="{Binding ProjectOpen}"/>
             <MenuItem Header="-" Height="1"/>
-            <MenuItem Header="{DynamicResource menu.file.importtracks}" Click="OnMenuImportTracks"/>
-            <MenuItem Header="{DynamicResource menu.file.importaudio}" Click="OnMenuImportAudio"/>
+            <MenuItem Header="{DynamicResource menu.file.importtracks}" Click="OnMenuImportTracks" IsEnabled="{Binding ProjectOpen}"/>
+            <MenuItem Header="{DynamicResource menu.file.importaudio}" Click="OnMenuImportAudio" IsEnabled="{Binding ProjectOpen}"/>
             <MenuItem Header="-" Height="1"/>
-            <MenuItem Header="{DynamicResource menu.file.exportaudio}">
+            <MenuItem Header="{DynamicResource menu.file.exportaudio}" IsEnabled="{Binding ProjectOpen}">
               <MenuItem Header="{DynamicResource menu.file.exportwav}" Click="OnMenuExportWav"/>
               <MenuItem Header="{DynamicResource menu.file.exportwavto}" Click="OnMenuExportWavTo"/>
               <MenuItem Header="{DynamicResource menu.file.exportmixdown}" Click="OnMenuExportMixdown"/>
             </MenuItem>
-            <MenuItem Header="{DynamicResource menu.file.exportproject}">
+            <MenuItem Header="{DynamicResource menu.file.exportproject}" IsEnabled="{Binding ProjectOpen}">
               <MenuItem Header="{DynamicResource menu.file.exportust}" Click="OnMenuExportUst"/>
               <MenuItem Header="{DynamicResource menu.file.exportustto}" Click="OnMenuExportUstTo"/>
               <MenuItem Header="{DynamicResource menu.file.exportmidi}" Click="OnMenuExportMidi"/>
               <MenuItem Header="{DynamicResource menu.file.exportds}" Click="OnMenuExportDsTo"/>
               <MenuItem Header="{DynamicResource menu.file.exportpmws}" Click="OnMenuExportPmws"/>
             </MenuItem>
-            <MenuItem Header="{DynamicResource menu.file.openexportlocation}" Click="OnMenuOpenProjectLocation"/>
+            <MenuItem Header="{DynamicResource menu.file.openexportlocation}" Click="OnMenuOpenProjectLocation" IsEnabled="{Binding ProjectOpen}"/>
             <MenuItem Header="-" Height="1"/>
-            <MenuItem Header="{DynamicResource menu.file.sendtowebsynth}" Click="OnMenuSendToWebSynth"/>
+            <MenuItem Header="{DynamicResource menu.file.sendtowebsynth}" Click="OnMenuSendToWebSynth" IsEnabled="{Binding ProjectOpen}"/>
           </MenuItem>
-          <MenuItem Header="{DynamicResource menu.edit}" IsEnabled="{Binding Page}">
+          <MenuItem Header="{DynamicResource menu.edit}" IsEnabled="{Binding ProjectOpen}">
             <MenuItem Header="{Binding UndoText}" InputGesture="Ctrl+Z" Command="{Binding Undo}" IsEnabled="{Binding CanUndo}"/>
             <MenuItem Header="{Binding RedoText}" InputGesture="Ctrl+Y" Command="{Binding Redo}" IsEnabled="{Binding CanRedo}"/>
           </MenuItem>
-          <MenuItem Header="{DynamicResource menu.project}" IsEnabled="{Binding Page}">
+          <MenuItem Header="{DynamicResource menu.project}" IsEnabled="{Binding ProjectOpen}">
             <MenuItem Header="{DynamicResource menu.project.expressions}" Click="OnMenuExpressionss"/>
             <MenuItem Header="{DynamicResource menu.project.remaptimeaxis}" Click="OnMenuRemapTimeaxis"/>
           </MenuItem>

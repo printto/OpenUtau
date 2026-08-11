@@ -66,6 +66,7 @@ namespace OpenUtau.App.ViewModels {
         ///0: welcome page, 1: tracks page
         /// </summary>
         [Reactive] public int Page { get; set; } = 0;
+        public bool ProjectOpen => Page != 0;
         ObservableCollectionExtended<RecentFileInfo> RecentFiles { get; } = new ObservableCollectionExtended<RecentFileInfo>();
         ObservableCollectionExtended<RecentFileInfo> TemplateFiles { get; } = new ObservableCollectionExtended<RecentFileInfo>();
         [Reactive] public bool HasRecovery { get; set; } = false;
@@ -145,6 +146,9 @@ namespace OpenUtau.App.ViewModels {
                 TracksViewModel.DeleteSelectedParts();
             });
             DocManager.Inst.AddSubscriber(this);
+
+            this.WhenAnyValue(vm => vm.Page)
+                .Subscribe(_ => this.RaisePropertyChanged(nameof(ProjectOpen)));
 
             this.WhenAnyValue(vm => vm.ShowPianoRoll, vm => vm.ProgressText, vm => vm.Progress)
                 .Subscribe(_ => {

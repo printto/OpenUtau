@@ -3,11 +3,11 @@ is_dark_mode: true
 background_color: '#ff1e1f24'
 background_color_pointer_over: '#ff2d2e35'
 background_color_pressed: '#ff3d3e47'
-background_color_disabled: '#ff4d4e59'
+background_color_disabled: '#ff1a1b1f'
 foreground_color: White
 foreground_color_pointer_over: White
 foreground_color_pressed: '#ffe6e6e6'
-foreground_color_disabled: '#ffcccccc'
+foreground_color_disabled: '#ff5d5e69'
 border_color: '#707070'
 border_color_pointer_over: '#B0B0B0'
 system_accent_color: '#4EA6EA'

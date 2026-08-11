@@ -35,7 +35,7 @@
   <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPointerOver"
                    Color="{DynamicResource BackgroundColorPointerOver}" />
   <SolidColorBrush x:Key="MenuFlyoutItemBackgroundDisabled"
-                   Color="{DynamicResource BackgroundColorDisabled}" />
+                   Color="Transparent" />
   <SolidColorBrush x:Key="MenuFlyoutItemForeground"
                    Color="{DynamicResource ForegroundColor}" />
   <SolidColorBrush x:Key="MenuFlyoutItemForegroundPointerOver"
