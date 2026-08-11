@@ -70,23 +70,23 @@ namespace OpenUtau.App.Views {
             bool open = viewModel.ProjectOpen;
             var exportAudio = MacMenu.SubMenu(MacMenu.Str("menu.file.exportaudio"),
                 MacMenu.Item(MacMenu.Str("menu.file.exportwav"),
-                    () => OnMenuExportWav(this, new RoutedEventArgs())),
+                    () => OnMenuExportWav(this, new RoutedEventArgs()), null, open),
                 MacMenu.Item(MacMenu.Str("menu.file.exportwavto"),
-                    () => OnMenuExportWavTo(this, new RoutedEventArgs())),
+                    () => OnMenuExportWavTo(this, new RoutedEventArgs()), null, open),
                 MacMenu.Item(MacMenu.Str("menu.file.exportmixdown"),
-                    () => OnMenuExportMixdown(this, new RoutedEventArgs())));
+                    () => OnMenuExportMixdown(this, new RoutedEventArgs()), null, open));
             exportAudio.IsEnabled = open;
             var exportProject = MacMenu.SubMenu(MacMenu.Str("menu.file.exportproject"),
                 MacMenu.Item(MacMenu.Str("menu.file.exportust"),
-                    () => OnMenuExportUst(this, new RoutedEventArgs())),
+                    () => OnMenuExportUst(this, new RoutedEventArgs()), null, open),
                 MacMenu.Item(MacMenu.Str("menu.file.exportustto"),
-                    () => OnMenuExportUstTo(this, new RoutedEventArgs())),
+                    () => OnMenuExportUstTo(this, new RoutedEventArgs()), null, open),
                 MacMenu.Item(MacMenu.Str("menu.file.exportmidi"),
-                    () => OnMenuExportMidi(this, new RoutedEventArgs())),
+                    () => OnMenuExportMidi(this, new RoutedEventArgs()), null, open),
                 MacMenu.Item(MacMenu.Str("menu.file.exportds"),
-                    () => OnMenuExportDsTo(this, new RoutedEventArgs())),
+                    () => OnMenuExportDsTo(this, new RoutedEventArgs()), null, open),
                 MacMenu.Item(MacMenu.Str("menu.file.exportpmws"),
-                    () => OnMenuExportPmws(this, new RoutedEventArgs())));
+                    () => OnMenuExportPmws(this, new RoutedEventArgs()), null, open));
             exportProject.IsEnabled = open;
             return MacMenu.SubMenu(MacMenu.Str("menu.file"),
                 MacMenu.Item(MacMenu.Str("menu.file.new"),
@@ -146,9 +146,7 @@ namespace OpenUtau.App.Views {
             if (pianoRoll != null) {
                 items.AddRange(pianoRoll.BuildNoteEditTail());
             }
-            var menu = MacMenu.SubMenu(MacMenu.Str("menu.noteedit"), items);
-            menu.IsEnabled = PianoRollMenusEnabled;
-            return menu;
+            return MacMenu.SubMenu(MacMenu.Str("menu.noteedit"), items);
         }
 
         private List<NativeMenuItem> BuildPianoRollMenus() {
@@ -167,11 +165,12 @@ namespace OpenUtau.App.Views {
         }
 
         private NativeMenuItem BuildProjectMenu() {
+            bool open = viewModel.ProjectOpen;
             var menu = MacMenu.SubMenu(MacMenu.Str("menu.project"),
                 MacMenu.Item(MacMenu.Str("menu.project.expressions"),
-                    () => OnMenuExpressionss(this, new RoutedEventArgs())),
+                    () => OnMenuExpressionss(this, new RoutedEventArgs()), null, open),
                 MacMenu.Item(MacMenu.Str("menu.project.remaptimeaxis"),
-                    () => OnMenuRemapTimeaxis(this, new RoutedEventArgs())));
+                    () => OnMenuRemapTimeaxis(this, new RoutedEventArgs()), null, open));
             menu.IsEnabled = viewModel.ProjectOpen;
             return menu;
         }

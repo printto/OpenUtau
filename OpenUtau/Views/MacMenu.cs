@@ -32,7 +32,11 @@ namespace OpenUtau.App.Views {
                 Gesture = gesture,
                 IsEnabled = enabled,
             };
-            item.Click += (sender, args) => Invoke(action);
+            if (enabled) {
+                item.Click += (sender, args) => Invoke(action);
+            } else {
+                item.Command = NeverCommand.Instance;
+            }
             return item;
         }
 
@@ -84,5 +88,12 @@ namespace OpenUtau.App.Views {
         }
 
         public static MenuItem TagSender(object tag) => new MenuItem { Tag = tag };
+
+        private sealed class NeverCommand : System.Windows.Input.ICommand {
+            public static readonly NeverCommand Instance = new NeverCommand();
+            public bool CanExecute(object? parameter) => false;
+            public void Execute(object? parameter) { }
+            public event EventHandler? CanExecuteChanged { add { } remove { } }
+        }
     }
 }
