@@ -29,6 +29,7 @@ namespace OpenUtau.App.Views {
 
         public ShareCodeDialog() {
             InitializeComponent();
+            MacWindow.MakeSeamless(this);
         }
 
         public void Init(UProject project, StartMode mode) {

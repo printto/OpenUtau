@@ -9,6 +9,7 @@ namespace OpenUtau.App.Views {
     public partial class SingerSetupDialog : Window {
         public SingerSetupDialog() {
             InitializeComponent();
+            MacWindow.MakeSeamless(this);
         }
 
         void InstallClicked(object sender, RoutedEventArgs arg) {

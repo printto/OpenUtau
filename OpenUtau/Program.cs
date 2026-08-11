@@ -70,7 +70,12 @@ namespace OpenUtau.App {
             } else if (OS.IsMacOS()) {
                 //To avoid text display corruption, specify Hiragino Sans font first.
                 //Due to the specification of AvaloniaUI, this only affects when the language is set to Japanese.
-                fontOptions.DefaultFamilyName = "Hiragino Sans, Segoe UI, San Francisco, Helvetica Neue";
+                fontOptions.DefaultFamilyName = ".AppleSystemUIFont";
+                fontOptions.FontFallbacks = new[] {
+                    new FontFallback { FontFamily = new FontFamily("Hiragino Sans") },
+                    new FontFallback { FontFamily = new FontFamily("Apple SD Gothic Neo") },
+                    new FontFallback { FontFamily = new FontFamily("Helvetica Neue") },
+                };
             }
             return AppBuilder.Configure<App>()
                 .UsePlatformDetect()

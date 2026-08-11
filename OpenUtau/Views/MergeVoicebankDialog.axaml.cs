@@ -9,6 +9,7 @@ namespace OpenUtau.App.Views {
     public partial class MergeVoicebankDialog : Window {
         public MergeVoicebankDialog() {
             InitializeComponent();
+            MacWindow.MakeSeamless(this);
         }
 
         void OnEditedFolder(object sender, DataGridCellEditEndedEventArgs e)

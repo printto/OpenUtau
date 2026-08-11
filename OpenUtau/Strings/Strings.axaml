@@ -5,6 +5,7 @@
   <system:String x:Key="button.apply">Apply</system:String>
   <system:String x:Key="button.cancel">Cancel</system:String>
   <system:String x:Key="button.no">No</system:String>
+  <system:String x:Key="button.dontsave">Don't Save</system:String>
   <system:String x:Key="button.off">Off</system:String>
   <system:String x:Key="button.ok">Ok</system:String>
   <system:String x:Key="button.on">On</system:String>
@@ -102,7 +103,7 @@
   <system:String x:Key="dialogs.about.caption">About OpenUtau - PRINTmov Edition</system:String>
   <system:String x:Key="dialogs.about.message">
 OpenUtau aims to be an open source editing environment for UTAU community, with a modern user experience and intelligent phonological support. Visit us on Github.</system:String>
-  <system:String x:Key="dialogs.exitsave.caption">Exit OpenUtau</system:String>
+  <system:String x:Key="dialogs.exitsave.caption">Exit PMOU</system:String>
   <system:String x:Key="dialogs.exitsave.message">The current project contains unsaved changes. Do you want to save it?</system:String>
   <system:String x:Key="dialogs.export.caption">Export</system:String>
   <system:String x:Key="dialogs.export.savefirst">Save project file first</system:String>

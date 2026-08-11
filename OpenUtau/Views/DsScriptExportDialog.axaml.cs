@@ -8,6 +8,7 @@ namespace OpenUtau.App.Views {
 
         public DsScriptExportDialog() {
             InitializeComponent();
+            MacWindow.MakeSeamless(this);
         }
 
         void OnOkClicked(object? sender, RoutedEventArgs e) {

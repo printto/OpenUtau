@@ -31,7 +31,10 @@ namespace OpenUtau.App.ViewModels {
                     return phonemizer.Tag;
                 }
                 if (string.IsNullOrEmpty(phonemizer.Language)) {
-                    return ThemeManager.GetString("phonemizer.selectlanguage");
+                    var selectLanguage = ThemeManager.GetString("phonemizer.selectlanguage");
+                    return OS.IsMacOS()
+                        ? selectLanguage.TrimStart('⚠', '️', ' ')
+                        : selectLanguage;
                 }
                 if (ThemeManager.TryGetString($"languages.{phonemizer.Language.ToLowerInvariant()}", out var langName)
                     && !string.IsNullOrEmpty(langName)) {

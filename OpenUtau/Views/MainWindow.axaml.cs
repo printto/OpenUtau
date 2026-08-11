@@ -104,7 +104,18 @@ namespace OpenUtau.App.Views {
 
             DocManager.Inst.AddSubscriber(this);
 
+            if (OS.IsMacOS()) {
+                ExtendClientAreaToDecorationsHint = true;
+                ExtendClientAreaChromeHints = Avalonia.Platform.ExtendClientAreaChromeHints.PreferSystemChrome;
+                ExtendClientAreaTitleBarHeightHint = -1;
+                MacTitle.IsVisible = true;
+                Activated += (sender, args) => MacTitle.Opacity = 1;
+                Deactivated += (sender, args) => MacTitle.Opacity = 0.5;
+            }
             InstallNativeMenu();
+#if DEBUG
+            this.AttachDevTools();
+#endif
 
             Log.Information("Main window checking Update.");
             UpdaterDialog.CheckForUpdate(
@@ -1954,7 +1965,9 @@ namespace OpenUtau.App.Views {
                 this,
                 ThemeManager.GetString("dialogs.exitsave.message"),
                 ThemeManager.GetString("dialogs.exitsave.caption"),
-                MessageBox.MessageBoxButtons.YesNoCancel);
+                OS.IsMacOS()
+                    ? MessageBox.MessageBoxButtons.SaveDontSaveCancel
+                    : MessageBox.MessageBoxButtons.YesNoCancel);
             switch (result) {
                 case MessageBox.MessageBoxResult.Yes:
                     await Save();

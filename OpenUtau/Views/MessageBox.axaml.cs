@@ -9,6 +9,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.Threading;
 using OpenUtau.Core;
 using Serilog;
@@ -16,11 +17,12 @@ using SharpCompress;
 
 namespace OpenUtau.App.Views {
     public partial class MessageBox : Window {
-        public enum MessageBoxButtons { Ok, OkCancel, YesNo, YesNoCancel, OkCopy }
+        public enum MessageBoxButtons { Ok, OkCancel, YesNo, YesNoCancel, OkCopy, SaveDontSaveCancel }
         public enum MessageBoxResult { Ok, Cancel, Yes, No }
 
         public MessageBox() {
             InitializeComponent();
+            MacWindow.MakeSeamless(this);
         }
 
         public void SetText(string text) {
@@ -118,6 +120,30 @@ namespace OpenUtau.App.Views {
             }
         }
 
+        private static void ApplyMacButtonConventions(MessageBox msgbox, List<Button> added) {
+            if (!OS.IsMacOS() || added.Count == 0) {
+                return;
+            }
+            msgbox.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+
+            var affirmative = added.FirstOrDefault(b => !b.IsCancel);
+            msgbox.Buttons.Children.Clear();
+            foreach (var btn in added.Where(b => b != affirmative)) {
+                msgbox.Buttons.Children.Add(btn);
+            }
+            if (affirmative != null) {
+                msgbox.Buttons.Children.Add(affirmative);
+                affirmative.IsDefault = true;
+                if (Application.Current != null
+                    && Application.Current.Resources.TryGetResource(
+                        "SystemAccentColor", Application.Current.ActualThemeVariant, out var accent)
+                    && accent is Color color) {
+                    affirmative.Background = new SolidColorBrush(color);
+                    affirmative.Foreground = Brushes.White;
+                }
+            }
+        }
+
         public static Task<MessageBoxResult> Show(Window parent, string text, string title, MessageBoxButtons buttons, string? stackTrace = null) {
             var msgbox = new MessageBox() {
                 Title = title
@@ -132,6 +158,7 @@ namespace OpenUtau.App.Views {
             }
 
             var res = MessageBoxResult.Ok;
+            var added = new List<Button>();
 
             void AddButton(string caption, MessageBoxResult r, bool def = false) {
                 var btn = new Button { Content = caption };
@@ -139,6 +166,10 @@ namespace OpenUtau.App.Views {
                     res = r;
                     msgbox.Close();
                 };
+                if (r == MessageBoxResult.Cancel) {
+                    btn.IsCancel = true;
+                }
+                added.Add(btn);
                 msgbox.Buttons.Children.Add(btn);
                 if (def)
                     res = r;
@@ -150,9 +181,16 @@ namespace OpenUtau.App.Views {
                 AddButton(ThemeManager.GetString("button.yes"), MessageBoxResult.Yes);
                 AddButton(ThemeManager.GetString("button.no"), MessageBoxResult.No, true);
             }
+            if (buttons == MessageBoxButtons.SaveDontSaveCancel) {
+                AddButton(ThemeManager.GetString("button.save"), MessageBoxResult.Yes);
+                AddButton(ThemeManager.GetString("button.dontsave"), MessageBoxResult.No, true);
+            }
 
-            if (buttons == MessageBoxButtons.OkCancel || buttons == MessageBoxButtons.YesNoCancel)
+            if (buttons == MessageBoxButtons.OkCancel || buttons == MessageBoxButtons.YesNoCancel
+                || buttons == MessageBoxButtons.SaveDontSaveCancel)
                 AddButton(ThemeManager.GetString("button.cancel"), MessageBoxResult.Cancel, true);
+
+            ApplyMacButtonConventions(msgbox, added);
             if (buttons == MessageBoxButtons.OkCopy) {
                 var btn = new Button { Content = ThemeManager.GetString("dialogs.messagebox.copy") };
                 btn.Click += (_, __) => {

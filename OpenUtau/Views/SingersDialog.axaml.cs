@@ -25,6 +25,7 @@ namespace OpenUtau.App.Views {
 
         public SingersDialog() {
             InitializeComponent();
+            MacWindow.MakeSeamless(this);
             DocManager.Inst.AddSubscriber(this);
         }
 

@@ -11,5 +11,13 @@
         Title="{Binding NotesViewModel.WindowTitle}" MinWidth="300" MinHeight="200" Width="{Binding Width}" Height="{Binding Height}"
         Focusable="True" GotFocus="WindowGotFocus" TransparencyLevelHint="None"
         Closing="WindowClosing" Deactivated="WindowDeactivated">
-    <ContentControl Name="PianoRollContainer"/>
+    <Grid>
+        <ContentControl Name="PianoRollContainer"
+                        Margin="{Binding $parent[Window].WindowDecorationMargin}"/>
+        <TextBlock Name="MacTitle" Text="{Binding NotesViewModel.WindowTitle}" IsVisible="False"
+                   HorizontalAlignment="Center" VerticalAlignment="Top"
+                   Height="28" Padding="0,6,0,0" FontSize="13" FontWeight="SemiBold"
+                   IsHitTestVisible="False" ZIndex="2"
+                   Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"/>
+    </Grid>
 </Window>

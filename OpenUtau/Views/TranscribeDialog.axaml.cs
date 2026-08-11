@@ -12,6 +12,7 @@ namespace OpenUtau.App.Views {
 
         public TranscribeDialog() {
             InitializeComponent();
+            MacWindow.MakeSeamless(this);
         }
 
         void OnOkClicked(object? sender, RoutedEventArgs e) {

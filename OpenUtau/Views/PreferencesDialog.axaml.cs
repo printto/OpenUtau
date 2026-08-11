@@ -15,6 +15,7 @@ namespace OpenUtau.App.Views {
 
         public PreferencesDialog() {
             InitializeComponent();
+            MacWindow.MakeSeamless(this);
         }
 
         void OpenSingersFolder(object sender, RoutedEventArgs e) {

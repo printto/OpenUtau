@@ -59,6 +59,8 @@ namespace OpenUtau.App.Controls {
             this.LayoutUpdated += PianoRollLayoutUpdated;
             if (OS.IsMacOS()) {
                 MenuBorder.IsVisible = false;
+                Grid.SetColumnSpan(ToolButtonsBorder, 2);
+                ToolButtonsBorder.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center;
             }
         }
 

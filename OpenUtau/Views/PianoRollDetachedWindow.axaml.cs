@@ -17,6 +17,15 @@ namespace OpenUtau.App.Views {
 
             PianoRollContainer.Content = pianoRoll;
 
+            if (OS.IsMacOS()) {
+                ExtendClientAreaToDecorationsHint = true;
+                ExtendClientAreaChromeHints = Avalonia.Platform.ExtendClientAreaChromeHints.PreferSystemChrome;
+                ExtendClientAreaTitleBarHeightHint = -1;
+                MacTitle.IsVisible = true;
+                Activated += (sender, args) => MacTitle.Opacity = 1;
+                Deactivated += (sender, args) => MacTitle.Opacity = 0.5;
+            }
+
             if (Preferences.Default.PianorollWindowSize.TryGetPosition(out int x, out int y)) {
                 Position = new PixelPoint(x, y);
             }

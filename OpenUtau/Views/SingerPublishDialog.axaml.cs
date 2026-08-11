@@ -11,6 +11,7 @@ namespace OpenUtau.App.Views {
     public partial class SingerPublishDialog : Window {
         public SingerPublishDialog() {
             InitializeComponent();
+            MacWindow.MakeSeamless(this);
         }
 
         async void PublishClicked(object sender, RoutedEventArgs arg){

@@ -9,6 +9,7 @@ namespace OpenUtau.App.Views {
 
         public TypeInDialog() {
             InitializeComponent();
+            MacWindow.MakeSeamless(this);
             OkButton.Click += OkButtonClick;
             TextBox.AttachedToVisualTree += (s, e) => { TextBox.SelectAll(); TextBox.Focus(); };
         }

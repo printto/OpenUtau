@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
@@ -20,6 +21,8 @@ namespace OpenUtau.App.Views {
 
             nativeMenu = new NativeMenu();
             nativeMenu.Opening += (sender, args) => RebuildNativeMenu();
+            MacMenu.MenuActionCompleted = () => RebuildNativeMenu(false);
+            Activated += (sender, args) => RebuildNativeMenu(true);
             RebuildNativeMenu();
             NativeMenu.SetMenu(this, nativeMenu);
         }
@@ -31,13 +34,20 @@ namespace OpenUtau.App.Views {
             NativeMenu.SetMenu(window, nativeMenu);
         }
 
-        private void RebuildNativeMenu() {
+        private DateTime lastMenuDataRefresh = DateTime.MinValue;
+
+        private void RebuildNativeMenu() => RebuildNativeMenu(true);
+
+        private void RebuildNativeMenu(bool refreshData) {
             if (nativeMenu == null) {
                 return;
             }
-            viewModel.RefreshOpenRecent();
-            viewModel.RefreshTemplates();
-            viewModel.RefreshCacheSize();
+            if (refreshData && DateTime.UtcNow - lastMenuDataRefresh > TimeSpan.FromSeconds(5)) {
+                lastMenuDataRefresh = DateTime.UtcNow;
+                viewModel.RefreshOpenRecent();
+                viewModel.RefreshTemplates();
+                viewModel.RefreshCacheSize();
+            }
 
             nativeMenu.Items.Clear();
             nativeMenu.Add(BuildFileMenu());
@@ -185,7 +195,7 @@ namespace OpenUtau.App.Views {
                 MacMenu.Item(MacMenu.Str("menu.tools.packages"),
                     () => OnMenuPackageManager(this, new RoutedEventArgs())),
                 MacMenu.Item(MacMenu.Str("menu.tools.prefs"),
-                    () => OnMenuPreferences(this, new RoutedEventArgs())));
+                    () => OnMenuPreferences(this, new RoutedEventArgs()), MacMenu.Cmd(Key.OemComma)));
         }
 
         private NativeMenuItem BuildHelpMenu() {

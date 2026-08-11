@@ -7,6 +7,7 @@ namespace OpenUtau.App.Views {
         PhoneticAssistantViewModel viewModel;
         public PhoneticAssistant() {
             InitializeComponent();
+            MacWindow.MakeSeamless(this);
             DataContext = viewModel = new PhoneticAssistantViewModel();
         }
 

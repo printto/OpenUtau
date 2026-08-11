@@ -13,6 +13,7 @@ namespace OpenUtau.App.Views {
 
         public TrackSettingsDialog(UTrack track) {
             InitializeComponent();
+            MacWindow.MakeSeamless(this);
             DataContext = viewModel = new TrackSettingsViewModel(track);
         }
 

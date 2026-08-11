@@ -8,6 +8,7 @@ namespace OpenUtau.App.Views {
     public partial class ExpressionsDialog : Window {
         public ExpressionsDialog() {
             InitializeComponent();
+            MacWindow.MakeSeamless(this);
         }
 
         private void ApplyButtonClicked(object sender, RoutedEventArgs _) {

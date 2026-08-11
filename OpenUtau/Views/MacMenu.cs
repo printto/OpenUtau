@@ -16,13 +16,23 @@ namespace OpenUtau.App.Views {
 
         public static KeyGesture Plain(Key key) => new KeyGesture(key);
 
+        internal static Action? MenuActionCompleted;
+
+        private static void Invoke(Action action) {
+            action();
+            var completed = MenuActionCompleted;
+            if (completed != null) {
+                Avalonia.Threading.Dispatcher.UIThread.Post(completed);
+            }
+        }
+
         public static NativeMenuItem Item(
             string header, Action action, KeyGesture? gesture = null, bool enabled = true) {
             var item = new NativeMenuItem(header) {
                 Gesture = gesture,
                 IsEnabled = enabled,
             };
-            item.Click += (sender, args) => action();
+            item.Click += (sender, args) => Invoke(action);
             return item;
         }
 
@@ -31,7 +41,7 @@ namespace OpenUtau.App.Views {
                 ToggleType = NativeMenuItemToggleType.CheckBox,
                 IsChecked = isChecked,
             };
-            item.Click += (sender, args) => action();
+            item.Click += (sender, args) => Invoke(action);
             return item;
         }
 

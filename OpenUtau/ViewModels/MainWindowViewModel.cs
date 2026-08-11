@@ -45,10 +45,20 @@ namespace OpenUtau.App.ViewModels {
     }
 
     public class MainWindowViewModel : ViewModelBase, ICmdSubscriber {
-        public string Title => !ProjectSaved
-            ? $"{AppVersion.Replace("v", "")}"
-            //: $"{(DocManager.Inst.ChangesSaved ? "" : "*")}{AppVersion} [{DocManager.Inst.Project.FilePath}]";
-            : $"{(DocManager.Inst.ChangesSaved ? "" : "*")}{Path.GetFileName(DocManager.Inst.Project.FilePath)} - {AppVersion.Replace("v", "")}";
+        private string DocumentTitle {
+            get {
+                string name = ProjectSaved
+                    ? Path.GetFileNameWithoutExtension(DocManager.Inst.Project.FilePath)
+                    : "Untitled";
+                return DocManager.Inst.ChangesSaved ? name : $"{name} — Edited";
+            }
+        }
+        public string Title => OS.IsMacOS()
+            ? DocumentTitle
+            : !ProjectSaved
+                ? AppVersion.Replace("v", "")
+                //: $"{(DocManager.Inst.ChangesSaved ? "" : "*")}{AppVersion} [{DocManager.Inst.Project.FilePath}]";
+                : $"{(DocManager.Inst.ChangesSaved ? "" : "*")}{Path.GetFileName(DocManager.Inst.Project.FilePath)} - {AppVersion.Replace("v", "")}";
         public double Width => Preferences.Default.MainWindowSize.Width;
         public double Height => Preferences.Default.MainWindowSize.Height;
 

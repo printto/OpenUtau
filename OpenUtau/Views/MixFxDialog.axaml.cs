@@ -15,6 +15,7 @@ namespace OpenUtau.App.Views {
 
         public MixFxDialog(UTrack? track) {
             InitializeComponent();
+            MacWindow.MakeSeamless(this);
             this.track = track;
             DataContext = viewModel = new MixFxViewModel(track);
             viewModel.AskForName = PromptForNameAsync;

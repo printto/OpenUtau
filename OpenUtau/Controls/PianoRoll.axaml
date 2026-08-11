@@ -425,7 +425,7 @@
           </Menu>
         </Border>
 
-        <Border Grid.Column="2">
+        <Border Name="ToolButtonsBorder" Grid.Column="2">
           <StackPanel Orientation="Horizontal">
             <ToggleButton Classes="toolbar" Margin="0" Padding="1" Height="20" Width="20" IsChecked="{Binding NotesViewModel.ShowTips}"
                           ToolTip.Tip="{DynamicResource pianoroll.toggle.tips}">

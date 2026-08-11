@@ -10,6 +10,7 @@ namespace OpenUtau.App.Views {
 
         public SliderDialog() {
             InitializeComponent();
+            MacWindow.MakeSeamless(this);
         }
         public SliderDialog(string title, double value, double min, double max, double tick) {
             InitializeComponent();

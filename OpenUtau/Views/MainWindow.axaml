@@ -540,5 +540,10 @@
         </Grid>
       </Carousel>
     </Grid>
+    <TextBlock Name="MacTitle" Text="{Binding Title}" IsVisible="False"
+               HorizontalAlignment="Center" VerticalAlignment="Top"
+               Height="28" Padding="0,6,0,0" FontSize="13" FontWeight="SemiBold"
+               IsHitTestVisible="False" ZIndex="2"
+               Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"/>
   </Grid>
 </Window>

@@ -20,6 +20,7 @@ namespace OpenUtau.App.Views {
 
         public TimeSignatureDialog(int beatPerBar, int beatUnit) {
             InitializeComponent();
+            MacWindow.MakeSeamless(this);
             BeatPerBar = beatPerBar;
             BeatUnit = beatUnit;
             DataContext = this;

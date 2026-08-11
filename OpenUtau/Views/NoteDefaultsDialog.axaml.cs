@@ -8,6 +8,7 @@ namespace OpenUtau.App.Views {
         internal readonly NoteDefaultsViewModel ViewModel;
         public NoteDefaultsDialog() {
             InitializeComponent();
+            MacWindow.MakeSeamless(this);
             DataContext = ViewModel = new NoteDefaultsViewModel();
         }
 
