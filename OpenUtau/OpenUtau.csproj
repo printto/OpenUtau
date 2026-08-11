@@ -19,8 +19,8 @@
     <StartupObject />
   </PropertyGroup>
   <PropertyGroup>
-    <CFBundleName>OpenUtau - PRINTmov Edition</CFBundleName>
-    <CFBundleDisplayName>OpenUtau - PRINTmov Edition</CFBundleDisplayName>
+    <CFBundleName>PMOU</CFBundleName>
+    <CFBundleDisplayName>PMOU</CFBundleDisplayName>
     <CFBundleIdentifier>com.printmov.openutau-printmov</CFBundleIdentifier>
     <CFBundleVersion>0.0.1</CFBundleVersion>
     <CFBundleShortVersionString>0.0.1</CFBundleShortVersionString>
@@ -53,6 +53,7 @@
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
+    <AvaloniaResource Remove="Assets\pmou-mac.icon\**" />
   </ItemGroup>
   <ItemGroup>
     <None Include="DefaultVocoder\**" CopyToOutputDirectory="PreserveNewest" LinkBase="DefaultVocoder\" />

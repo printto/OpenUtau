@@ -20,7 +20,7 @@
       <Grid.Resources>
         <vm:StringNotEmptyConverter x:Key="StringNotEmpty"/>
       </Grid.Resources>
-      <Menu Grid.Row="0" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24"
+      <Menu Name="MainMenu" Grid.Row="0" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="24"
                 Opened="OnMainMenuOpened" Closed="OnMainMenuClosed" PointerExited="OnMainMenuPointerLeave"
                 ZIndex="1">
           <MenuItem Header="{DynamicResource menu.file}" IsEnabled="{Binding Page}">

@@ -271,7 +271,7 @@
           <ColumnDefinition Width="*"/>
           <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <Border Grid.Column="0">
+        <Border Name="MenuBorder" Grid.Column="0">
           <Menu Height="20" Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
                 Closed="OnMenuClosed" PointerExited="OnMenuPointerLeave">
             <Menu.Styles>

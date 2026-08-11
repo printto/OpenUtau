@@ -104,6 +104,8 @@ namespace OpenUtau.App.Views {
 
             DocManager.Inst.AddSubscriber(this);
 
+            InstallNativeMenu();
+
             Log.Information("Main window checking Update.");
             UpdaterDialog.CheckForUpdate(
                 dialog => dialog.Show(this),
@@ -1330,6 +1332,7 @@ namespace OpenUtau.App.Views {
                     if (Preferences.Default.DetachPianoRoll) {
                         viewModel.ShowPianoRoll = false;
                         pianoRollWindow = new(pianoRoll);
+                        AttachNativeMenu(pianoRollWindow);
                     } else {
                         PianoRollContainer.Content = pianoRoll;
                     }
@@ -1340,6 +1343,7 @@ namespace OpenUtau.App.Views {
                     LoadingWindow.EndLoading();
 
                     pianoRoll.ViewModel.PlaybackViewModel = viewModel.PlaybackViewModel;
+                    RebuildNativeMenu();
                 }
                 if (pianoRollWindow != null) {
                     pianoRollWindow.Show();
@@ -1373,6 +1377,7 @@ namespace OpenUtau.App.Views {
                 Dispatcher.UIThread.Post(() => {
                     if (pianoRollWindow == null) {
                         pianoRollWindow = new(pianoRoll);
+                        AttachNativeMenu(pianoRollWindow);
                         pianoRollWindow.Show();
                     }
                 }, DispatcherPriority.Background);

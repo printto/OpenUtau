@@ -68,10 +68,20 @@ elif sys.platform == 'darwin':
     os.system("dotnet restore OpenUtau -r osx-x64")
     os.system("dotnet msbuild OpenUtau -t:BundleApp -p:Configuration=Release -p:RuntimeIdentifier=osx-x64 -p:UseAppHost=true -p:OutputPath=../bin/osx-x64/")
     os.system(
-        "cp OpenUtau/Assets/OpenUtau.icns bin/osx-x64/publish/OpenUtau.app/Contents/Resources/")
+        "cp OpenUtau/Assets/pmou.icns bin/osx-x64/publish/PMOU.app/Contents/Resources/")
+    os.system("xcrun actool OpenUtau/Assets/pmou-mac.icon"
+              " --compile bin/osx-x64/publish/PMOU.app/Contents/Resources"
+              " --app-icon pmou-mac --enable-on-demand-resources NO"
+              " --development-region en --target-device mac --platform macosx"
+              " --enable-icon-stack-fallback-generation=disabled --include-all-app-icons"
+              " --minimum-deployment-target 11.0 --output-partial-info-plist /dev/null")
+    os.system("plutil -replace CFBundleIconName -string pmou-mac"
+              " bin/osx-x64/publish/PMOU.app/Contents/Info.plist")
+    os.system("codesign --force --deep --sign - bin/osx-x64/publish/PMOU.app")
+    os.system("codesign --verify --deep --strict --verbose=2 bin/osx-x64/publish/PMOU.app")
     os.system("rm *.dmg")
     os.system("npm install -g create-dmg")
-    os.system("create-dmg bin/osx-x64/publish/OpenUtau.app")
+    os.system("create-dmg bin/osx-x64/publish/PMOU.app")
     os.system("mv *.dmg OpenUtau-osx-x64.dmg")
     os.system("codesign -fvs - OpenUtau-osx-x64.dmg")
     os.system("git checkout OpenUtau/OpenUtau.csproj")

@@ -16,6 +16,9 @@ namespace OpenUtau.App {
         public override void Initialize() {
             Log.Information("Initializing application.");
             AvaloniaXamlLoader.Load(this);
+            if (OS.IsMacOS()) {
+                Name = "PMOU";
+            }
             InitializeCulture();
             InitializeTheme();
             Log.Information("Initialized application.");

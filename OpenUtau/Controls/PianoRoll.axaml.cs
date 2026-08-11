@@ -57,6 +57,9 @@ namespace OpenUtau.App.Controls {
             SetPitchToolIcon();
             penTool.AddHandler(PointerPressedEvent, OnToolButtonPointerPressed, RoutingStrategies.Tunnel | RoutingStrategies.Bubble, true);
             this.LayoutUpdated += PianoRollLayoutUpdated;
+            if (OS.IsMacOS()) {
+                MenuBorder.IsVisible = false;
+            }
         }
 
         private void PianoRollLayoutUpdated(object? sender, EventArgs e) {
