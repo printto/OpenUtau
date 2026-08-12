@@ -6,13 +6,6 @@ using OpenUtau.App.Views;
 
 namespace OpenUtau.App.Controls {
     public partial class PianoRoll {
-        internal List<NativeMenuItem> BuildViewAndBatchMenus() {
-            return new List<NativeMenuItem> {
-                BuildViewMenu(),
-                BuildBatchMenu(),
-            };
-        }
-
         internal void ToggleFullScreenFromMenu() => OnMenuFullScreen(this, new RoutedEventArgs());
 
         internal List<NativeMenuItemBase> BuildNoteEditTail() {
@@ -21,8 +14,6 @@ namespace OpenUtau.App.Controls {
                     () => OnMenuSearchNote(this, new RoutedEventArgs()),
                     MacMenu.Cmd(Key.F)),
                 MacMenu.Separator(),
-                MacMenu.Item(MacMenu.Str("pianoroll.menu.part.singer"),
-                    () => OnMenuSingers(this, new RoutedEventArgs())),
                 MacMenu.SubMenu(MacMenu.Str("menu.edit.lockunselectednotes"),
                     MacMenu.Toggle(MacMenu.Str("menu.edit.lockunselectednotes.pitchpoints"),
                         ViewModel.LockPitchPoints,
@@ -41,7 +32,7 @@ namespace OpenUtau.App.Controls {
             };
         }
 
-        private NativeMenuItem BuildViewMenu() {
+        internal NativeMenuItem BuildViewMenu() {
             return MacMenu.SubMenu(MacMenu.Str("menu.view"),
                 MacMenu.Toggle(MacMenu.Str("prefs.appearance.showportrait"),
                     ViewModel.ShowPortrait, () => OnMenuShowPortrait(this, new RoutedEventArgs())),
@@ -93,7 +84,7 @@ namespace OpenUtau.App.Controls {
                         () => OnMenuHidePianoRoll(this, new RoutedEventArgs()))));
         }
 
-        private NativeMenuItem BuildBatchMenu() {
+        internal NativeMenuItem BuildBatchMenu() {
             return MacMenu.SubMenu(MacMenu.Str("pianoroll.menu.batch"),
                 MacMenu.SubMenu(MacMenu.Str("pianoroll.menu.notes"), ViewModel.NoteBatchEdits),
                 MacMenu.SubMenu(MacMenu.Str("pianoroll.menu.lyrics"), ViewModel.LyricBatchEdits),

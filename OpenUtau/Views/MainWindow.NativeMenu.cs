@@ -85,9 +85,9 @@ namespace OpenUtau.App.Views {
             nativeMenu.Items.Clear();
             nativeMenu.Add(BuildFileMenu());
             nativeMenu.Add(BuildEditMenu());
-            nativeMenu.Add(BuildNoteEditMenu());
-            foreach (var item in BuildPianoRollMenus()) {
-                nativeMenu.Add(item);
+            if (pianoRoll != null) {
+                nativeMenu.Add(WithPianoRollGate(pianoRoll.BuildViewMenu()));
+                nativeMenu.Add(WithPianoRollGate(pianoRoll.BuildBatchMenu()));
             }
             nativeMenu.Add(BuildProjectMenu());
             nativeMenu.Add(BuildToolsMenu());
@@ -151,41 +151,34 @@ namespace OpenUtau.App.Views {
         }
 
         private NativeMenuItem BuildEditMenu() {
-            var menu = MacMenu.SubMenu(MacMenu.Str("menu.edit"),
+            bool open = viewModel.ProjectOpen;
+            var items = new List<NativeMenuItemBase> {
                 MacMenu.Item(viewModel.UndoText, () => viewModel.Undo(),
                     MacMenu.Cmd(Key.Z), viewModel.CanUndo),
                 MacMenu.Item(viewModel.RedoText, () => viewModel.Redo(),
-                    MacMenu.Cmd(Key.Y), viewModel.CanRedo));
-            menu.IsEnabled = viewModel.ProjectOpen;
+                    MacMenu.Cmd(Key.Y), viewModel.CanRedo),
+                MacMenu.Separator(),
+                MacMenu.Item(MacMenu.Str("menu.edit.cut"), Cut, MacMenu.Cmd(Key.X), open),
+                MacMenu.Item(MacMenu.Str("menu.edit.copy"), Copy, MacMenu.Cmd(Key.C), open),
+                MacMenu.Item(MacMenu.Str("menu.edit.paste"), Paste, MacMenu.Cmd(Key.V), open),
+                MacMenu.Item(MacMenu.Str("menu.edit.pasteplainnotes"),
+                    () => pianoRoll?.ViewModel.PastePlain(), MacMenu.Cmd(Key.V, KeyModifiers.Shift), open),
+                MacMenu.Item(MacMenu.Str("menu.edit.delete"), Delete, MacMenu.Plain(Key.Delete), open),
+                MacMenu.Separator(),
+                MacMenu.Item(MacMenu.Str("menu.edit.selectall"), SelectAll, MacMenu.Cmd(Key.A), open),
+            };
+            if (pianoRoll != null) {
+                items.Add(MacMenu.Separator());
+                items.AddRange(pianoRoll.BuildNoteEditTail());
+            }
+            var menu = MacMenu.SubMenu(MacMenu.Str("menu.edit"), items);
+            menu.IsEnabled = open;
             return menu;
         }
 
-        private NativeMenuItem BuildNoteEditMenu() {
-            var items = new List<NativeMenuItemBase> {
-                MacMenu.Item(MacMenu.Str("menu.edit.cut"), Cut, MacMenu.Cmd(Key.X)),
-                MacMenu.Item(MacMenu.Str("menu.edit.copy"), Copy, MacMenu.Cmd(Key.C)),
-                MacMenu.Item(MacMenu.Str("menu.edit.paste"), Paste, MacMenu.Cmd(Key.V)),
-                MacMenu.Item(MacMenu.Str("menu.edit.pasteplainnotes"),
-                    () => pianoRoll?.ViewModel.PastePlain(), MacMenu.Cmd(Key.V, KeyModifiers.Shift)),
-                MacMenu.Item(MacMenu.Str("menu.edit.delete"), Delete, MacMenu.Plain(Key.Delete)),
-                MacMenu.Separator(),
-                MacMenu.Item(MacMenu.Str("menu.edit.selectall"), SelectAll, MacMenu.Cmd(Key.A)),
-            };
-            if (pianoRoll != null) {
-                items.AddRange(pianoRoll.BuildNoteEditTail());
-            }
-            return MacMenu.SubMenu(MacMenu.Str("menu.noteedit"), items);
-        }
-
-        private List<NativeMenuItem> BuildPianoRollMenus() {
-            if (pianoRoll == null) {
-                return new List<NativeMenuItem>();
-            }
-            var menus = pianoRoll.BuildViewAndBatchMenus();
-            foreach (var menu in menus) {
-                menu.IsEnabled = PianoRollMenusEnabled;
-            }
-            return menus;
+        private NativeMenuItem WithPianoRollGate(NativeMenuItem menu) {
+            menu.IsEnabled = PianoRollMenusEnabled;
+            return menu;
         }
 
         private NativeMenuItem BuildProjectMenu() {
