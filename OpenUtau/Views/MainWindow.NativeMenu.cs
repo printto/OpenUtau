@@ -6,7 +6,9 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using OpenUtau.App.ViewModels;
+using OpenUtau.Core;
 using OpenUtau.Core.Util;
+using ReactiveUI;
 
 namespace OpenUtau.App.Views {
     public partial class MainWindow {
@@ -15,6 +17,13 @@ namespace OpenUtau.App.Views {
         private bool PianoRollFocused =>
             pianoRoll != null &&
             (pianoRollWindow != null ? pianoRollWindow.IsActive : PianoRollContainer.IsKeyboardFocusWithin);
+
+        private bool HasSelection =>
+            viewModel.TracksViewModel.SelectedParts.Count > 0 ||
+            (pianoRoll != null && !pianoRoll.ViewModel.NotesViewModel.Selection.IsEmpty);
+
+        private bool HasClipboard =>
+            DocManager.Inst.PartsClipboard?.Count > 0 || DocManager.Inst.NotesClipboard?.Count > 0;
 
         private bool PianoRollMenusEnabled =>
             pianoRoll != null && (pianoRollWindow != null
@@ -31,6 +40,8 @@ namespace OpenUtau.App.Views {
             nativeMenu.Opening += (sender, args) => RebuildNativeMenu();
             MacMenu.MenuActionCompleted = () => RebuildNativeMenu(false);
             Activated += (sender, args) => RebuildNativeMenu(true);
+            MessageBus.Current.Listen<PartsSelectionEvent>().Subscribe(_ => InvalidateNativeMenu());
+            MessageBus.Current.Listen<NotesSelectionEvent>().Subscribe(_ => InvalidateNativeMenu());
             viewModel.PropertyChanged += (sender, args) => {
                 if (args.PropertyName != null && MenuRelevantProperties.Contains(args.PropertyName)) {
                     InvalidateNativeMenu();
@@ -162,12 +173,15 @@ namespace OpenUtau.App.Views {
                 MacMenu.Item(viewModel.RedoText, () => viewModel.Redo(),
                     MacMenu.Cmd(Key.Y), viewModel.CanRedo),
                 MacMenu.Separator(),
-                MacMenu.Item(MacMenu.Str("menu.edit.cut"), Cut, MacMenu.Cmd(Key.X), open),
-                MacMenu.Item(MacMenu.Str("menu.edit.copy"), Copy, MacMenu.Cmd(Key.C), open),
-                MacMenu.Item(MacMenu.Str("menu.edit.paste"), Paste, MacMenu.Cmd(Key.V), open),
+                MacMenu.Item(MacMenu.Str("menu.edit.cut"), Cut, MacMenu.Cmd(Key.X), open && HasSelection),
+                MacMenu.Item(MacMenu.Str("menu.edit.copy"), Copy, MacMenu.Cmd(Key.C), open && HasSelection),
+                MacMenu.Item(MacMenu.Str("menu.edit.paste"), Paste, MacMenu.Cmd(Key.V), open && HasClipboard),
                 MacMenu.Item(MacMenu.Str("menu.edit.pasteplainnotes"),
-                    () => pianoRoll?.ViewModel.PastePlain(), MacMenu.Cmd(Key.V, KeyModifiers.Shift), open),
-                MacMenu.Item(MacMenu.Str("menu.edit.delete"), Delete, MacMenu.Plain(Key.Delete), open),
+                    () => pianoRoll?.ViewModel.PastePlain(),
+                    MacMenu.Cmd(Key.V, KeyModifiers.Shift),
+                    PianoRollMenusEnabled && DocManager.Inst.NotesClipboard?.Count > 0),
+                MacMenu.Item(MacMenu.Str("menu.edit.delete"), Delete,
+                    MacMenu.Plain(Key.Delete), open && HasSelection),
                 MacMenu.Separator(),
                 MacMenu.Item(MacMenu.Str("menu.edit.selectall"), SelectAll, MacMenu.Cmd(Key.A), open),
             };
