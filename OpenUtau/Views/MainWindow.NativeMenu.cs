@@ -6,6 +6,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using OpenUtau.App.ViewModels;
+using OpenUtau.Core.Util;
 
 namespace OpenUtau.App.Views {
     public partial class MainWindow {
@@ -16,7 +17,9 @@ namespace OpenUtau.App.Views {
             (pianoRollWindow != null ? pianoRollWindow.IsActive : PianoRollContainer.IsKeyboardFocusWithin);
 
         private bool PianoRollMenusEnabled =>
-            pianoRoll != null && (pianoRollWindow == null || pianoRollWindow.IsActive);
+            pianoRoll != null && (pianoRollWindow != null
+                ? pianoRollWindow.IsActive
+                : viewModel.ShowPianoRoll);
 
         private void InstallNativeMenu() {
             if (!OS.IsMacOS()) {
@@ -48,6 +51,7 @@ namespace OpenUtau.App.Views {
 
         private static readonly HashSet<string> MenuRelevantProperties = new() {
             nameof(MainWindowViewModel.Page),
+            nameof(MainWindowViewModel.ShowPianoRoll),
             nameof(MainWindowViewModel.CanUndo),
             nameof(MainWindowViewModel.CanRedo),
             nameof(MainWindowViewModel.UndoText),
@@ -85,9 +89,9 @@ namespace OpenUtau.App.Views {
             nativeMenu.Items.Clear();
             nativeMenu.Add(BuildFileMenu());
             nativeMenu.Add(BuildEditMenu());
-            if (pianoRoll != null) {
-                nativeMenu.Add(WithPianoRollGate(pianoRoll.BuildViewMenu()));
-                nativeMenu.Add(WithPianoRollGate(pianoRoll.BuildBatchMenu()));
+            if (PianoRollMenusEnabled) {
+                nativeMenu.Add(pianoRoll!.BuildViewMenu());
+                nativeMenu.Add(pianoRoll!.BuildBatchMenu());
             }
             nativeMenu.Add(BuildProjectMenu());
             nativeMenu.Add(BuildToolsMenu());
@@ -167,18 +171,31 @@ namespace OpenUtau.App.Views {
                 MacMenu.Separator(),
                 MacMenu.Item(MacMenu.Str("menu.edit.selectall"), SelectAll, MacMenu.Cmd(Key.A), open),
             };
-            if (pianoRoll != null) {
-                items.Add(MacMenu.Separator());
-                items.AddRange(pianoRoll.BuildNoteEditTail());
-            }
+            items.Add(MacMenu.Separator());
+            items.AddRange(PianoRollMenusEnabled
+                ? pianoRoll!.BuildNoteEditTail()
+                : DisabledNoteEditTail());
             var menu = MacMenu.SubMenu(MacMenu.Str("menu.edit"), items);
             menu.IsEnabled = open;
             return menu;
         }
 
-        private NativeMenuItem WithPianoRollGate(NativeMenuItem menu) {
-            menu.IsEnabled = PianoRollMenusEnabled;
-            return menu;
+        private static List<NativeMenuItemBase> DisabledNoteEditTail() {
+            Action noop = () => { };
+            return new List<NativeMenuItemBase> {
+                MacMenu.Item(MacMenu.Str("pianoroll.menu.searchnote"), noop, MacMenu.Cmd(Key.F), false),
+                MacMenu.Separator(),
+                MacMenu.SubMenu(MacMenu.Str("menu.edit.lockunselectednotes"),
+                    MacMenu.Toggle(MacMenu.Str("menu.edit.lockunselectednotes.pitchpoints"),
+                        Preferences.Default.LockUnselectedNotesPitch, noop, false),
+                    MacMenu.Toggle(MacMenu.Str("menu.edit.lockunselectednotes.vibrato"),
+                        Preferences.Default.LockUnselectedNotesVibrato, noop, false),
+                    MacMenu.Toggle(MacMenu.Str("menu.edit.lockunselectednotes.expressions"),
+                        Preferences.Default.LockUnselectedNotesExpressions, noop, false)),
+                MacMenu.Separator(),
+                MacMenu.Item(MacMenu.Str("pianoroll.menu.lyrics.edit"), noop, null, false),
+                MacMenu.Item(MacMenu.Str("pianoroll.menu.notedefaults"), noop, null, false),
+            };
         }
 
         private NativeMenuItem BuildProjectMenu() {
