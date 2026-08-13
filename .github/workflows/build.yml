@@ -67,6 +67,31 @@ jobs:
           version: ${{ inputs.version }}
           csproj-files: "OpenUtau/*.csproj"
 
+      # Guards
+      - name: Show build mode
+        shell: bash
+        run: |
+          if [ "${{ inputs.release }}" = "true" ]; then
+            echo "### Mode: RELEASE — assets go to the \`${{ inputs.version }}\` release (draft=${{ inputs.draft }})" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "### Mode: ARTIFACTS ONLY — nothing is uploaded to any release." >> "$GITHUB_STEP_SUMMARY"
+            echo "Re-run with the **Release** box ticked to publish \`${{ inputs.version }}\`." >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "Ref: \`${{ github.ref_name }}\` · Version: \`${{ inputs.version }}\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Verify branding
+        shell: bash
+        run: |
+          set -euo pipefail
+          assembly=$(sed -n 's:.*<AssemblyName>\(.*\)</AssemblyName>.*:\1:p' OpenUtau/OpenUtau.csproj)
+          bundle=$(sed -n 's:.*<CFBundleName>\(.*\)</CFBundleName>.*:\1:p' OpenUtau/OpenUtau.csproj)
+          echo "ref=${{ github.ref_name }} AssemblyName=$assembly CFBundleName=$bundle"
+          if [ "$assembly" != "OpenUtau-PRINTmov" ]; then
+            echo "::error::Building '$assembly', not OpenUtau-PRINTmov. This ref (${{ github.ref_name }}) lacks the PRINTmov branding — dispatch from printmov-build."
+            exit 1
+          fi
+          echo "APP_BUNDLE=$bundle.app" >> "$GITHUB_ENV"
+
       # Test
       - name: Test
         run: dotnet test OpenUtau.Test
@@ -128,13 +153,32 @@ jobs:
       # Create Dmg
       - name: Create Dmg
         run: |
+          set -euo pipefail
           npm install -g create-dmg
           latest_xcode=$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -n1)
           if [ -n "$latest_xcode" ]; then
             sudo xcode-select -s "$latest_xcode"
           fi
           xcodebuild -version || true
-          app=$(ls -d bin/${{ matrix.arch.name }}/publish/*.app | head -n1)
+
+          shopt -s nullglob
+          apps=(bin/${{ matrix.arch.name }}/publish/*.app)
+          shopt -u nullglob
+          if [ ${#apps[@]} -ne 1 ]; then
+            echo "::error::Expected exactly 1 .app in bin/${{ matrix.arch.name }}/publish, found ${#apps[@]}: ${apps[*]:-<none>}"
+            exit 1
+          fi
+          app="${apps[0]}"
+          if [ "$(basename "$app")" != "$APP_BUNDLE" ]; then
+            echo "::error::Bundle is '$(basename "$app")' but csproj says '$APP_BUNDLE' — BundleApp did not pick up CFBundleName."
+            exit 1
+          fi
+          echo "Bundle: $app"
+
+          # VersionPatcher only rewrites <Version>; CFBundle* stay at their csproj literals.
+          plutil -replace CFBundleShortVersionString -string "${{ inputs.version }}" "$app/Contents/Info.plist"
+          plutil -replace CFBundleVersion -string "${{ inputs.version }}" "$app/Contents/Info.plist"
+
           cp OpenUtau/Assets/pmou.icns "$app/Contents/Resources/"
           if xcrun actool --help 2>&1 | grep -q -- '--enable-icon-stack-fallback-generation'; then
             xcrun actool OpenUtau/Assets/pmou-mac.icon \
@@ -150,13 +194,34 @@ jobs:
               --output-partial-info-plist /dev/null
             plutil -replace CFBundleIconName -string pmou-mac "$app/Contents/Info.plist"
           else
-            echo "actool has no Icon Composer support, keeping pmou.icns"
+            echo "::warning::actool has no Icon Composer support on this runner — shipping the legacy pmou.icns only."
           fi
+
           codesign --force --deep --sign - "$app"
           codesign --verify --deep --strict --verbose=2 "$app"
+          # An .app that never got a real bundle signature reports "Sealed Resources=none"
+          # and Identifier=apphost — that is the .NET stub, not our signature.
+          info=$(codesign -dv --verbose=2 "$app" 2>&1)
+          echo "$info"
+          if echo "$info" | grep -q "Sealed Resources=none"; then
+            echo "::error::codesign left the bundle unsealed — the app is not actually signed."
+            exit 1
+          fi
+
+          out=OpenUtau-PRINTmov-${{ matrix.arch.name }}.dmg
+          rm -f ./*.dmg
+          # create-dmg exits 2 when it succeeds but emits warnings, so check for the file instead.
           create-dmg "$app" || true
-          mv *.dmg OpenUtau-PRINTmov-${{ matrix.arch.name }}.dmg
-          codesign -fvs - OpenUtau-PRINTmov-${{ matrix.arch.name }}.dmg
+          shopt -s nullglob
+          dmgs=(*.dmg)
+          shopt -u nullglob
+          if [ ${#dmgs[@]} -ne 1 ]; then
+            echo "::error::create-dmg produced ${#dmgs[@]} dmg files (expected 1): ${dmgs[*]:-<none>}"
+            exit 1
+          fi
+          mv "${dmgs[0]}" "$out"
+          codesign -fvs - "$out"
+          hdiutil verify "$out"
         if: ${{ matrix.arch.os == 'osx' }}
 
       # Create Appimage
@@ -235,6 +300,7 @@ jobs:
           name: ${{ env.release-name }}
           prerelease: ${{ inputs.beta }}
           draft: ${{ inputs.draft }}
+          fail_on_unmatched_files: true
           files: |
             appcast.${{ matrix.arch.name }}*.xml
             OpenUtau-PRINTmov-${{ matrix.arch.name }}.*
