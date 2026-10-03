@@ -1652,14 +1652,15 @@ namespace OpenUtau.App.Controls {
                     case Key.D4: ViewModel.ToolIndex = 3; return true;
                     case Key.D5: ViewModel.ToolIndex = 4; return true;
                     case Key.D6: ViewModel.ToolIndex = 5; return true;
+                    case Key.D7: ViewModel.ToolIndex = 6; return true;
                 }
             }
             if (isShift) {
                 switch (args.Key) {
-                    case Key.D1: ViewModel.ToolIndex = 5; ViewModel.PitchToolIndex = 0; SetPitchToolIcon(); return true;
-                    case Key.D2: ViewModel.ToolIndex = 5; ViewModel.PitchToolIndex = 1; SetPitchToolIcon(); return true;
-                    case Key.D3: ViewModel.ToolIndex = 5; ViewModel.PitchToolIndex = 2; SetPitchToolIcon(); return true;
-                    case Key.D4: ViewModel.ToolIndex = 5; ViewModel.PitchToolIndex = 3; SetPitchToolIcon(); return true;
+                    case Key.D1: ViewModel.ToolIndex = 6; ViewModel.PitchToolIndex = 0; SetPitchToolIcon(); return true;
+                    case Key.D2: ViewModel.ToolIndex = 6; ViewModel.PitchToolIndex = 1; SetPitchToolIcon(); return true;
+                    case Key.D3: ViewModel.ToolIndex = 6; ViewModel.PitchToolIndex = 2; SetPitchToolIcon(); return true;
+                    case Key.D4: ViewModel.ToolIndex = 6; ViewModel.PitchToolIndex = 3; SetPitchToolIcon(); return true;
                 }
             }
             if (isAlt) {

@@ -30,7 +30,7 @@ namespace OpenUtau.Core.Util {
                 switch (BaseTool) {
                     case 1:
                         return PenToolVariation == 1 ? EditTools.PenPlusTool : EditTools.PenTool;
-                    case 5:
+                    case 6:
                         return PitchToolVariation switch {
                             1 => EditTools.PitchSCurveTool,
                             2 => EditTools.PitchSineWaveTool,
@@ -42,7 +42,7 @@ namespace OpenUtau.Core.Util {
                 }
             }
         }
-        [JsonIgnore] public bool IsPitchTool => BaseTool == 4 || BaseTool == 5;
+        [JsonIgnore] public bool IsPitchTool => BaseTool == 5 || BaseTool == 6;
         public bool IsMatch(IEnumerable<EditTools> tools) => tools.Contains(CurrentTool);
     }
 }
