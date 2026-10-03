@@ -18,6 +18,8 @@ namespace OpenUtau.Classic {
             Ustx.DYN,
             Ustx.PITD,
             Ustx.CLR,
+            Ustx.CLRY,
+            Ustx.XSY,
             Ustx.ENG,
             Ustx.VEL,
             Ustx.VOL,
@@ -27,13 +29,17 @@ namespace OpenUtau.Classic {
             Ustx.MODP,
             Ustx.ALT,
             Ustx.DIR,
-            Ustx.SHFT
+            Ustx.SHFT,
+            Ustx.GENC,
+            Ustx.TENC,
+            Ustx.BREC,
+            Ustx.VOIC,
+            Ustx.GRWC,
         };
 
         public USingerType SingerType => USingerType.Classic;
 
         public bool SupportsRenderPitch => false;
-
         public bool SupportsExpression(UExpressionDescriptor descriptor) {
             return descriptor.isFlag
                 || !string.IsNullOrEmpty(descriptor.flag)
@@ -48,7 +54,7 @@ namespace OpenUtau.Classic {
             };
         }
 
-        public Task<RenderResult> Render(RenderPhrase phrase, Progress progress, int trackNo, CancellationTokenSource cancellation, bool isPreRender) {
+        public Task<RenderResult> Render(RenderPhrase phrase, Progress progress, int trackNo, CancellationTokenSource cancellation, bool isPreRender, RenderPhraseEvents? renderEvents = null) {
             if (phrase.wavtool == SharpWavtool.nameConvergence || phrase.wavtool == SharpWavtool.nameSimple) {
                 return RenderInternal(phrase, progress, trackNo, cancellation, isPreRender);
             } else {
@@ -66,7 +72,7 @@ namespace OpenUtau.Classic {
                     MaxDegreeOfParallelism = Preferences.Default.NumRenderThreads
                 }, body: item => {
                     if (!cancellation.IsCancellationRequested && !File.Exists(item.outputFile)) {
-                        if (!(item.resampler is WorldlineResampler)) {
+                        if (!(item.resampler is WorldlineResampler or HifisamplerResampler)) {
                             VoicebankFiles.Inst.CopySourceTemp(item.inputFile, item.inputTemp);
                         }
                         if(!item.phone.direct){
@@ -78,7 +84,7 @@ namespace OpenUtau.Classic {
                                 throw new InvalidDataException($"{item.resampler} failed to resample \"{item.phone.phoneme}\" at {bar}:{beat}.{string.Format("{0:000}", tick)}");
                             }
                         }
-                        if (!(item.resampler is WorldlineResampler)) {
+                        if (!(item.resampler is WorldlineResampler or HifisamplerResampler)) {
                             VoicebankFiles.Inst.CopyBackMetaFiles(item.inputFile, item.inputTemp);
                         }
                     }

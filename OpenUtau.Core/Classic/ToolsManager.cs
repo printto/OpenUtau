@@ -56,7 +56,7 @@ namespace OpenUtau.Classic {
                 return new ExeWavtool(filePath, basePath);
             } 
             if (!OS.IsWindows() && (ext == ".sh" || string.IsNullOrEmpty(ext))) {
-                return new ExeWavtool(filePath, basePath);
+                return new UnixWavtool(filePath, basePath);
             }
             return null;
         }
@@ -72,6 +72,7 @@ namespace OpenUtau.Classic {
             resamplers.Clear();
             resamplersMap.Clear();
             resamplers.Add(new WorldlineResampler());
+            resamplers.Add(new HifisamplerResampler());
             string basePath = PathManager.Inst.ResamplersPath;
             try {
                 Directory.CreateDirectory(basePath);
