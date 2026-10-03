@@ -4,6 +4,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:c="clr-namespace:OpenUtau.App.Controls"
         mc:Ignorable="d"
+        xmlns:vm="using:OpenUtau.App.ViewModels"
+        x:DataType="vm:UpdaterViewModel"
         x:Class="OpenUtau.App.Views.UpdaterDialog"
         Width="400" Height="460" CanResize="False" WindowStartupLocation="CenterScreen"
         Icon="/Assets/pmou.png"

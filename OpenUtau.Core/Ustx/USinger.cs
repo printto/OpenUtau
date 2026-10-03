@@ -219,6 +219,7 @@ namespace OpenUtau.Core.Ustx {
         public virtual string Id { get; }
         public virtual string Name => name;
         public virtual Dictionary<string, string> LocalizedNames { get; }
+        public virtual IList<string> SearchTerms => Array.Empty<string>();
         public virtual USingerType SingerType { get; }
         public virtual string BasePath { get; }
         public virtual string Author { get; }
@@ -306,7 +307,7 @@ namespace OpenUtau.Core.Ustx {
             return TryGetOto(phoneme, out oto);
         }
 
-        public virtual IEnumerable<UOto> GetSuggestions(string text) { return emptyOtos; }
+        public virtual Dictionary<string, UOto> GetSuggestions(string text, bool isAlias) { return new Dictionary<string, UOto>(); }
         public virtual byte[] LoadPortrait() => null;
         public virtual byte[] LoadLipSyncPortrait(string vowel) => null;
         public virtual byte[] LoadLipSyncAvatar(string vowel) => null;

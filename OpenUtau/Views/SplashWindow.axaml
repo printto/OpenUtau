@@ -7,10 +7,9 @@
         Title="SplashWindow"
         Icon="/Assets/pmou.png"
         CanResize="False"
-        ExtendClientAreaChromeHints="NoChrome"
         ExtendClientAreaTitleBarHeightHint="-1"
         ExtendClientAreaToDecorationsHint="True"
-        SystemDecorations="BorderOnly"
+        WindowDecorations="BorderOnly"
         WindowStartupLocation="CenterScreen">
   <Grid>
     <Image Margin="20" Width="96" Height="96"
@@ -18,10 +17,10 @@
            Source="/Assets/pmou.png"/>
     <Image x:Name="LogoTypeDark" Height="16" Margin="0,136,0,10"
            VerticalAlignment="Top" HorizontalAlignment="Center"
-           Source="/Assets/logotype-w.png" IsVisible="{Binding IsDarkMode}"/>
+           Source="/Assets/logotype-w.png"/>
     <Image x:Name="LogoTypeLight" Height="16" Margin="0,136,0,10"
            VerticalAlignment="Top" HorizontalAlignment="Center"
-           Source="/Assets/logotype.png" IsVisible="{Binding !IsDarkMode}"/>
+           Source="/Assets/logotype.png"/>
     <TextBlock Text="PRINTmov Edition" FontSize="11" Opacity="0.7"
            VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,156,0,0"/>
     <ProgressBar VerticalAlignment="Bottom" HorizontalAlignment="Stretch"

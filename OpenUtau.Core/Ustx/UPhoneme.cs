@@ -41,6 +41,7 @@ namespace OpenUtau.Core.Ustx {
         public UPhoneme Next { get; set; }
         public bool Error { get; set; } = false;
         public Exception? ErrorException { get; set; }
+        Exception? durationErrorException;
 
         public override string ToString() => $"\"{phoneme}\" pos:{position}";
 
@@ -78,7 +79,17 @@ namespace OpenUtau.Core.Ustx {
             EndMs = project.timeAxis.TickPosToMsPos(part.position + End);
             Error = Duration <= 0;
             if (Error) {
-                ErrorException ??= new Exception("Phoneme duration is not positive.");
+                // The exception is remembered so it does not flicker between
+                // validates, and Validate() keeps the error visible until it
+                // clears again.
+                durationErrorException ??= new Exception("Phoneme duration is not positive.");
+                ErrorException ??= durationErrorException;
+            } else if (ReferenceEquals(ErrorException, durationErrorException)) {
+                // Duration is valid again (e.g. the phoneme offset override was
+                // moved back), so clear the stale duration error. A phonemizer
+                // response error stored in ErrorException is left untouched.
+                durationErrorException = null;
+                ErrorException = null;
             }
         }
 
@@ -126,8 +137,6 @@ namespace OpenUtau.Core.Ustx {
                         if (autoPreutter - autoOverlap > prevDur * 0.5f) {
                             maxPreutter = prevDur * 0.5f / (autoPreutter - autoOverlap) * autoPreutter;
                         }
-                    } else { // Plosive consonants
-                        maxPreutter = Math.Min(maxPreutter, prevDur * 0.9);
                     }
                     maxPreutter = Math.Min(maxPreutter, prevDur);
                     if (Prev.preutter < 5) {
@@ -137,7 +146,7 @@ namespace OpenUtau.Core.Ustx {
                     maxPreutter = gapMs;
                 }
                 if (autoPreutter > maxPreutter) {
-                    double ratio = maxPreutter / autoPreutter;
+                    double ratio = autoPreutter > 0 ? maxPreutter / autoPreutter : 0d;
                     autoPreutter = maxPreutter;
                     autoOverlap *= ratio;
                 }
@@ -148,6 +157,10 @@ namespace OpenUtau.Core.Ustx {
             preutter = Math.Max(0, autoPreutter + (preutterDelta ?? 0));
             overlap = autoOverlap + (overlapDelta ?? 0);
             if (Prev != null) {
+                if (Prev.DurationMs - preutter < 5) {
+                    var minOverlap = 5 - (Prev.DurationMs - preutter);
+                    overlap = Math.Max(overlap, minOverlap);
+                }
                 Prev.tailIntrude = adjacent ? Math.Max(preutter, preutter - overlap) : 0;
                 Prev.tailOverlap = adjacent ? Math.Max(overlap, 0) : 0;
                 overlapped = adjacent && overlap > 0;
@@ -204,19 +217,20 @@ namespace OpenUtau.Core.Ustx {
         /// If the phoneme does not have the corresponding expression, return the track's expression and false
         /// <summary>
         public Tuple<float, bool> GetExpression(UProject project, UTrack track, string abbr) {
-            track.TryGetExpDescriptor(project, abbr, out var descriptor);
+            // Loops rather than LINQ: phrase snapshots call this for every phoneme and expression.
             var note = Parent.Extends ?? Parent;
-            var phonemeExp = note.phonemeExpressions.FirstOrDefault(exp => exp.descriptor?.abbr == abbr && exp.index == index);
-            if (phonemeExp != null) {
-                return Tuple.Create(phonemeExp.value, true);
-            } else {
-                var phonemizerExp = note.phonemizerExpressions.FirstOrDefault(exp => exp.descriptor?.abbr == abbr && exp.index == index);
-                if (phonemizerExp != null) {
-                    return Tuple.Create(phonemizerExp.value, false);
-                } else {
-                    return Tuple.Create(descriptor.CustomDefaultValue, false);
+            foreach (var exp in note.phonemeExpressions) {
+                if (exp.descriptor?.abbr == abbr && exp.index == index) {
+                    return Tuple.Create(exp.value, true);
                 }
             }
+            foreach (var exp in note.phonemizerExpressions) {
+                if (exp.descriptor?.abbr == abbr && exp.index == index) {
+                    return Tuple.Create(exp.value, false);
+                }
+            }
+            track.TryGetExpDescriptor(project, abbr, out var descriptor);
+            return Tuple.Create(descriptor.CustomDefaultValue, false);
         }
 
         public void SetExpression(UProject project, UTrack track, string abbr, float? value) {
@@ -241,15 +255,29 @@ namespace OpenUtau.Core.Ustx {
         }
 
         public Tuple<string, int?, string>[] GetResamplerFlags(UProject project, UTrack track) {
-            var flags = new List<Tuple<string, int?, string>>();
+            return BuildResamplerFlags(GetExpressionDescriptors(project, track),
+                abbr => GetExpression(project, track, abbr).Item1);
+        }
+
+        /// <summary>
+        /// The track's expressions in flag order: the project's, with the track's own replacing theirs.
+        /// </summary>
+        public static List<UExpressionDescriptor> GetExpressionDescriptors(UProject project, UTrack track) {
             var expressions = new List<UExpressionDescriptor>();
             expressions.AddRange(project.expressions.Values);
             expressions.RemoveAll(exp => track.TrackExpressions.Any(te => te.abbr == exp.abbr));
             expressions.AddRange(track.TrackExpressions);
+            return expressions;
+        }
+
+        /// <summary>The resampler flags of the given expressions, from each expression's value.</summary>
+        public static Tuple<string, int?, string>[] BuildResamplerFlags(
+                IEnumerable<UExpressionDescriptor> expressions, Func<string, float> getValue) {
+            var flags = new List<Tuple<string, int?, string>>();
             foreach (var descriptor in expressions) {
                 if (descriptor.type == UExpressionType.Numerical) {
                     if (!string.IsNullOrEmpty(descriptor.flag)) {
-                        int value = (int)GetExpression(project, track, descriptor.abbr).Item1;
+                        int value = (int)getValue(descriptor.abbr);
                         if (descriptor.skipOutputIfDefault && value == (int)descriptor.defaultValue) {
                             continue;
                         }
@@ -257,7 +285,7 @@ namespace OpenUtau.Core.Ustx {
                     }
                 } else if (descriptor.type == UExpressionType.Options) {
                     if (descriptor.isFlag) {
-                        int value = (int)GetExpression(project, track, descriptor.abbr).Item1;
+                        int value = (int)getValue(descriptor.abbr);
                         flags.Add(Tuple.Create<string, int?, string>(descriptor.options[value], null, descriptor.abbr));
                     }
                 }
@@ -274,6 +302,17 @@ namespace OpenUtau.Core.Ustx {
                 return null;
             }
             return track.VoiceColorExp.options[index];
+        }
+
+        public string GetVoiceColor2(UProject project, UTrack track) {
+            if (track.VoiceColor2Exp == null) {
+                return null;
+            }
+            int index = (int)GetExpression(project, track, Format.Ustx.CLRY).Item1;
+            if (index < 0 || index >= track.VoiceColor2Exp.options.Length) {
+                return null;
+            }
+            return track.VoiceColor2Exp.options[index];
         }
     }
 

@@ -8,7 +8,6 @@ namespace OpenUtau.App.Views {
                 return;
             }
             window.ExtendClientAreaToDecorationsHint = true;
-            window.ExtendClientAreaChromeHints = ExtendClientAreaChromeHints.PreferSystemChrome;
             window.ExtendClientAreaTitleBarHeightHint = -1;
         }
     }

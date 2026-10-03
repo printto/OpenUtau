@@ -8,7 +8,7 @@ using System.Text;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
-using Avalonia.ReactiveUI;
+using ReactiveUI.Avalonia;
 using OpenUtau.App.ViewModels;
 using OpenUtau.Core;
 using Serilog;
@@ -77,12 +77,24 @@ namespace OpenUtau.App {
                     new FontFallback { FontFamily = new FontFamily("Helvetica Neue") },
                 };
             }
-            return AppBuilder.Configure<App>()
+
+            var builder = AppBuilder.Configure<App>()
                 .UsePlatformDetect()
                 .LogToTrace()
-                .UseReactiveUI()
+                .UseReactiveUI(_ => { })
                 .With(fontOptions)
-                .With(new X11PlatformOptions {EnableIme = true});
+                .With(new SkiaOptions
+                {
+                    MaxGpuResourceSizeBytes = 256 * 1024 * 1024 // 256 MB
+                });
+            
+            if (OS.IsLinux() && Core.Util.Preferences.Default.UseWayland) {
+                builder.UseWaylandWithFallback();
+            }
+            
+            return builder.With(new X11PlatformOptions {
+                EnableIme = true
+            });
         }
 
         public static void Run(string[] args)

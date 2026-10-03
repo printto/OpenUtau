@@ -3,16 +3,16 @@ using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Reactive;
 using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
 using OpenUtau.Core;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.Primitives;
+using ReactiveUI.SourceGenerators;
 using Serilog;
 
 namespace OpenUtau.App.ViewModels {
-    public class SingerCardViewModel : ViewModelBase {
+    public partial class SingerCardViewModel : ViewModelBase {
         public CatalogSinger Singer { get; }
         public string Id => Singer.id;
         public string Name => string.IsNullOrEmpty(Singer.name) ? Singer.id : Singer.name;
@@ -22,14 +22,14 @@ namespace OpenUtau.App.ViewModels {
         public bool IsExternal => !string.IsNullOrEmpty(Singer.page_url);
         public string PageUrl => Singer.page_url;
 
-        [Reactive] public Bitmap? Image { get; set; }
-        [Reactive] public string DownloadUrl { get; set; } = string.Empty;
-        [Reactive] public string LatestVersion { get; set; } = string.Empty;
-        [Reactive] public bool IsInstalled { get; set; }
-        [Reactive] public string InstalledVersion { get; set; } = string.Empty;
-        [Reactive] public bool Resolved { get; set; }
-        [Reactive] public bool Busy { get; set; }
-        [Reactive] public double Progress { get; set; }
+        [Reactive] public partial Bitmap? Image { get; set; }
+        [Reactive] public partial string DownloadUrl { get; set; } = string.Empty;
+        [Reactive] public partial string LatestVersion { get; set; } = string.Empty;
+        [Reactive] public partial bool IsInstalled { get; set; }
+        [Reactive] public partial string InstalledVersion { get; set; } = string.Empty;
+        [Reactive] public partial bool Resolved { get; set; }
+        [Reactive] public partial bool Busy { get; set; }
+        [Reactive] public partial double Progress { get; set; }
 
         public bool HasUpdate => IsInstalled && Resolved
             && !string.IsNullOrEmpty(LatestVersion)
@@ -79,7 +79,7 @@ namespace OpenUtau.App.ViewModels {
         }
     }
 
-    public class SingerCategoryViewModel : ViewModelBase {
+    public partial class SingerCategoryViewModel : ViewModelBase {
         public string Title { get; }
         public ObservableCollection<SingerCardViewModel> Singers { get; } = new ObservableCollection<SingerCardViewModel>();
         public int Count => Singers.Count;
@@ -89,13 +89,13 @@ namespace OpenUtau.App.ViewModels {
         }
     }
 
-    public class SingerCatalogViewModel : ViewModelBase {
+    public partial class SingerCatalogViewModel : ViewModelBase {
         public ObservableCollection<SingerCategoryViewModel> Categories { get; } = new ObservableCollection<SingerCategoryViewModel>();
-        [Reactive] public string Status { get; set; } = string.Empty;
+        [Reactive] public partial string Status { get; set; } = string.Empty;
         public bool HasStatus => !string.IsNullOrEmpty(Status);
-        [Reactive] public bool IsLoading { get; set; }
-        [Reactive] public string SearchText { get; set; } = string.Empty;
-        public ReactiveCommand<Unit, Unit> RefreshCommand { get; }
+        [Reactive] public partial bool IsLoading { get; set; }
+        [Reactive] public partial string SearchText { get; set; } = string.Empty;
+        public ReactiveCommand<RxVoid, RxVoid> RefreshCommand { get; }
 
         readonly List<SingerCardViewModel> allCards = new List<SingerCardViewModel>();
 

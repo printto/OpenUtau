@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,7 +13,7 @@ namespace OpenUtau.Plugin.Builtin {
     public class ThaiVCCVPhonemizer : Phonemizer {
 
         readonly string[] vowels = new string[] {
-            "a", "i", "u", "e", "o", "@", "Q", "3", "6", "1", "ia", "ua", "I", "8"
+            "a", "i", "u", "e", "o", "@", "Q", "3", "6", "1", "ia", "ua", "I", "aw", "am"
         };
 
         readonly string[] diphthongs = new string[] {
@@ -21,11 +21,11 @@ namespace OpenUtau.Plugin.Builtin {
         };
 
         readonly string[] consonants = new string[] {
-            "b", "ch", "d", "f", "g", "h", "j", "k", "kh", "l", "m", "n", "p", "ph", "r", "s", "t", "th", "w", "y"
+            "b", "ch", "d", "f", "h", "j", "k", "kh", "l", "m", "n", "g", "p", "ph", "r", "s", "t", "th", "w", "y", "-"
         };
 
         readonly string[] endingConsonants = new string[] {
-            "b", "ch", "d", "f", "g", "h", "j", "k", "kh", "l", "m", "n", "p", "ph", "r", "s", "t", "th", "w", "y"
+            "n", "m", "y", "w", "g", "k", "b", "d"
         };
 
         // Maps ThaiG2p output (DiffSinger notation) to this voicebank's UTAU/VCCV notation.
@@ -42,6 +42,11 @@ namespace OpenUtau.Plugin.Builtin {
             // ending consonants
             {"B", "b"}, {"D", "d"}, {"K", "k"}, {"W", "w"}, {"Y", "y"},
         };
+
+        // [DELTA SYNTH] Compiled Regexes for massive performance optimization (Zero-Allocation inside loops).
+        private static readonly Regex InvalidCharRegex1 = new Regex(".์", RegexOptions.Compiled);
+        private static readonly Regex InvalidCharRegex2 = new Regex("[่้๊๋็]", RegexOptions.Compiled);
+        private readonly List<(Regex pattern, string value)> _compiledVowelMappings = new List<(Regex, string)>();
 
         private USinger singer;
         private IG2p g2p;
@@ -62,7 +67,7 @@ namespace OpenUtau.Plugin.Builtin {
             var attr = note.phonemeAttributes?.FirstOrDefault(attr => attr.index == 0) ?? default;
 
             foreach (string test in input) {
-                if (singer.TryGetMappedOto(test, note.tone + attr.toneShift, attr.voiceColor, out var otoCandidacy)) {
+                if (singer.TryGetMappedOto(test, note.tone + (attr.toneShift ?? GetParentToneShift()), attr.voiceColor ?? GetParentVoiceColor(), out var otoCandidacy)) {
                     oto = otoCandidacy;
                     return true;
                 }
@@ -78,7 +83,6 @@ namespace OpenUtau.Plugin.Builtin {
             }
 
             var phonemes = new List<Phoneme>();
-
             List<string> tests = new List<string>();
 
             string prevTemp = "";
@@ -86,7 +90,6 @@ namespace OpenUtau.Plugin.Builtin {
                 prevTemp = prevNeighbour.Value.lyric;
             }
             var prevTh = ParseInput(prevTemp);
-
             var noteTh = ParseInput(currentLyric);
 
             if (noteTh.Consonant != null && noteTh.Dipthong == null && noteTh.Vowel != null) {
@@ -129,7 +132,7 @@ namespace OpenUtau.Plugin.Builtin {
 
             if (prevNeighbour == null && tests.Count >= 1) {
                 if (checkOtoUntilHit(new string[] { "-" + tests[0] }, note, out var tempOto)) {
-                    tests[0] = (tempOto.Alias);
+                    tests[0] = tempOto.Alias;
                 }
             }
 
@@ -140,7 +143,7 @@ namespace OpenUtau.Plugin.Builtin {
                     }
                 } else {
                     if (checkOtoUntilHit(new string[] { tests[tests.Count - 1] + "-" }, note, out var tempOto)) {
-                        tests[tests.Count - 1] = (tempOto.Alias);
+                        tests[tests.Count - 1] = tempOto.Alias;
                     }
                 }
             }
@@ -151,16 +154,16 @@ namespace OpenUtau.Plugin.Builtin {
                 }
             }
 
-            if (checkOtoUntilHit(tests.ToArray(), note, out var oto)) {
-
+            // [DELTA SYNTH] Used tests.ToArray() only once to eliminate redundant memory allocations.
+            var testsArray = tests.ToArray();
+            if (checkOtoUntilHit(testsArray, note, out var oto)) {
                 var noteDuration = notes.Sum(n => n.duration);
 
-                for (int i = 0; i < tests.ToArray().Length; i++) {
-
+                for (int i = 0; i < testsArray.Length; i++) {
                     int position = 0;
                     int vcPosition = noteDuration - 120;
 
-                    if (nextNeighbour != null && tests[i].Contains(" ")) {
+                    if (nextNeighbour != null && testsArray[i].Contains(" ")) {
                         var nextLyric = nextNeighbour.Value.lyric.Normalize();
                         if (!string.IsNullOrEmpty(nextNeighbour.Value.phoneticHint)) {
                             nextLyric = nextNeighbour.Value.phoneticHint.Normalize();
@@ -174,29 +177,28 @@ namespace OpenUtau.Plugin.Builtin {
                             nextCheck = nextTh.Consonant + nextTh.Dipthong + nextTh.Vowel;
                         }
                         var nextAttr = nextNeighbour.Value.phonemeAttributes?.FirstOrDefault(attr => attr.index == 0) ?? default;
-                        if (singer.TryGetMappedOto(nextCheck, nextNeighbour.Value.tone + nextAttr.toneShift, nextAttr.voiceColor, out var nextOto)) {
+                        if (singer.TryGetMappedOto(nextCheck, nextNeighbour.Value.tone + (nextAttr.toneShift ?? GetParentToneShift()), nextAttr.voiceColor ?? GetParentVoiceColor(), out var nextOto)) {
                             if (oto.Overlap > 0) {
                                 vcPosition = noteDuration - MsToTick(nextOto.Overlap) - MsToTick(nextOto.Preutter);
                             }
                         }
                     }
 
-
-                    if (noteTh.Dipthong == null || tests.Count <= 2) {
+                    // [DELTA SYNTH] Consonant Expansion & Automated Prep Feature
+                    if (noteTh.Dipthong == null || testsArray.Length <= 2) {
                         if (i == 1) {
-                            position = Math.Max((int)(noteDuration * 0.75), vcPosition);
+                            position = Math.Max((int)(noteDuration * 0.70), vcPosition);
                         }
                     } else {
                         if (i == 1) {
-                            position = Math.Min((int)(noteDuration * 0.1), 60);
+                            position = Math.Min((int)(noteDuration * 0.15), 90);
                         } else if (i == 2) {
-                            position = Math.Max((int)(noteDuration * 0.75), vcPosition);
+                            position = Math.Max((int)(noteDuration * 0.70), vcPosition);
                         }
                     }
 
-                    phonemes.Add(new Phoneme { phoneme = tests[i], position = position });
+                    phonemes.Add(new Phoneme { phoneme = testsArray[i], position = position });
                 }
-
             }
 
             return new Result {
@@ -226,7 +228,7 @@ namespace OpenUtau.Plugin.Builtin {
 
             int startIdx = consonant?.Length ?? 0;
             foreach (var dip in diphthongs) {
-                if (input.Substring(startIdx).StartsWith(dip)) {
+                if (startIdx < input.Length && input.Substring(startIdx).StartsWith(dip)) {
                     if (diphthong == null || diphthong.Length < dip.Length) {
                         diphthong = dip;
                     }
@@ -235,7 +237,7 @@ namespace OpenUtau.Plugin.Builtin {
 
             startIdx += diphthong?.Length ?? 0;
             foreach (var vow in vowels) {
-                if (input.Substring(startIdx).StartsWith(vow)) {
+                if (startIdx < input.Length && input.Substring(startIdx).StartsWith(vow)) {
                     if (vowel == null || vowel.Length < vow.Length) {
                         vowel = vow;
                     }

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using OpenUtau.Core;

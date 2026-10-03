@@ -5,7 +5,7 @@ using OpenUtau.Classic;
 using OpenUtau.Core.Ustx;
 
 namespace OpenUtau.Core.Format {
-    public enum ProjectFormats { Unknown, Vsq3, Vsq4, Ust, Ustx, Midi, Ufdata, Musicxml, Pmws };
+    public enum ProjectFormats { Unknown, Vsq3, Vsq4, Ust, Ustx, Midi, Ufdata, Musicxml, Pmws, Svp };
 
     public static class Formats {
         const string ustMatch = "[#SETTING]";
@@ -16,6 +16,9 @@ namespace OpenUtau.Core.Format {
         const string midiMatch = "MThd";
         const string ufdataMatch = "\"formatVersion\":";
         const string musicxmlMatch = "score-partwise";
+        const string svpVersion = "\"version\":";
+        const string svpdata = "\"database\":";
+        const string svp2 = "\"mouthOpening\":";
 
         public static ProjectFormats DetectProjectFormat(string file) {
             var lines = new List<string>();
@@ -41,6 +44,10 @@ namespace OpenUtau.Core.Format {
                 return ProjectFormats.Ufdata;
             } else if (contents.Contains(musicxmlMatch)) {
                 return ProjectFormats.Musicxml;
+            } else if (contents.Contains(svp2)) {
+                return ProjectFormats.Svp;
+            } else if (contents.Contains(svpVersion) || contents.Contains(svpdata)) {
+                return ProjectFormats.Svp;
             } else {
                 return ProjectFormats.Unknown;
             }
@@ -56,6 +63,13 @@ namespace OpenUtau.Core.Format {
             }
             ProjectFormats format = DetectProjectFormat(files[0]);
             UProject? project = null;
+            var lines = new List<string>();
+            using (var reader = new StreamReader(files[0])) {
+                for (int i = 0; i < 10 && !reader.EndOfStream; ++i) {
+                    lines.Add(reader.ReadLine());
+                }
+            }
+            string contents = string.Join("\n", lines);
             switch (format) {
                 case ProjectFormats.Ustx:
                     project = Ustx.Load(files[0]);
@@ -78,6 +92,13 @@ namespace OpenUtau.Core.Format {
                     break;
                 case ProjectFormats.Pmws:
                     project = Pmws.Load(files[0]);
+                    break;
+                case ProjectFormats.Svp:
+                    if (contents.Contains(svp2)) {
+                        project = SVP2.Load(files[0]);
+                    } else {
+                        project = SVP.Load(files[0]);
+                    }
                     break;
                 default:
                     throw new FileFormatException("Unknown file format");

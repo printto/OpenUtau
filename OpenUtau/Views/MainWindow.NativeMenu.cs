@@ -9,6 +9,8 @@ using OpenUtau.App.ViewModels;
 using OpenUtau.Core;
 using OpenUtau.Core.Util;
 using ReactiveUI;
+using ReactiveUI.Primitives;
+using static ReactiveUI.Primitives.SubscribeExtensions;
 
 namespace OpenUtau.App.Views {
     public partial class MainWindow {

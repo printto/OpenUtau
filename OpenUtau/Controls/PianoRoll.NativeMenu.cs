@@ -81,7 +81,7 @@ namespace OpenUtau.App.Controls {
                         ViewModel.PianoRollDetached,
                         () => OnMenuDetachPianoRoll(this, new RoutedEventArgs())),
                     MacMenu.Item(MacMenu.Str("pianoroll.menu.view.pianoroll.hide"),
-                        () => OnMenuHidePianoRoll(this, new RoutedEventArgs()))));
+                        () => OnHidePianoRoll(this, new RoutedEventArgs()))));
         }
 
         internal NativeMenuItem BuildBatchMenu() {
