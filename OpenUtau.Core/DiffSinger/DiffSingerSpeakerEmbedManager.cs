@@ -58,6 +58,8 @@ namespace OpenUtau.Core.DiffSinger
             }
         }
 
+        private readonly HashSet<string> warnedSuffixes = new HashSet<string>();
+
         public int getSpeakerIndexBySuffix(string suffix) {
             var speakerIndex = dsConfig.speakers.IndexOf(suffix);
             if (speakerIndex >= 0) {
@@ -76,9 +78,11 @@ namespace OpenUtau.Core.DiffSinger
                 throw new InvalidOperationException(
                     "Subbanks are defined in character.yaml but \"speakers\" is empty in dsconfig.yaml.");
             }
-            Log.Warning(
-                $"Speaker suffix \"{suffix}\" not found in dsConfig.speakers, falling back to first speaker. " +
-                $"Candidates: {string.Join(',', dsConfig.speakers)}.");
+            if (warnedSuffixes.Add(suffix)) {
+                Log.Warning(
+                    $"Speaker suffix \"{suffix}\" not found in dsConfig.speakers, falling back to first speaker. " +
+                    $"Candidates: {string.Join(',', dsConfig.speakers)}.");
+            }
             return 0;
         }
 

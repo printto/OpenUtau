@@ -149,6 +149,8 @@ namespace OpenUtau.App.Controls {
         private readonly Dictionary<(Color from, Color to, byte amount), IBrush> highlightBrushes = new();
         private bool playbackSeekPending = true;
         private bool renderPassActive;
+        private readonly HashSet<UNote> phonemeErrorNotes = new HashSet<UNote>();
+        private readonly HashSet<UNote> notesWithPhonemes = new HashSet<UNote>();
         private bool invalidatePending;
 
         private const double HoverGlowDuration = 0.12;
@@ -381,6 +383,7 @@ namespace OpenUtau.App.Controls {
                 bool seek = playbackSeekPending;
                 playbackSeekPending = false;
                 UpdatePlaybackHighlight(seek);
+                CollectPhonemeErrors();
 
                 if (showGhostNotes) {
                 foreach (UPart otherPart in otherPartsInView) {
@@ -533,6 +536,24 @@ namespace OpenUtau.App.Controls {
         private static float MoveTowards(float value, float target, float delta) =>
             Math.Abs(target - value) <= delta ? target : value + Math.Sign(target - value) * delta;
 
+        private void CollectPhonemeErrors() {
+            phonemeErrorNotes.Clear();
+            notesWithPhonemes.Clear();
+            if (Part?.phonemes == null) {
+                return;
+            }
+            foreach (var p in Part.phonemes) {
+                var parent = p.Parent;
+                if (parent == null) {
+                    continue;
+                }
+                notesWithPhonemes.Add(parent);
+                if (p.Error) {
+                    phonemeErrorNotes.Add(parent);
+                }
+            }
+        }
+
         private void RenderNoteBody(UNote note, NotesViewModel viewModel, DrawingContext context) {
             Point leftTop = viewModel.TickToneToPoint(note.position, note.AdjustedTone);
             leftTop = leftTop.WithX(leftTop.X + 1).WithY(Math.Round(leftTop.Y + 1));
@@ -544,22 +565,12 @@ namespace OpenUtau.App.Controls {
 
             // Check for Phoneme Errors (mimicking PhonemeCanvas behavior)
             if (!hasError && Part != null && Part.phonemes != null) {
-                int phonemeCount = 0;
-                foreach (var p in Part.phonemes) {
-                    if (p.Parent == note) {
-                        phonemeCount++;
-                        // If any attached phoneme has an error, the whole note is flagged
-                        if (p.Error) {
-                            hasError = true;
-                            break;
-                        }
-                    }
-                }
-                // Edge Case: If the note is not a continuation/rest but generated 0 phonemes, 
-                // it means the phonemizer completely failed to process the lyric.
-                if (!hasError && phonemeCount == 0 && !note.lyric.StartsWith("+") && !note.lyric.StartsWith("-")) {
-                    hasError = true;
-                }
+                // If any attached phoneme has an error, the whole note is flagged.
+                hasError = phonemeErrorNotes.Contains(note)
+                    // Edge Case: If the note is not a continuation/rest but generated 0 phonemes,
+                    // it means the phonemizer completely failed to process the lyric.
+                    || (!notesWithPhonemes.Contains(note)
+                        && !note.lyric.StartsWith("+") && !note.lyric.StartsWith("-"));
             }
             // apply the transparent/greyed-out brush if an error was found
             IBrush baseBrush = selectedNotes.Contains(note)
