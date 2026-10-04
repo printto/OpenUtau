@@ -13,7 +13,7 @@ namespace OpenUtau.Plugin.Builtin {
     public class ThaiVCCVPhonemizer : Phonemizer {
 
         readonly string[] vowels = new string[] {
-            "a", "i", "u", "e", "o", "@", "Q", "3", "6", "1", "ia", "ua", "I", "aw", "am"
+            "a", "i", "u", "e", "o", "@", "Q", "3", "6", "1", "ia", "ua", "I", "8"
         };
 
         readonly string[] diphthongs = new string[] {
