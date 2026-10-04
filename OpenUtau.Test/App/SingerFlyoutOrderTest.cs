@@ -43,7 +43,7 @@ namespace OpenUtau.Test.App {
         }
 
         [Fact]
-        public void FavoritesThenRecentsThenGroups() {
+        public void FavoritesThenGroups() {
             var order = Order(
                 new[] { "b-classic", "missing", "y-diffsinger" },
                 new[] { "z-enunu", "c-classic", "y-diffsinger" });
@@ -52,10 +52,8 @@ namespace OpenUtau.Test.App {
                 "y-diffsinger",
                 // Remaining favorites alphabetically.
                 "c-classic", "z-enunu",
-                // Recent non-favorites, unknown ids skipped.
-                "b-classic",
-                // Everything else by group name, then singer name.
-                "a-classic",
+                // Everything else: DiffSinger first, then other types by name.
+                "a-classic", "b-classic",
             }, order);
         }
 
@@ -67,32 +65,30 @@ namespace OpenUtau.Test.App {
             int lastFavorite = order.FindLastIndex(favorites.Contains);
             int firstOther = order.FindIndex(id => !favorites.Contains(id));
             Assert.True(lastFavorite < firstOther);
-            Assert.Equal(new[] { "a-classic", "y-diffsinger", "z-enunu", "b-classic", "c-classic" }, order);
+            Assert.Equal(new[] { "a-classic", "y-diffsinger", "b-classic", "c-classic", "z-enunu" }, order);
         }
 
         [Fact]
-        public void GroupsFollowGroupNameOrder() {
+        public void DiffSingerGroupComesFirst() {
             var order = Order(new string[0], new string[0]);
-            // Classic, DiffSinger, Enunu: by name, not by USingerType value.
-            Assert.Equal(new[] { "a-classic", "b-classic", "c-classic", "y-diffsinger", "z-enunu" }, order);
+            // DiffSinger first, then the other types by name.
+            Assert.Equal(new[] { "y-diffsinger", "a-classic", "b-classic", "c-classic", "z-enunu" }, order);
         }
 
         [Fact]
-        public void SplitsFavoritesRecentsAndRest() {
+        public void SplitsFavoritesAndRest() {
             var sections = Sections(new[] { "b-classic", "y-diffsinger" }, new[] { "y-diffsinger" });
-            Assert.Equal(3, sections.Count);
+            Assert.Equal(2, sections.Count);
             Assert.Equal(new[] { "y-diffsinger" }, sections[0]);
-            Assert.Equal(new[] { "b-classic" }, sections[1]);
-            Assert.Equal(new[] { "a-classic", "c-classic", "z-enunu" }, sections[2]);
+            Assert.Equal(new[] { "a-classic", "b-classic", "c-classic", "z-enunu" }, sections[1]);
         }
 
         [Fact]
         public void EmptySectionsAreKept() {
             var sections = Sections(new string[0], new string[0]);
-            Assert.Equal(3, sections.Count);
+            Assert.Equal(2, sections.Count);
             Assert.Empty(sections[0]);
-            Assert.Empty(sections[1]);
-            Assert.Equal(5, sections[2].Count);
+            Assert.Equal(5, sections[1].Count);
         }
 
         [Theory]

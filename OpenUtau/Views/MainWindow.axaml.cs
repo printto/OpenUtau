@@ -1562,24 +1562,22 @@ namespace OpenUtau.App.Views {
                 return;
             }
             if (Preferences.Default.DetachPianoRoll) {
-                pianoRollWindow?.ForceClose();
-                pianoRollWindow = null;
-                viewModel.ShowPianoRoll = true;
-                Preferences.Default.DetachPianoRoll = false;
-                Dispatcher.UIThread.Post(() => {
-                    PianoRollContainer.Content = pianoRoll;
-                    InvalidateNativeMenu();
-                }, DispatcherPriority.Background);
-            } else {
                 PianoRollContainer.Content = null;
                 viewModel.ShowPianoRoll = false;
-                Preferences.Default.DetachPianoRoll = true;
                 Dispatcher.UIThread.Post(() => {
                     if (pianoRollWindow == null) {
                         pianoRollWindow = new(pianoRoll);
                         AttachNativeMenu(pianoRollWindow);
                         pianoRollWindow.Show();
                     }
+                }, DispatcherPriority.Background);
+            } else {
+                pianoRollWindow?.ForceClose();
+                pianoRollWindow = null;
+                viewModel.ShowPianoRoll = true;
+                Dispatcher.UIThread.Post(() => {
+                    PianoRollContainer.Content = pianoRoll;
+                    InvalidateNativeMenu();
                 }, DispatcherPriority.Background);
             }
         }

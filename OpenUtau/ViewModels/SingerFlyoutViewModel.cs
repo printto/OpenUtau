@@ -47,8 +47,8 @@ namespace OpenUtau.App.ViewModels {
                     (Location == null || !Location.Contains(term, StringComparison.OrdinalIgnoreCase)))
                 .ToList();
             ToolTipText = extra.Count == 0
-                ? Location
-                : $"{Location}\n{ThemeManager.GetString("tracks.searchterms")}: {string.Join(", ", extra)}".Trim();
+                ? null
+                : $"{ThemeManager.GetString("tracks.searchterms")}: {string.Join(", ", extra)}";
             Avatar = SingerAvatarCache.Get(singer, bitmap => Avatar = bitmap);
         }
 
@@ -126,6 +126,18 @@ namespace OpenUtau.App.ViewModels {
             if (current != null && !current.Found && !string.IsNullOrEmpty(current.Name)) {
                 singerSections.Insert(0, new List<USinger> { current });
             }
+            if (singerSections.Count > 0 && singerSections[^1].Count > 0) {
+                var byType = singerSections[^1]
+                    .GroupBy(singer => singer.SingerType)
+                    .OrderBy(group => GroupRank(group.Key))
+                    .ThenBy(group => group.Key.ToString(), StringComparer.Ordinal)
+                    .Select(group => group.ToList())
+                    .ToList();
+                if (byType.Count > 1) {
+                    singerSections.RemoveAt(singerSections.Count - 1);
+                    singerSections.AddRange(byType);
+                }
+            }
             sections = singerSections
                 .Where(section => section.Count > 0)
                 .Select(section => section
@@ -167,12 +179,14 @@ namespace OpenUtau.App.ViewModels {
         /// Recent non-favorites are most recent first; everything else is by group name and singer name.
         /// Each singer appears once.
         /// </summary>
+        static int GroupRank(USingerType type) => type == USingerType.DiffSinger ? 0 : 1;
+
         public static List<List<USinger>> OrderSingers(
                 IReadOnlyDictionary<string, USinger> singers,
                 IReadOnlyDictionary<USingerType, List<USinger>> groups,
                 IEnumerable<string> recentIds,
                 IEnumerable<string> favoriteIds) {
-            var result = new List<List<USinger>> { new List<USinger>(), new List<USinger>(), new List<USinger>() };
+            var result = new List<List<USinger>> { new List<USinger>(), new List<USinger>() };
             var added = new HashSet<string>();
             void Add(int section, USinger singer) {
                 if (added.Add(singer.Id)) {
@@ -195,12 +209,9 @@ namespace OpenUtau.App.ViewModels {
             foreach (var singer in favorites.LocalizedOrderBy(singer => singer.LocalizedName)) {
                 Add(0, singer);
             }
-            foreach (var singer in recents) {
-                Add(1, singer);
-            }
-            foreach (var pair in groups.OrderBy(pair => pair.Key.ToString(), StringComparer.Ordinal)) {
+            foreach (var pair in groups.OrderBy(pair => GroupRank(pair.Key)).ThenBy(pair => pair.Key.ToString(), StringComparer.Ordinal)) {
                 foreach (var singer in pair.Value) {
-                    Add(2, singer);
+                    Add(1, singer);
                 }
             }
             return result;
