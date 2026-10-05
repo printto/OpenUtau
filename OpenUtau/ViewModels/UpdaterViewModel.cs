@@ -125,7 +125,7 @@ namespace OpenUtau.App.ViewModels {
                 return null;
             }
             var selected = releases
-                .Where(r => !r.draft && IsReleaseForChannel(r, Preferences.Default.Channel))
+                .Where(r => !r.draft && IsReleaseForChannel(r, "stable"))
                 .OrderByDescending(r => r.id)
                 .FirstOrDefault();
             latestReleaseNotes = selected?.body?.Trim() ?? string.Empty;

@@ -81,14 +81,6 @@
               </DataTemplate>
             </ComboBox.ItemTemplate>
           </ComboBox>
-          <Grid Margin="0,5,0,0">
-            <TextBlock Text="{DynamicResource prefs.channel}" HorizontalAlignment="Left"/>
-            <ComboBox SelectedIndex="{Binding Channel}" HorizontalAlignment="Right" Width="120">
-              <ComboBoxItem Content="{DynamicResource prefs.channel.stable}"/>
-              <ComboBoxItem Content="{DynamicResource prefs.channel.beta}"/>
-              <ComboBoxItem Content="{DynamicResource prefs.channel.alpha}"/>
-            </ComboBox>
-          </Grid>
           <TextBlock Classes="restart"/>
         </StackPanel>
         

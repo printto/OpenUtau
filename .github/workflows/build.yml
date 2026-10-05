@@ -1,14 +1,10 @@
 on:
-  schedule:
-    # Daily alpha build. Skipped if master has no new commits since the
-    # last alpha release (see the next-version job below).
-    - cron: '0 12 * * *'
   workflow_dispatch:
     inputs:
       channel:
         description: "Release channel"
         type: choice
-        default: alpha
+        default: stable
         options:
           - stable
           - beta
