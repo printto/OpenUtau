@@ -56,6 +56,7 @@
             <MenuItem Header="{DynamicResource menu.file.openexportlocation}" Click="OnMenuOpenProjectLocation" IsEnabled="{Binding ProjectOpen}"/>
             <MenuItem Header="-" Height="1"/>
             <MenuItem Header="{DynamicResource menu.file.sendtowebsynth}" Click="OnMenuSendToWebSynth" IsEnabled="{Binding ProjectOpen}"/>
+            <MenuItem Header="{DynamicResource menu.file.sendtosplice}" Click="OnMenuSendToSplice" IsEnabled="{Binding ProjectOpen}"/>
           </MenuItem>
           <MenuItem Header="{DynamicResource menu.edit}" IsEnabled="{Binding ProjectOpen}">
             <MenuItem Header="{Binding UndoText}" InputGesture="Ctrl+Z" Command="{Binding Undo}" IsEnabled="{Binding CanUndo}"/>

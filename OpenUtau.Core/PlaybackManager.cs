@@ -569,6 +569,20 @@ namespace OpenUtau.Core {
             });
         }
 
+        public Task RenderMixdownTo(UProject project, string exportPath, bool includeWaveParts = true) {
+            return Task.Run(() => {
+                RenderEngine engine = new RenderEngine(project) {
+                    SkipWaveParts = !includeWaveParts,
+                };
+                var planner = new MixPlanner();
+                var projectMix = engine.RenderMixdown(
+                    DocManager.Inst.MainScheduler, ref exportCancellation,
+                    wait: true, applyMixFx: true, planner).Item1;
+                CheckFileWritable(exportPath);
+                WaveFileWriter.CreateWaveFile16(exportPath, new ExportAdapter(projectMix));
+            });
+        }
+
         // Exporting each tracks
         public async Task RenderToFiles(UProject project, string exportPath) {
             await Task.Run(() => {

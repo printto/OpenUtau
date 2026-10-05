@@ -638,6 +638,20 @@ namespace OpenUtau.App.Views {
         async void OnMenuShareToDevice(object sender, RoutedEventArgs e)
             => await ShowShareDialog(ShareCodeDialog.StartMode.Choose);
 
+        async void OnMenuSendToSplice(object sender, RoutedEventArgs e) {
+            DocManager.Inst.ExecuteCmd(new ToastNotification(
+                "MainWindow", "Creating PRINTmov Splice hand-off.", "dialogs.splice.creating") {
+                type = "Information",
+            });
+            try {
+                var handoff = await SpliceLink.StartAsync(DocManager.Inst.Project);
+                Log.Information($"PRINTmov Splice hand-off at {handoff.Folder}");
+                handoff.OpenInBrowser();
+            } catch (Exception ex) {
+                Log.Error(ex, "Failed to hand off to PRINTmov Splice");
+            }
+        }
+
         async void OnMenuOpenShareCode(object sender, RoutedEventArgs e) {
             var dialog = new TypeInDialog();
             dialog.Title = ThemeManager.GetString("dialogs.opensharecode.caption");

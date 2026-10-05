@@ -202,6 +202,8 @@ OpenUtau aims to be an open source editing environment for UTAU community, with 
   <system:String x:Key="dialogs.sharecode.open">Open in PRINTmov Vocal</system:String>
   <system:String x:Key="dialogs.sharecode.copycode">Copy code</system:String>
   <system:String x:Key="dialogs.sharecode.expiry">The code expires after {0} hours</system:String>
+  <system:String x:Key="menu.file.sendtosplice">Make Video in PRINTmov Splice…</system:String>
+  <system:String x:Key="dialogs.splice.creating">Creating PRINTmov Splice hand-off…</system:String>
   <system:String x:Key="dialogs.opensharecode.caption">Open from Share Code</system:String>
   <system:String x:Key="dialogs.opensharecode.message">Enter the 6-character share code:</system:String>
   <system:String x:Key="dialogs.opensharecode.open">Open</system:String>

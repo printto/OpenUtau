@@ -93,6 +93,8 @@ namespace OpenUtau.Core.Render {
         readonly UVoicePart focusPart;
         readonly int focusTick;
 
+        public bool SkipWaveParts { get; set; }
+
         static readonly System.Collections.Concurrent.ConcurrentDictionary<string, float[]> XsyBlendCache =
             new System.Collections.Concurrent.ConcurrentDictionary<string, float[]>();
 
@@ -147,7 +149,9 @@ namespace OpenUtau.Core.Render {
                 }
             }
             Dictionary<UWavePart, (double offsetMs, double estimatedLengthMs, int channels, float[] pcm)> waveTrims = null;
-            foreach (var part in project.parts.OfType<UWavePart>()) {
+            foreach (var part in SkipWaveParts
+                    ? Enumerable.Empty<UWavePart>()
+                    : project.parts.OfType<UWavePart>()) {
                 if (trackNo != -1 && part.trackNo != trackNo) {
                     continue;
                 }

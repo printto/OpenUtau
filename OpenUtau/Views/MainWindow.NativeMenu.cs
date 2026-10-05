@@ -164,7 +164,9 @@ namespace OpenUtau.App.Views {
                     () => OnMenuOpenProjectLocation(this, new RoutedEventArgs()), null, open),
                 MacMenu.Separator(),
                 MacMenu.Item(MacMenu.Str("menu.file.sendtowebsynth"),
-                    () => OnMenuSendToWebSynth(this, new RoutedEventArgs()), null, open));
+                    () => OnMenuSendToWebSynth(this, new RoutedEventArgs()), null, open),
+                MacMenu.Item(MacMenu.Str("menu.file.sendtosplice"),
+                    () => OnMenuSendToSplice(this, new RoutedEventArgs()), null, open));
         }
 
         private NativeMenuItem BuildEditMenu() {
