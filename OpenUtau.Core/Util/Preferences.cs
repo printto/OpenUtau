@@ -117,6 +117,7 @@ namespace OpenUtau.Core.Util {
                         Default.Beta = false;
                     }
                     if (!new[] { "stable", "beta", "alpha" }.Contains(Default.Channel)) Default.Channel = "stable";
+                    if (Default.DefaultRenderer == "Classic") Default.DefaultRenderer = Renderers.CLASSIC;
                     if (!Renderers.getRendererOptions().Contains(Default.DefaultRenderer)) Default.DefaultRenderer = string.Empty;
                     if (!Onnx.getRunnerOptions().Contains(Default.OnnxRunner)) Default.OnnxRunner = string.Empty;
                     if (OS.IsWindows()) Default.WinePath = string.Empty;
@@ -174,6 +175,9 @@ namespace OpenUtau.Core.Util {
             public bool ShowTips = true;
             public string ThemeName = "PRINTmov";
             public bool PenPlusDefault = false;
+            public string UiFontPath = string.Empty;
+            public string UiFontFamily = string.Empty;
+            public bool UseUiFontForNotes = false;
             public int DegreeStyle;
             public bool UseFlats = true;
             public bool UseTrackColor = false;
@@ -236,6 +240,7 @@ namespace OpenUtau.Core.Util {
             public bool ShowPlaybackNoteBounce = false;
             public EditTool EditTool = new EditTool();
             public bool PlayTone = true;
+            public bool PlaySineWhenNoSinger = true;
             /// <summary>Legacy; migrated to <see cref="RealTimePitchMode"/> on load.</summary>
             public bool RealTimePitchGeneration = false;
             public int RealTimePitchMode = (int)LivePitchMode.Off;
@@ -252,6 +257,7 @@ namespace OpenUtau.Core.Util {
             public string LyricHelper = string.Empty;
             public bool ShownPotluckVocoderCredit = false;
             public bool LyricsHelperBrackets = false;
+            public bool RenderStatusInTrackBar = true;
             public int OtoEditor = 0;
             public string VLabelerPath = string.Empty;
             public string SetParamPath = string.Empty;

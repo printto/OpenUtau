@@ -188,6 +188,36 @@ jobs:
         run: dotnet msbuild OpenUtau -t:BundleApp -p:Configuration=Release -p:RuntimeIdentifier=${{ matrix.arch.rid }} -p:UseAppHost=true -p:SelfContained=true -p:OutputPath=../bin/${{ matrix.arch.name }}/
         if: ${{ matrix.arch.os == 'osx' }}
 
+      # Upstream's step, pointed at the PRINTmov bundle and icon. Xcode is selected the
+      # same way as Create Dmg (latest available) instead of pinning one version.
+      - name: Add Liquid Glass icon (macOS)
+        run: |
+          set -euo pipefail
+          latest_xcode=$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -n1)
+          if [ -n "$latest_xcode" ]; then
+            sudo xcode-select -s "$latest_xcode"
+          fi
+          chmod +x .github/scripts/add-liquid-glass-icon.sh
+          .github/scripts/add-liquid-glass-icon.sh \
+            "bin/${{ matrix.arch.name }}/publish/$APP_BUNDLE" \
+            OpenUtau/Assets/pmou-mac.icon \
+            pmou
+        if: ${{ matrix.arch.os == 'osx' }}
+
+      # The macOS runner is a plugin execution provider: without its library in the
+      # bundle the app silently falls back to CPU, so fail the build here instead.
+      - name: Verify WebGPU execution provider is bundled (macOS)
+        run: |
+          app="bin/${{ matrix.arch.name }}/publish/$APP_BUNDLE"
+          lib=$(find "$app" -name 'libonnxruntime_providers_webgpu.dylib' -print -quit)
+          if [ -z "$lib" ]; then
+            echo "::error::libonnxruntime_providers_webgpu.dylib is missing from $app"
+            find "$app" -name '*onnxruntime*' -print
+            exit 1
+          fi
+          echo "WebGPU plugin library: $lib"
+        if: ${{ matrix.arch.os == 'osx' }}
+
       - name: Write release channel info
         run: "@{Channel='${{ needs.next-version.outputs.channel }}'} | ConvertTo-Json > bin/${{ matrix.arch.name }}/prefs-default.json"
         shell: pwsh

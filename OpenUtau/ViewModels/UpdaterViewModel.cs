@@ -12,6 +12,8 @@ using NetSparkleUpdater.Interfaces;
 using NetSparkleUpdater.SignatureVerifiers;
 using OpenUtau.Core;
 using OpenUtau.Core.Util;
+using ReactiveUI;
+using ReactiveUI.Primitives;
 using ReactiveUI.SourceGenerators;
 using Serilog;
 
@@ -51,11 +53,16 @@ namespace OpenUtau.App.ViewModels {
         [Reactive] public partial bool HasReleaseNotes { get; set; }
         [Reactive] public partial bool UpdateAvailable { get; set; }
         [Reactive] public partial FontWeight UpdateButtonFontWeight { get; set; }
+        // Index into stable / beta / alpha, same order as the preferences dialog.
+        [Reactive] public partial int Channel { get; set; }
+        [Reactive] public partial bool UpdateAccepted { get; set; }
         public Action? CloseApplication { get; set; }
 
         private SparkleUpdater? sparkle;
         private UpdateInfo? updateInfo;
-        private bool updateAccepted;
+        // Bumped on every check so that a check still in flight when the user
+        // switches channel does not overwrite the result of the newer one.
+        private int checkGeneration;
 
         public UpdaterViewModel() {
             UpdaterStatus = string.Empty;
@@ -63,6 +70,20 @@ namespace OpenUtau.App.ViewModels {
             HasReleaseNotes = false;
             UpdateAvailable = false;
             UpdateButtonFontWeight = FontWeight.Normal;
+            Channel = Preferences.Default.Channel switch {
+                "beta" => 1,
+                "alpha" => 2,
+                _ => 0
+            };
+            this.WhenAnyValue(vm => vm.Channel).Skip(1).Subscribe(channel => {
+                Preferences.Default.Channel = channel switch {
+                    1 => "beta",
+                    2 => "alpha",
+                    _ => "stable"
+                };
+                Preferences.Save();
+                Init();
+            });
             Init();
         }
 
@@ -142,13 +163,21 @@ namespace OpenUtau.App.ViewModels {
         }
 
         async void Init() {
+            int generation = ++checkGeneration;
+            sparkle?.Dispose();
+            sparkle = null;
+            updateInfo = null;
+            UpdateAvailable = false;
+            UpdateButtonFontWeight = FontWeight.Normal;
             UpdaterStatus = ThemeManager.GetString("updater.status.checking");
-            sparkle = await NewUpdaterAsync();
-            if (sparkle == null) {
-                UpdaterStatus = ThemeManager.GetString("updater.status.unknown");
+            var newSparkle = await NewUpdaterAsync();
+            var newInfo = newSparkle == null ? null : await newSparkle.CheckForUpdatesQuietly();
+            if (generation != checkGeneration) {
+                newSparkle?.Dispose();
                 return;
             }
-            updateInfo = await sparkle.CheckForUpdatesQuietly();
+            sparkle = newSparkle;
+            updateInfo = newInfo;
             if (updateInfo == null) {
                 UpdaterStatus = ThemeManager.GetString("updater.status.unknown");
                 return;
@@ -186,7 +215,7 @@ namespace OpenUtau.App.ViewModels {
                 return;
             }
             UpdateAvailable = false;
-            updateAccepted = true;
+            UpdateAccepted = true;
 
             AppCastItem? downloadedItem = null;
             sparkle.CloseApplication += () => {
@@ -219,7 +248,7 @@ namespace OpenUtau.App.ViewModels {
         }
 
         public void OnClosing() {
-            if (!updateAccepted && updateInfo != null &&
+            if (!UpdateAccepted && updateInfo != null &&
                 (updateInfo.Status == UpdateStatus.UpdateAvailable ||
                 updateInfo.Status == UpdateStatus.UserSkipped) &&
                 updateInfo.Updates.Count > 0) {

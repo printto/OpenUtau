@@ -217,7 +217,6 @@ namespace OpenUtau.App.Controls {
                 ActivateVolumeOrPanTextBox(
                     VolumeTextBox, string.Format("{0:0.0}", ViewModel.Volume));
                 args.Handled = true;
-                args.Pointer.Capture(sender as IInputElement);
             }
         }
         void PanPointerPressed(object sender, PointerPressedEventArgs args) {
@@ -252,6 +251,8 @@ namespace OpenUtau.App.Controls {
             textBox.IsEnabled = true;
             textBox.IsVisible = true;
             textBox.Focus();
+            // The caret would otherwise sit before the old value, so typing inserted into it.
+            textBox.SelectAll();
         }
 
         private void MoveHandleScrolled(object? sender, PointerWheelEventArgs e) {

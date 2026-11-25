@@ -248,7 +248,7 @@ namespace OpenUtau.App.Views {
                 MacMenu.Item(viewModel.ClearCacheHeader,
                     () => OnMenuClearCache(this, new RoutedEventArgs())),
                 MacMenu.Item(MacMenu.Str("menu.tools.debugwindow"),
-                    () => OnMenuDebugWindow(this, new RoutedEventArgs())),
+                    () => OnMenuDeveloperWindow(this, new RoutedEventArgs())),
                 MacMenu.Item(MacMenu.Str("phoneticassistant.caption"),
                     () => OnMenuPhoneticAssistant(this, new RoutedEventArgs())),
                 MacMenu.Item(MacMenu.Str("menu.tools.singer.install"),

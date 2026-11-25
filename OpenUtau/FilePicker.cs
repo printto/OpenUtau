@@ -48,6 +48,9 @@ namespace OpenUtau.App {
         public static FilePickerFileType AudioFiles { get; } = new("Audio Files") {
             Patterns = new[] { "*.wav", "*.mp3", "*.ogg", "*.opus", "*.flac", "*.m4a" },
         };
+        public static FilePickerFileType FontFiles { get; } = new("Font Files") {
+            Patterns = new[] { "*.ttf", "*.otf" },
+        };
         public static FilePickerFileType WAV { get; } = new("WAV") {
             Patterns = new[] { "*.wav" },
         };
