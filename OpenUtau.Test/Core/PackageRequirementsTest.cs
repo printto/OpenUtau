@@ -31,6 +31,10 @@ namespace OpenUtau.Core {
                     PackageManager.Inst.GetInstalledPath("nsf_hifigan") != null) {
                     return; // Environment already has a vocoder; skipping keeps the assertion meaningful.
                 }
+                if (File.Exists(Path.Combine(PathManager.Inst.RootPath,
+                        DiffSingerSinger.DefaultVocoderFolder, "vocoder.yaml"))) {
+                    Assert.Skip("A vocoder is bundled with the app, so the missing-package path cannot be reached.");
+                }
                 var ex = Assert.Throws<MissingPackageException>(() => singer.getVocoder());
                 Assert.Contains(pc, MissingPackageException.Collect(ex));
             } finally {

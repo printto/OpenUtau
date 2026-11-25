@@ -220,13 +220,16 @@ namespace OpenUtau.Core.DiffSinger {
 
         public bool UsingDefaultVocoder { get; private set; }
 
+        /// <summary>Folder beside the executable holding the vocoder shipped with the app.</summary>
+        public const string DefaultVocoderFolder = "DefaultVocoder";
+
         /// <summary>
         /// Loads the vocoder bundled with the application (PRINTmov default, currently Potluck)
         /// and flags it so the renderer can show the attribution notice once per session.
         /// </summary>
         private bool TryGetDefaultVocoder(out DsVocoder defaultVocoder) {
             defaultVocoder = null;
-            var defaultPath = Path.Combine(PathManager.Inst.RootPath, "DefaultVocoder");
+            var defaultPath = Path.Combine(PathManager.Inst.RootPath, DefaultVocoderFolder);
             if (!File.Exists(Path.Combine(defaultPath, "vocoder.yaml"))) {
                 return false;
             }
